@@ -20,15 +20,15 @@ export function DashboardPage() {
   const [isLoading, setIsLoading] = useState(true)
 
   return (
-    <div className="space-y-6 p-6">
-      <Tabs defaultValue="overview">
+    <div className="max-w-7xl mx-auto">
+      <Tabs defaultValue="overview" className="w-full">
         <TabsList>
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="add-product">Add Product</TabsTrigger>
         </TabsList>
         
         <TabsContent value="overview">
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {isLoading ? (
               <div>Loading stats...</div>
             ) : (
@@ -53,7 +53,7 @@ export function DashboardPage() {
           </div>
         </TabsContent>
 
-        <TabsContent value="add-product">
+        <TabsContent value="add-product" className="max-w-4xl mx-auto">
           <ProductForm />
         </TabsContent>
       </Tabs>

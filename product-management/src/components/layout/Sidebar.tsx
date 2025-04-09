@@ -10,20 +10,22 @@ import {
   ChevronRight,
   Menu
 } from 'lucide-react'
-import { useState } from 'react'
 import { cn } from "../../lib/utils"
 
-export function Sidebar() {
-  const [expanded, setExpanded] = useState(false)
+interface SidebarProps {
+  expanded: boolean;
+  onToggle: (expanded: boolean) => void;
+}
 
+export function Sidebar({ expanded, onToggle }: SidebarProps) {
   return (
     <aside className={cn(
-      "fixed left-0 top-0 h-screen border-r bg-card transition-width duration-300",
+      "fixed left-0 top-0 h-screen border-r bg-card transition-all duration-300 z-50",
       expanded ? "w-64" : "w-16"
     )}>
       <div className="p-4">
         <button 
-          onClick={() => setExpanded(!expanded)}
+          onClick={() => onToggle(!expanded)}
           className="mb-8 p-2 hover:bg-accent rounded-lg w-full flex justify-center"
         >
           <Menu size={20} />
