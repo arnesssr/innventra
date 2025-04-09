@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import { RootLayout } from './components/layout/RootLayout'
 import { DashboardPage } from './pages/dashboard/DashboardPage'
 import { ProductsPage } from './pages/products/ProductsPage'
@@ -13,12 +13,14 @@ export function AppRoutes() {
       <Route element={<RootLayout />}>
         <Route path="/" element={<DashboardPage />} />
         <Route path="/products" element={<ProductsPage />}>
+          <Route index element={<Navigate to="/products/published" replace />} />
           <Route path="published" element={<PublishedProducts />} />
           <Route path="drafts" element={<DraftsPage />} />
           <Route path="categories" element={<CategoriesPage />} />
           <Route path="new" element={<ProductForm />} />
         </Route>
         <Route path="/settings" element={<div>Settings</div>} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Route>
     </Routes>
   )
