@@ -51,11 +51,23 @@ const DEFAULT_CATEGORIES: Category[] = [
   }
 ]
 
+interface Product {
+  id: string;
+  name: string;
+  category: string;
+  price: number;
+  description: string;
+  images: File[];
+  stock: number;
+  status: 'draft' | 'published';
+  [key: string]: any;
+}
+
 interface Store {
-  [x: string]: any;
-  products: any[];
+  products: Product[];
   categories: Category[];
   addCategory: (category: Category) => void;
+  addProduct: (product: Omit<Product, 'id'>) => void;
   getStats: () => {
     totalProducts: number;
     totalValue: number;
@@ -69,6 +81,9 @@ export const useStore = create<Store>((set, get) => ({
   categories: DEFAULT_CATEGORIES,
   addCategory: (category: Category) => set(state => ({
     categories: [...state.categories, category]
+  })),
+  addProduct: (product) => set(state => ({
+    products: [...state.products, { ...product, id: Date.now().toString() }]
   })),
   getStats: () => {
     const products = get().products

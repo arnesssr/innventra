@@ -131,26 +131,20 @@ export function ProductForm() {
     e.preventDefault()
     if (!category) return
 
-    const categoryFields = CATEGORY_FIELDS[category as keyof typeof CATEGORY_FIELDS]
-    const requiredFields = Object.entries(categoryFields)
-      .filter(([_, field]) => field.required)
-      .map(([key]) => key)
-
-    const missingFields = requiredFields.filter(field => !formData[field])
-    if (missingFields.length > 0) {
-      alert(`Please fill in all required fields: ${missingFields.join(', ')}`)
-      return
-    }
-
     const submitData = {
       ...formData,
       status,
-      price: parseFloat(formData.price),
-      category
+      price: parseFloat(formData.price) || 0,
+      stock: parseInt(String(formData.stock)) || 0,
+      category,
+      id: Date.now().toString()
     }
     
+    // Log the data being submitted
+    console.log('Submitting product:', submitData)
+    
     addProduct(submitData)
-    navigate(status === 'draft' ? '/products/drafts' : '/products/published')
+    navigate(status === 'draft' ? '/products/drafts' : `/products/categories/${category}`)
   }
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
