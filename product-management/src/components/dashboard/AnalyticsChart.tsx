@@ -2,12 +2,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/Ca
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 
 const data = [
-  { name: 'Jan', sales: 4000 },
-  { name: 'Feb', sales: 3000 },
-  { name: 'Mar', sales: 2000 },
-  { name: 'Apr', sales: 2780 },
-  { name: 'May', sales: 1890 },
-  { name: 'Jun', sales: 2390 },
+  { name: 'Books', sales: 1245 },
+  { name: 'Bibles', sales: 842 },
+  { name: 'Gifts', sales: 523 },
+  { name: 'Stationery', sales: 234 },
+  { name: 'Toys', sales: 156 },
+  { name: 'Cards', sales: 289 },
 ]
 
 export function AnalyticsChart() {

@@ -1,27 +1,32 @@
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/Card"
-import { Package, DollarSign, Users, ShoppingCart } from "lucide-react"
+import { Book, Bible, Gift, PenTool, Gamepad } from "lucide-react"
 import { AnalyticsChart } from "../../components/dashboard/AnalyticsChart"
 
-interface StatCardProps {
-  title: string;
-  value: string;
-  icon: React.ReactNode;
-  trend: string;
-}
-
 export function DashboardPage() {
-  const stats: StatCardProps[] = [
+  const stats = [
     {
-      title: "Total Products",
-      value: "2,350",
-      icon: <Package className="h-4 w-4 text-muted-foreground" />,
-      trend: "+20.1%"
+      title: "Total Books",
+      value: "1,245",
+      icon: <Book className="h-4 w-4 text-muted-foreground" />,
+      trend: "+12%"
     },
     {
-      title: "Total Revenue",
-      value: "$45,231.89",
-      icon: <DollarSign className="h-4 w-4 text-muted-foreground" />,
-      trend: "+15%"
+      title: "Bible Sales",
+      value: "842",
+      icon: <Bible className="h-4 w-4 text-muted-foreground" />,
+      trend: "+18%"
+    },
+    {
+      title: "Gifts & Cards",
+      value: "523",
+      icon: <Gift className="h-4 w-4 text-muted-foreground" />,
+      trend: "+8%"
+    },
+    {
+      title: "Stationery",
+      value: "234",
+      icon: <PenTool className="h-4 w-4 text-muted-foreground" />,
+      trend: "+5%"
     }
   ]
 
