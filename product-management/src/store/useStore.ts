@@ -10,10 +10,19 @@ interface Product {
   createdAt: Date;
 }
 
+interface Category {
+  id: string;
+  name: string;
+  description: string;
+  subcategories: string[];
+}
+
 interface ProductStore {
   products: Product[];
   drafts: Product[];
+  categories: Category[];
   addProduct: (product: Omit<Product, 'id' | 'createdAt'>) => void;
+  addCategory: (category: Omit<Category, 'id'>) => void;
   getStats: () => {
     totalProducts: number;
     totalValue: number;
@@ -25,6 +34,14 @@ interface ProductStore {
 export const useStore = create<ProductStore>((set, get) => ({
   products: [],
   drafts: [],
+  categories: [
+    {
+      id: 'bibles',
+      name: 'Bibles',
+      description: 'Holy Bibles in different versions and formats',
+      subcategories: ['Study Bibles', 'Children\'s Bibles', 'Reference Bibles']
+    },
+  ],
   addProduct: (product) => {
     const newProduct = {
       ...product,
@@ -38,6 +55,9 @@ export const useStore = create<ProductStore>((set, get) => ({
         : state.drafts
     }))
   },
+  addCategory: (category) => set(state => ({
+    categories: [...state.categories, { ...category, id: Date.now().toString() }]
+  })),
   getStats: () => {
     const { products, drafts } = get()
     return {

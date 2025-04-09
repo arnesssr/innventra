@@ -2,17 +2,12 @@ import { useState } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../../components/ui/Dialog"
 import { Button } from "../../components/ui/Button"
 import { Input } from "../../components/ui/Input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/Select"
+import { Plus, Trash } from "lucide-react"
 
 interface CategoryFormData {
   name: string;
-  type: string;
-  fields: {
-    name: string;
-    type: 'text' | 'select' | 'number';
-    options?: string[];
-    required: boolean;
-  }[];
+  description: string;
+  subcategories: string[];
 }
 
 export function CategoryForm({ open, onClose, onSave }: {
@@ -22,33 +17,32 @@ export function CategoryForm({ open, onClose, onSave }: {
 }) {
   const [formData, setFormData] = useState<CategoryFormData>({
     name: '',
-    type: '',
-    fields: []
+    description: '',
+    subcategories: []
   })
 
-  const [newField, setNewField] = useState<{
-    name: string;
-    type: 'text' | 'select' | 'number';
-    options: string;
-    required: boolean;
-  }>({
-    name: '',
-    type: 'text',
-    options: '',
-    required: false
-  })
+  const [newSubcategory, setNewSubcategory] = useState('')
 
-  const addField = () => {
+  const addSubcategory = () => {
+    if (newSubcategory.trim()) {
+      setFormData(prev => ({
+        ...prev,
+        subcategories: [...prev.subcategories, newSubcategory.trim()]
+      }))
+      setNewSubcategory('')
+    }
+  }
+
+  const removeSubcategory = (index: number) => {
     setFormData(prev => ({
       ...prev,
-      fields: [...prev.fields, {
-        name: newField.name,
-        type: newField.type,
-        options: newField.type === 'select' ? newField.options.split(',').map(o => o.trim()) : undefined,
-        required: newField.required
-      }]
+      subcategories: prev.subcategories.filter((_, i) => i !== index)
     }))
-    setNewField({ name: '', type: 'text', options: '', required: false })
+  }
+
+  const handleSave = () => {
+    onSave(formData)
+    onClose()
   }
 
   return (
@@ -63,53 +57,54 @@ export function CategoryForm({ open, onClose, onSave }: {
             <Input
               value={formData.name}
               onChange={e => setFormData(prev => ({ ...prev, name: e.target.value }))}
-              placeholder="e.g., Study Bibles, Children's Books"
+              placeholder="Enter category name"
             />
           </div>
 
-          <div className="space-y-4">
-            <h4 className="font-medium">Custom Fields</h4>
-            {formData.fields.map((field, index) => (
-              <div key={index} className="flex items-center gap-2 bg-accent/50 p-2 rounded">
-                <span>{field.name}</span>
-                <span className="text-sm text-muted-foreground">({field.type})</span>
-              </div>
-            ))}
+          <div className="space-y-2">
+            <label>Description</label>
+            <textarea
+              className="w-full rounded-md border p-2"
+              value={formData.description}
+              onChange={e => setFormData(prev => ({ ...prev, description: e.target.value }))}
+              placeholder="Enter category description"
+              rows={3}
+            />
+          </div>
 
-            <div className="grid grid-cols-2 gap-2">
+          <div className="space-y-2">
+            <label>Subcategories</label>
+            <div className="flex gap-2">
               <Input
-                placeholder="Field name"
-                value={newField.name}
-                onChange={e => setNewField(prev => ({ ...prev, name: e.target.value }))}
+                value={newSubcategory}
+                onChange={e => setNewSubcategory(e.target.value)}
+                placeholder="Enter subcategory name"
+                onKeyDown={e => e.key === 'Enter' && addSubcategory()}
               />
-              <Select
-                value={newField.type}
-                onValueChange={value => setNewField(prev => ({ ...prev, type: value as any }))}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Field type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="text">Text</SelectItem>
-                  <SelectItem value="select">Select</SelectItem>
-                  <SelectItem value="number">Number</SelectItem>
-                </SelectContent>
-              </Select>
-              {newField.type === 'select' && (
-                <Input
-                  className="col-span-2"
-                  placeholder="Options (comma separated)"
-                  value={newField.options}
-                  onChange={e => setNewField(prev => ({ ...prev, options: e.target.value }))}
-                />
-              )}
-              <Button className="col-span-2" onClick={addField}>Add Field</Button>
+              <Button type="button" onClick={addSubcategory}>
+                <Plus className="h-4 w-4" />
+              </Button>
+            </div>
+            
+            <div className="space-y-2 mt-2">
+              {formData.subcategories.map((sub, index) => (
+                <div key={index} className="flex items-center justify-between bg-accent/50 p-2 rounded">
+                  <span>{sub}</span>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => removeSubcategory(index)}
+                  >
+                    <Trash className="h-4 w-4" />
+                  </Button>
+                </div>
+              ))}
             </div>
           </div>
-          
-          <div className="flex justify-end gap-2">
+
+          <div className="flex justify-end gap-2 pt-4">
             <Button variant="outline" onClick={onClose}>Cancel</Button>
-            <Button onClick={() => onSave(formData)}>Create Category</Button>
+            <Button onClick={handleSave}>Save Category</Button>
           </div>
         </div>
       </DialogContent>
