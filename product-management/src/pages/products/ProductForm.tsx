@@ -110,6 +110,7 @@ export function ProductForm() {
   const { category } = useParams()
   const navigate = useNavigate()
   const addProduct = useStore(state => state.addProduct)
+  const getCategoryName = useStore(state => state.getCategoryName)
 
   const [formData, setFormData] = useState<ProductFormData>({
     name: "",
@@ -137,11 +138,9 @@ export function ProductForm() {
       price: parseFloat(formData.price) || 0,
       stock: parseInt(String(formData.stock)) || 0,
       category,
+      categoryName: getCategoryName(category),
       id: Date.now().toString()
     }
-    
-    // Log the data being submitted
-    console.log('Submitting product:', submitData)
     
     addProduct(submitData)
     navigate(status === 'draft' ? '/products/drafts' : `/products/categories/${category}`)

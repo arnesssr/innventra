@@ -3,6 +3,7 @@ import { Table, TableHeader, TableBody, TableRow, TableCell } from "../../compon
 
 export function PublishedProducts() {
   const products = useStore(state => state.products.filter(p => p.status === 'published'))
+  const getCategoryName = useStore(state => state.getCategoryName)
 
   return (
     <div className="space-y-4">
@@ -20,7 +21,7 @@ export function PublishedProducts() {
           {products.map((product) => (
             <TableRow key={product.id}>
               <TableCell>{product.name}</TableCell>
-              <TableCell className="capitalize">{product.category}</TableCell>
+              <TableCell className="capitalize">{getCategoryName(product.category)}</TableCell>
               <TableCell>KES {product.price.toLocaleString()}</TableCell>
               <TableCell>{product.stock}</TableCell>
               <TableCell>

@@ -1,7 +1,7 @@
 import { create } from 'zustand'
-import { Category } from '../types/category'
+import { Category as CategoryType } from '../types/category'
 
-const DEFAULT_CATEGORIES: Category[] = [
+const DEFAULT_CATEGORIES: CategoryType[] = [
   {
     id: 'books',
     name: 'Books',
@@ -63,11 +63,19 @@ interface Product {
   [key: string]: any;
 }
 
+interface Category {
+  id: string;
+  name: string;
+  description: string;
+  fields: any[];
+}
+
 interface Store {
   products: Product[];
-  categories: Category[];
-  addCategory: (category: Category) => void;
+  categories: CategoryType[];
+  addCategory: (category: Omit<CategoryType, 'id'>) => void;
   addProduct: (product: Omit<Product, 'id'>) => void;
+  getCategoryName: (categoryId: string) => string;
   getStats: () => {
     totalProducts: number;
     totalValue: number;
@@ -79,12 +87,20 @@ interface Store {
 export const useStore = create<Store>((set, get) => ({
   products: [],
   categories: DEFAULT_CATEGORIES,
-  addCategory: (category: Category) => set(state => ({
-    categories: [...state.categories, category]
+  
+  addCategory: (category) => set(state => ({
+    categories: [...state.categories, { ...category, id: Date.now().toString() }]
   })),
+
   addProduct: (product) => set(state => ({
-    products: [...state.products, { ...product, id: Date.now().toString() }]
+    products: [...state.products, { ...product, id: Date.now().toString() } as Product]
   })),
+
+  getCategoryName: (categoryId: string) => {
+    const category = get().categories.find(c => c.id === categoryId)
+    return category?.name || categoryId
+  },
+
   getStats: () => {
     const products = get().products
     return {
