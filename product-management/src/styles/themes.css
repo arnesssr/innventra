@@ -1,0 +1,24 @@
+.theme-neumorphic {
+  --shadow-color: 220 3% 15%;
+  --shadow-strength: 1%;
+  --shadow: 
+    0.3px 0.5px 0.7px hsl(var(--shadow-color) / 0.34),
+    0.4px 0.8px 1px -1.2px hsl(var(--shadow-color) / 0.34),
+    1px 2px 2.5px -2.5px hsl(var(--shadow-color) / 0.34);
+  --inner-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.2);
+  
+  --background: 220 25% 97%;
+  --card: 220 25% 95%;
+  --border-radius: 1rem;
+}
+
+.theme-glassmorphic {
+  --glass-bg: rgba(255, 255, 255, 0.1);
+  --glass-border: rgba(255, 255, 255, 0.2);
+  --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  --blur: blur(8px);
+  
+  --background: 220 50% 98%;
+  --card: var(--glass-bg);
+  --border: var(--glass-border);
+}

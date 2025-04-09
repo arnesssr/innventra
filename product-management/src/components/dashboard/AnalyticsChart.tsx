@@ -1,0 +1,29 @@
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
+
+const data = [
+  { name: 'Jan', sales: 4000 },
+  { name: 'Feb', sales: 3000 },
+  { name: 'Mar', sales: 2000 },
+  { name: 'Apr', sales: 2780 },
+  { name: 'May', sales: 1890 },
+  { name: 'Jun', sales: 2390 },
+]
+
+export function AnalyticsChart() {
+  return (
+    <div className="rounded-lg border bg-card p-6">
+      <h2 className="mb-4 text-lg font-semibold">Sales Analytics</h2>
+      <div className="h-[300px]">
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart data={data}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="name" />
+            <YAxis />
+            <Tooltip />
+            <Bar dataKey="sales" fill="#8884d8" />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+    </div>
+  )
+}
