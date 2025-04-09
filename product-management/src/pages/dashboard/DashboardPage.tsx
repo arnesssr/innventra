@@ -1,62 +1,56 @@
-import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/Card"
-import { AnalyticsChart } from "../../components/dashboard/AnalyticsChart"
-import { ProductForm } from "../../components/products/ProductForm"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../components/ui/Tabs"
-
-interface DashboardStat {
-  id: string;
-  title: string;
-  value: number;
-  icon: JSX.Element;
-  trend: {
-    value: number;
-    isPositive: boolean;
-  };
-}
+import { Book, DollarSign, ShoppingBag, Archive } from "lucide-react"
 
 export function DashboardPage() {
-  const [stats, setStats] = useState<DashboardStat[]>([])
-  const [isLoading, setIsLoading] = useState(true)
+  const stats = [
+    {
+      title: "Total Revenue",
+      value: "KES 45,231",
+      description: "+20.1% from last month",
+      icon: <DollarSign className="h-5 w-5 text-muted-foreground/70" />,
+    },
+    {
+      title: "Products",
+      value: "2,350",
+      description: "120 added this month",
+      icon: <ShoppingBag className="h-5 w-5 text-muted-foreground/70" />,
+    },
+    {
+      title: "Drafts",
+      value: "12",
+      description: "Products pending review",
+      icon: <Archive className="h-5 w-5 text-muted-foreground/70" />,
+    },
+    {
+      title: "Categories",
+      value: "6",
+      description: "Across all sections",
+      icon: <Book className="h-5 w-5 text-muted-foreground/70" />,
+    },
+  ]
 
   return (
-    <div className="max-w-7xl mx-auto">
-      <Tabs defaultValue="overview" className="w-full">
-        <TabsList>
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="add-product">Add Product</TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="overview">
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {isLoading ? (
-              <div>Loading stats...</div>
-            ) : (
-              stats.map((stat) => (
-                <Card key={stat.id}>
-                  <CardHeader className="flex flex-row items-center justify-between pb-2">
-                    <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
-                    {stat.icon}
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">{stat.value.toLocaleString()}</div>
-                    <p className={`text-xs ${stat.trend.isPositive ? 'text-green-500' : 'text-red-500'}`}>
-                      {stat.trend.isPositive ? '+' : '-'}{Math.abs(stat.trend.value)}%
-                    </p>
-                  </CardContent>
-                </Card>
-              ))
-            )}
-          </div>
-          <div className="grid gap-4 md:grid-cols-2 mt-6">
-            <AnalyticsChart />
-          </div>
-        </TabsContent>
-
-        <TabsContent value="add-product" className="max-w-4xl mx-auto">
-          <ProductForm />
-        </TabsContent>
-      </Tabs>
+    <div className="space-y-6 p-8">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        {stats.map((stat, index) => (
+          <Card key={index}>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                {stat.title}
+              </CardTitle>
+              {stat.icon}
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stat.value}</div>
+              <p className="text-xs text-muted-foreground pt-1">
+                {stat.description}
+              </p>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+      
+      {/* Add more dashboard sections here */}
     </div>
   )
 }

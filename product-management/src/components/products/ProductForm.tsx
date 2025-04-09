@@ -90,8 +90,9 @@ export function ProductForm() {
     }
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent, status: 'draft' | 'published') => {
     e.preventDefault()
+    setFormData(prev => ({ ...prev, status }))
     console.log(formData)
   }
 
@@ -218,11 +219,24 @@ export function ProductForm() {
 
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle>Add New Product</CardTitle>
+        <div className="flex gap-2">
+          <Button 
+            variant="outline" 
+            onClick={(e) => handleSubmit(e, 'draft')}
+          >
+            Save as Draft
+          </Button>
+          <Button 
+            onClick={(e) => handleSubmit(e, 'published')}
+          >
+            Publish
+          </Button>
+        </div>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form className="space-y-6">
           <div className="grid gap-4 md:grid-cols-2">
             {/* Basic fields */}
             <div className="space-y-2">
@@ -331,13 +345,6 @@ export function ProductForm() {
                 required
               />
             </div>
-          </div>
-
-          <div className="flex justify-end">
-            <Button type="submit">
-              <Upload className="mr-2 h-4 w-4" />
-              Save Product
-            </Button>
           </div>
         </form>
       </CardContent>
