@@ -31,7 +31,14 @@ export function Stats() {
   )
 }
 
-function StatCard({ title, value, icon, trend }) {
+interface StatCardProps {
+  title: string;
+  value: string;
+  icon: React.ReactNode;
+  trend: string;
+}
+
+function StatCard({ title, value, icon, trend }: StatCardProps) {
   return (
     <div className="rounded-lg border bg-card p-6">
       <div className="flex items-center justify-between">

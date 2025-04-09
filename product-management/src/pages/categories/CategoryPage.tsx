@@ -1,5 +1,5 @@
-import { Table, TableHeader, TableBody, TableRow, TableCell } from "@/components/ui/Table"
-import { Button } from "@/components/ui/Button"
+import { Table, TableHeader, TableBody, TableRow, TableCell } from "../../components/ui/Table"
+import { Button } from "../../components/ui/Button"
 import { Plus, Edit, Trash } from "lucide-react"
 
 export function CategoryPage() {

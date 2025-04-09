@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom'
-import { LayoutDashboard, Package, Categories, Settings } from 'lucide-react'
+import { LayoutDashboard, Package, ListOrdered, Settings } from 'lucide-react'
 
 export function Sidebar() {
   return (
@@ -17,7 +17,7 @@ export function Sidebar() {
           <span>Products</span>
         </NavLink>
         <NavLink to="/categories" className="flex items-center gap-2 p-2 hover:bg-accent">
-          <Categories size={20} />
+          <ListOrdered size={20} />
           <span>Categories</span>
         </NavLink>
         <NavLink to="/settings" className="flex items-center gap-2 p-2 hover:bg-accent">

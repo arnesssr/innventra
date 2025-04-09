@@ -1,7 +1,7 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card"
-import { Button } from "@/components/ui/Button"
-import { Input } from "@/components/ui/Input"
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/Tabs"
+import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/Card"
+import { Button } from "../../components/ui/Button"
+import { Input } from "../../components/ui/Input"
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "../../components/ui/Tabs"
 
 export function SettingsPage() {
   return (
