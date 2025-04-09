@@ -7,6 +7,7 @@ import { PublishedProducts } from './pages/products/PublishedProducts'
 import { CategoriesPage } from './pages/products/CategoriesPage'
 import { CategoryView } from './pages/products/CategoryView'
 import { DraftsPage } from './pages/products/DraftsPage'
+import { CategoryCreate } from './features/categories/CategoryCreate'
 
 export function AppRoutes() {
   return (
@@ -17,6 +18,7 @@ export function AppRoutes() {
           <Route index element={<Navigate to="/products/categories" replace />} />
           <Route path="categories" element={<CategoriesPage />} />
           <Route path="categories/:category" element={<CategoryView />} />
+          <Route path="categories/new" element={<CategoryCreate />} />
           <Route path="new/:category" element={<ProductForm />} />
           <Route path="published" element={<PublishedProducts />} />
           <Route path="drafts" element={<DraftsPage />} />

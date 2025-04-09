@@ -1,28 +1,61 @@
 import { create } from 'zustand'
+import { Category } from '../types/category'
 
-interface Product {
-  id: string;
-  name: string;
-  category: string;
-  price: number;
-  stock: number;
-  status: 'draft' | 'published';
-  createdAt: Date;
-}
+const DEFAULT_CATEGORIES: Category[] = [
+  {
+    id: 'books',
+    name: 'Books',
+    description: 'Christian books and literature',
+    fields: [
+      { id: 'isbn', name: 'ISBN', type: 'text', required: true },
+      { id: 'author', name: 'Author', type: 'text', required: true },
+      { id: 'genre', name: 'Genre', type: 'select', required: true },
+    ]
+  },
+  {
+    id: 'bibles',
+    name: 'Bibles',
+    description: 'Holy Bibles in different versions and formats',
+    fields: [
+      { id: 'isbn', name: 'ISBN', type: 'text', required: true },
+      { id: 'version', name: 'Version', type: 'select', required: true },
+      { id: 'coverType', name: 'Cover Type', type: 'select', required: true },
+    ]
+  },
+  {
+    id: 'gifts',
+    name: 'Gifts & Cards',
+    description: 'Christian gifts and greeting cards',
+    fields: [
+      { id: 'type', name: 'Gift Type', type: 'select', required: true },
+      { id: 'occasion', name: 'Occasion', type: 'select', required: true },
+    ]
+  },
+  {
+    id: 'stationery',
+    name: 'Stationery',
+    description: 'Office and school supplies',
+    fields: [
+      { id: 'type', name: 'Item Type', type: 'select', required: true },
+      { id: 'brand', name: 'Brand', type: 'text', required: false },
+    ]
+  },
+  {
+    id: 'toys',
+    name: 'Toys & Games',
+    description: 'Educational toys and games',
+    fields: [
+      { id: 'ageGroup', name: 'Age Group', type: 'select', required: true },
+      { id: 'brand', name: 'Brand', type: 'text', required: false },
+    ]
+  }
+]
 
-interface Category {
-  id: string;
-  name: string;
-  description: string;
-  subcategories: string[];
-}
-
-interface ProductStore {
-  products: Product[];
-  drafts: Product[];
+interface Store {
+  [x: string]: any;
+  products: any[];
   categories: Category[];
-  addProduct: (product: Omit<Product, 'id' | 'createdAt'>) => void;
-  addCategory: (category: Omit<Category, 'id'>) => void;
+  addCategory: (category: Category) => void;
   getStats: () => {
     totalProducts: number;
     totalValue: number;
@@ -31,39 +64,18 @@ interface ProductStore {
   };
 }
 
-export const useStore = create<ProductStore>((set, get) => ({
+export const useStore = create<Store>((set, get) => ({
   products: [],
-  drafts: [],
-  categories: [
-    {
-      id: 'bibles',
-      name: 'Bibles',
-      description: 'Holy Bibles in different versions and formats',
-      subcategories: ['Study Bibles', 'Children\'s Bibles', 'Reference Bibles']
-    },
-  ],
-  addProduct: (product) => {
-    const newProduct = {
-      ...product,
-      id: Date.now().toString(),
-      createdAt: new Date()
-    }
-    set((state) => ({
-      products: [...state.products, newProduct],
-      drafts: product.status === 'draft' 
-        ? [...state.drafts, newProduct]
-        : state.drafts
-    }))
-  },
-  addCategory: (category) => set(state => ({
-    categories: [...state.categories, { ...category, id: Date.now().toString() }]
+  categories: DEFAULT_CATEGORIES,
+  addCategory: (category: Category) => set(state => ({
+    categories: [...state.categories, category]
   })),
   getStats: () => {
-    const { products, drafts } = get()
+    const products = get().products
     return {
       totalProducts: products.length,
       totalValue: products.reduce((acc, curr) => acc + (curr.price * curr.stock), 0),
-      draftsCount: drafts.length,
+      draftsCount: products.filter(p => p.status === 'draft').length,
       publishedCount: products.filter(p => p.status === 'published').length
     }
   }

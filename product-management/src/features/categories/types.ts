@@ -1,9 +1,9 @@
-export interface Category {
+export interface Field {
   id: string;
   name: string;
-  description: string;
-  subcategories: SubCategory[];
-  defaultFields: Field[];
+  type: 'text' | 'number' | 'select' | 'date';
+  required: boolean;
+  options?: string[];
 }
 
 export interface SubCategory {
@@ -12,16 +12,16 @@ export interface SubCategory {
   fields: Field[];
 }
 
-export interface Field {
+export interface Category {
+  id: string;
   name: string;
-  type: 'text' | 'number' | 'select';
-  required: boolean;
-  options?: string[];
+  description: string;
+  subcategories: SubCategory[];
 }
 
 export const DEFAULT_FIELDS: Field[] = [
-  { name: 'name', type: 'text', required: true },
-  { name: 'price', type: 'number', required: true },
-  { name: 'stock', type: 'number', required: true },
-  { name: 'description', type: 'text', required: false }
+  { id: 'name', name: 'Product Name', type: 'text', required: true },
+  { id: 'price', name: 'Price', type: 'number', required: true },
+  { id: 'stock', name: 'Stock', type: 'number', required: true },
+  { id: 'description', name: 'Description', type: 'text', required: false }
 ]
