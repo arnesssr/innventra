@@ -5,7 +5,7 @@ export function RootLayout() {
   return (
     <div className="min-h-screen bg-background">
       <Sidebar />
-      <div className="pl-64">
+      <div className="pl-16 transition-all duration-300">
         <main>
           <Outlet />
         </main>

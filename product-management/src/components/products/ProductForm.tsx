@@ -1,175 +1,137 @@
-import { useState } from 'react'
-import { ImagePlus, Save, X } from 'lucide-react'
+import { useState } from "react"
+import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/Card"
+import { Input } from "../../components/ui/Input"
+import { Button } from "../../components/ui/Button"
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "../../components/ui/Select"
+import { ImagePlus, Upload } from "lucide-react"
 
 interface ProductFormData {
-  name: string
-  category: string
-  price: string
-  stock: number
-  description: string
-  sku: string
-  tags: string[]
-  images: string[]
-  brand: string
-  weight: string
-  dimensions: {
-    length: string
-    width: string
-    height: string
-  }
-  specifications: Array<{ key: string; value: string }>
+  name: string;
+  category: string;
+  price: string;
+  description: string;
+  image: File | null;
 }
 
+const categories = [
+  { value: "books", label: "Books" },
+  { value: "bibles", label: "Bibles" },
+  { value: "gifts", label: "Gifts & Cards" },
+  { value: "stationery", label: "Stationery" },
+  { value: "toys", label: "Toys & Games" }
+]
+
 export function ProductForm() {
-  const [product, setProduct] = useState<ProductFormData>({
-    name: '',
-    category: '',
-    price: '',
-    stock: 0,
-    description: '',
-    sku: '',
-    tags: [],
-    images: [],
-    brand: '',
-    weight: '',
-    dimensions: { length: '', width: '', height: '' },
-    specifications: []
+  const [formData, setFormData] = useState<ProductFormData>({
+    name: "",
+    category: "",
+    price: "",
+    description: "",
+    image: null
   })
 
-  const [errors, setErrors] = useState<Partial<Record<keyof ProductFormData, string>>>({})
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    const validationErrors = validateProduct(product)
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors)
-      return
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      setFormData(prev => ({ ...prev, image: file }))
     }
-    // TODO: Submit product
   }
 
-  const addSpecification = () => {
-    setProduct(prev => ({
-      ...prev,
-      specifications: [...prev.specifications, { key: '', value: '' }]
-    }))
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    console.log(formData)
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-8">
-      <div className="grid gap-6 md:grid-cols-2">
-        <div className="space-y-2">
-          <label className="text-sm font-medium">Product Name</label>
-          <input
-            type="text"
-            value={product.name}
-            onChange={e => setProduct({ ...product, name: e.target.value })}
-            className="w-full rounded-lg border p-2"
-          />
-          {errors.name && <span className="text-sm text-red-500">{errors.name}</span>}
-        </div>
+    <Card>
+      <CardHeader>
+        <CardTitle>Add New Product</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-2">
+              <label>Product Name</label>
+              <Input 
+                value={formData.name}
+                onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                placeholder="Enter product name"
+                required
+              />
+            </div>
 
-        <div className="space-y-2">
-          <label className="text-sm font-medium">SKU</label>
-          <input
-            type="text"
-            value={product.sku}
-            onChange={e => setProduct({ ...product, sku: e.target.value })}
-            className="w-full rounded-lg border p-2"
-          />
-        </div>
+            <div className="space-y-2">
+              <label>Category</label>
+              <Select 
+                value={formData.category}
+                onValueChange={(value) => setFormData(prev => ({ ...prev, category: value }))}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select category" />
+                </SelectTrigger>
+                <SelectContent>
+                  {categories.map((category) => (
+                    <SelectItem key={category.value} value={category.value}>
+                      {category.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-        <div className="space-y-2">
-          <label className="text-sm font-medium">Brand</label>
-          <input
-            type="text"
-            value={product.brand}
-            onChange={e => setProduct({ ...product, brand: e.target.value })}
-            className="w-full rounded-lg border p-2"
-          />
-        </div>
+            <div className="space-y-2">
+              <label>Price</label>
+              <Input 
+                type="number"
+                value={formData.price}
+                onChange={(e) => setFormData(prev => ({ ...prev, price: e.target.value }))}
+                placeholder="Enter price"
+                required
+              />
+            </div>
 
-        <div className="space-y-2">
-          <label className="text-sm font-medium">Price</label>
-          <input
-            type="number"
-            value={product.price}
-            onChange={e => setProduct({ ...product, price: e.target.value })}
-            className="w-full rounded-lg border p-2"
-          />
-        </div>
-
-        <div className="col-span-2">
-          <label className="text-sm font-medium">Description</label>
-          <textarea
-            rows={4}
-            value={product.description}
-            onChange={e => setProduct({ ...product, description: e.target.value })}
-            className="w-full rounded-lg border p-2"
-          />
-        </div>
-
-        <div className="col-span-2">
-          <label className="text-sm font-medium">Specifications</label>
-          <div className="space-y-2">
-            {product.specifications.map((spec, index) => (
-              <div key={index} className="flex gap-2">
+            <div className="space-y-2">
+              <label>Image</label>
+              <div className="flex items-center gap-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => document.getElementById('image-upload')?.click()}
+                >
+                  <ImagePlus className="mr-2 h-4 w-4" />
+                  Choose Image
+                </Button>
+                {formData.image && <span>{formData.image.name}</span>}
                 <input
-                  placeholder="Key"
-                  value={spec.key}
-                  onChange={e => {
-                    const newSpecs = [...product.specifications]
-                    newSpecs[index].key = e.target.value
-                    setProduct({ ...product, specifications: newSpecs })
-                  }}
-                  className="w-1/3 rounded-lg border p-2"
-                />
-                <input
-                  placeholder="Value"
-                  value={spec.value}
-                  onChange={e => {
-                    const newSpecs = [...product.specifications]
-                    newSpecs[index].value = e.target.value
-                    setProduct({ ...product, specifications: newSpecs })
-                  }}
-                  className="w-2/3 rounded-lg border p-2"
+                  id="image-upload"
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleImageUpload}
                 />
               </div>
-            ))}
-            <button
-              type="button"
-              onClick={addSpecification}
-              className="text-sm text-primary hover:underline"
-            >
-              + Add Specification
-            </button>
+            </div>
+
+            <div className="col-span-2 space-y-2">
+              <label>Description</label>
+              <textarea
+                value={formData.description}
+                onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                className="w-full rounded-md border p-2 min-h-[100px]"
+                placeholder="Enter product description"
+                required
+              />
+            </div>
           </div>
-        </div>
-      </div>
 
-      <div className="flex justify-end gap-2">
-        <button
-          type="button"
-          className="rounded-lg border px-4 py-2"
-        >
-          Cancel
-        </button>
-        <button
-          type="submit"
-          className="rounded-lg bg-primary px-4 py-2 text-white"
-        >
-          <Save className="mr-2 h-4 w-4" />
-          Save Product
-        </button>
-      </div>
-    </form>
+          <div className="flex justify-end">
+            <Button type="submit">
+              <Upload className="mr-2 h-4 w-4" />
+              Save Product
+            </Button>
+          </div>
+        </form>
+      </CardContent>
+    </Card>
   )
-}
-
-function validateProduct(product: ProductFormData) {
-  const errors: Partial<Record<keyof ProductFormData, string>> = {}
-  if (!product.name) errors.name = 'Product name is required'
-  if (!product.price) errors.price = 'Price is required'
-  if (!product.category) errors.category = 'Category is required'
-  return errors
 }
