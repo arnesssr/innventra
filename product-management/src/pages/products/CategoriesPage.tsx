@@ -6,6 +6,10 @@ import { Book, BookOpen, Gift, PenTool, Gamepad } from "lucide-react"
 export function CategoriesPage() {
   const navigate = useNavigate()
   
+  const handleAddNew = (categoryId: string) => {
+    navigate(`/products/new/${categoryId}`) // Navigate to form with category
+  }
+
   const categories = [
     { id: 'bibles', name: 'Bibles', icon: BookOpen, description: 'Holy Bibles in different versions and formats' },
     { id: 'books', name: 'Books', icon: Book, description: 'Christian literature and study materials' },
@@ -29,11 +33,11 @@ export function CategoriesPage() {
             <div className="flex gap-2">
               <Button 
                 variant="outline" 
-                onClick={() => navigate(`/products/${id}`)}
+                onClick={() => navigate(`/products/categories/${id}`)}
               >
                 View Products
               </Button>
-              <Button onClick={() => navigate(`/products/add/${id}`)}>
+              <Button onClick={() => handleAddNew(id)}>
                 Add New
               </Button>
             </div>

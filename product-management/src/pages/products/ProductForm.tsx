@@ -1,5 +1,5 @@
-import { useState } from "react"
-import { useNavigate } from "react-router-dom"
+import { useState, useEffect } from "react"
+import { useParams, useNavigate } from "react-router-dom"
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/Card"
 import { Input } from "../../components/ui/Input"
 import { Button } from "../../components/ui/Button"
@@ -10,32 +10,57 @@ interface ProductFormProps {
   category?: string;
 }
 
-export function ProductForm({ category }: ProductFormProps) {
+interface ProductFormData {
+  name: string;
+  category: string;
+  price: string;
+  description: string;
+  image: File | null;
+  stockQuantity: number;
+  status: 'draft' | 'published';
+}
+
+export function ProductForm() {
+  const { category } = useParams() // Get category from URL
   const navigate = useNavigate()
   const addProduct = useStore(state => state.addProduct)
 
-  const [formData, setFormData] = useState({
-    name: '',
-    category: category || '',
-    price: '',
-    stock: '',
-    isbn: '',
-    author: '',
-    version: '',
-    coverType: '',
-    description: '',
-    status: 'draft' as const
+  // Initialize form with category from URL
+  const [formData, setFormData] = useState<ProductFormData>({
+    name: "",
+    category: category || "", // Set initial category from URL
+    price: "",
+    description: "",
+    image: null,
+    stockQuantity: 0,
+    status: 'draft'
   })
 
+  // Update category when URL param changes
+  useEffect(() => {
+    if (category) {
+      setFormData(prev => ({ ...prev, category }))
+    }
+  }, [category])
+
+  // Handle form submission
   const handleSubmit = (e: React.FormEvent, status: 'draft' | 'published') => {
     e.preventDefault()
-    addProduct({
+    const submitData = {
       ...formData,
+      status,
       price: parseFloat(formData.price),
-      stock: parseInt(formData.stock),
-      status
-    })
-    navigate('/products')
+    }
+    
+    // Here you would typically save to your store/backend
+    addProduct(submitData)
+
+    // Navigate based on status
+    if (status === 'draft') {
+      navigate('/products/drafts')
+    } else {
+      navigate('/products/published')
+    }
   }
 
   const renderCategoryFields = () => {
@@ -46,16 +71,16 @@ export function ProductForm({ category }: ProductFormProps) {
             <div className="space-y-2">
               <label>ISBN</label>
               <Input
-                value={formData.isbn}
-                onChange={e => setFormData({ ...formData, isbn: e.target.value })}
+                value={formData.category}
+                onChange={e => setFormData({ ...formData, category: e.target.value })}
                 placeholder="Enter ISBN"
               />
             </div>
             <div className="space-y-2">
               <label>Author</label>
               <Input
-                value={formData.author}
-                onChange={e => setFormData({ ...formData, author: e.target.value })}
+                value={formData.name}
+                onChange={e => setFormData({ ...formData, name: e.target.value })}
                 placeholder="Enter author name"
               />
             </div>
@@ -66,7 +91,7 @@ export function ProductForm({ category }: ProductFormProps) {
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <label>Version</label>
-              <Select value={formData.version} onValueChange={value => setFormData({ ...formData, version: value })}>
+              <Select value={formData.category} onValueChange={value => setFormData({ ...formData, category: value })}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select version" />
                 </SelectTrigger>
@@ -79,7 +104,7 @@ export function ProductForm({ category }: ProductFormProps) {
             </div>
             <div className="space-y-2">
               <label>Cover Type</label>
-              <Select value={formData.coverType} onValueChange={value => setFormData({ ...formData, coverType: value })}>
+              <Select value={formData.name} onValueChange={value => setFormData({ ...formData, name: value })}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select cover type" />
                 </SelectTrigger>
@@ -129,8 +154,8 @@ export function ProductForm({ category }: ProductFormProps) {
                 <label>Stock Quantity</label>
                 <Input
                   type="number"
-                  value={formData.stock}
-                  onChange={e => setFormData({ ...formData, stock: e.target.value })}
+                  value={formData.stockQuantity}
+                  onChange={e => setFormData({ ...formData, stockQuantity: parseInt(e.target.value) })}
                   placeholder="0"
                   required
                 />
