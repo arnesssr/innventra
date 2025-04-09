@@ -1,6 +1,7 @@
 import { Outlet } from 'react-router-dom'
 import { Sidebar } from './Sidebar'
 import { useState } from 'react'
+import { cn } from '../../lib/utils'
 
 export function RootLayout() {
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(false)

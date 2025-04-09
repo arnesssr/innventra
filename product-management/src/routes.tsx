@@ -7,11 +7,10 @@ import { LoginPage } from './pages/auth/LoginPage'
 export function AppRoutes() {
   return (
     <Routes>
-      <Route path="/login" element={<LoginPage />} />
       <Route element={<RootLayout />}>
         <Route path="/" element={<DashboardPage />} />
         <Route path="/categories/:type" element={<CategoryPage />} />
-        <Route path="/settings" element={<div>Settings</div>} />
+        <Route path="/settings" element={<div>Settings Page</div>} />
       </Route>
     </Routes>
   )
