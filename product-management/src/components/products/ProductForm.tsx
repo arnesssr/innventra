@@ -18,19 +18,33 @@ interface ProductFormData {
   // Bible specific fields
   version?: string;
   coverType?: string;
+  stockQuantity: number;
+  status: 'draft' | 'published';
+  customGenre?: string;
 }
 
 const GENRES = [
-  "Fiction",
+  // Christian Categories
+  "Biblical Studies",
   "Christian Living",
   "Devotional",
   "Theology",
-  "Biography",
-  "Children's",
-  "Youth",
+  "Prayer",
+  "Worship",
+  "Ministry",
+  "Evangelism",
+  "Discipleship",
   "Marriage & Family",
   "Leadership",
-  "Prayer"
+  "Youth",
+  "Children's",
+  "Biography",
+  "Fiction",
+  "Commentary",
+  "Reference",
+  "Pastoral",
+  "Missions",
+  "Custom"
 ]
 
 const BIBLE_VERSIONS = [
@@ -58,10 +72,14 @@ export function ProductForm() {
     category: "",
     price: "",
     description: "",
-    image: null
+    image: null,
+    stockQuantity: 0,
+    status: 'draft'
   })
 
-  const handleFieldChange = (field: keyof ProductFormData, value: string) => {
+  const [showCustomGenre, setShowCustomGenre] = useState(false)
+
+  const handleFieldChange = (field: keyof ProductFormData, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }))
   }
 
@@ -75,6 +93,47 @@ export function ProductForm() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     console.log(formData)
+  }
+
+  const renderGenreFields = () => {
+    return (
+      <div className="space-y-2">
+        <label>Genre</label>
+        <Select
+          value={formData.genre}
+          onValueChange={(value) => {
+            if (value === 'custom') {
+              setShowCustomGenre(true)
+            } else {
+              setShowCustomGenre(false)
+              handleFieldChange('genre', value)
+            }
+          }}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Select genre" />
+          </SelectTrigger>
+          <SelectContent>
+            {GENRES.map((genre) => (
+              <SelectItem key={genre} value={genre.toLowerCase()}>
+                {genre}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        {showCustomGenre && (
+          <Input
+            value={formData.customGenre || ''}
+            onChange={(e) => {
+              handleFieldChange('customGenre', e.target.value)
+              handleFieldChange('genre', e.target.value.toLowerCase())
+            }}
+            placeholder="Enter custom genre"
+            className="mt-2"
+          />
+        )}
+      </div>
+    )
   }
 
   const renderCategorySpecificFields = () => {
@@ -98,24 +157,7 @@ export function ProductForm() {
                 placeholder="Enter author name"
               />
             </div>
-            <div className="space-y-2">
-              <label>Genre</label>
-              <Select
-                value={formData.genre}
-                onValueChange={(value) => handleFieldChange('genre', value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select genre" />
-                </SelectTrigger>
-                <SelectContent>
-                  {GENRES.map((genre) => (
-                    <SelectItem key={genre} value={genre.toLowerCase()}>
-                      {genre}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+            {renderGenreFields()}
           </div>
         )
 
@@ -218,14 +260,43 @@ export function ProductForm() {
           {/* Common fields */}
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
-              <label>Price</label>
+              <label>Price (KES)</label>
               <Input 
                 type="number"
                 value={formData.price}
                 onChange={(e) => handleFieldChange('price', e.target.value)}
-                placeholder="Enter price"
+                placeholder="0.00"
+                min="0"
+                step="0.01"
                 required
               />
+            </div>
+
+            <div className="space-y-2">
+              <label>Stock Quantity</label>
+              <Input
+                type="number"
+                value={formData.stockQuantity}
+                onChange={(e) => handleFieldChange('stockQuantity', parseInt(e.target.value))}
+                placeholder="0"
+                min="0"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label>Status</label>
+              <Select
+                value={formData.status}
+                onValueChange={(value: 'draft' | 'published') => handleFieldChange('status', value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="draft">Draft</SelectItem>
+                  <SelectItem value="published">Published</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="space-y-2">

@@ -2,6 +2,7 @@ import { Outlet } from 'react-router-dom'
 import { Sidebar } from './Sidebar'
 import { useState } from 'react'
 import { cn } from '../../lib/utils'
+import { Header } from './Header'
 
 export function RootLayout() {
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(false)
@@ -13,6 +14,7 @@ export function RootLayout() {
         "flex-1 transition-all duration-300",
         isSidebarExpanded ? "ml-64" : "ml-16"
       )}>
+        <Header />
         <main className="container mx-auto p-6">
           <Outlet />
         </main>

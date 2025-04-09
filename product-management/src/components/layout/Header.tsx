@@ -1,38 +1,24 @@
-import { Bell, Search, Sun, Moon, User } from 'lucide-react'
-import { useTheme } from '../../context/theme-context'
+import { Bell, Sun, Moon, User } from "lucide-react"
+import { Button } from "../ui/Button"
 
 export function Header() {
-  const { theme, setTheme } = useTheme()
-
-  const toggleTheme = () => {
-    setTheme(theme === 'dark' ? 'light' : 'dark')
-  }
-
   return (
-    <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur">
-      <div className="flex h-16 items-center justify-between px-6">
-        <div className="flex w-full max-w-md items-center gap-2">
-          <Search className="h-4 w-4" />
-          <input
-            type="search"
-            placeholder="Search..."
-            className="w-full bg-transparent outline-none"
-          />
-        </div>
+    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container flex h-14 items-center justify-between">
+        <div></div>
         <div className="flex items-center gap-4">
-          <button onClick={toggleTheme}>
-            {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
-          </button>
-          <button className="relative">
-            <Bell size={20} />
-            <span className="absolute -right-1 -top-1 h-4 w-4 rounded-full bg-primary text-xs text-white">
+          <Button variant="ghost" size="icon">
+            <Sun className="h-5 w-5" />
+          </Button>
+          <Button variant="ghost" size="icon" className="relative">
+            <Bell className="h-5 w-5" />
+            <span className="absolute -right-1 -top-1 h-4 w-4 rounded-full bg-primary text-[10px] text-primary-foreground flex items-center justify-center">
               3
             </span>
-          </button>
-          <button className="flex items-center gap-2">
-            <User size={20} />
-            <span>Admin</span>
-          </button>
+          </Button>
+          <Button variant="ghost" size="icon">
+            <User className="h-5 w-5" />
+          </Button>
         </div>
       </div>
     </header>
