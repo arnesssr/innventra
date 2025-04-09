@@ -1,38 +1,35 @@
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/Card"
-import { Book, DollarSign, ShoppingBag, Archive } from "lucide-react"
+import { Book, DollarSign, Archive } from "lucide-react"
+import { useStore } from "../../store/useStore"
 
 export function DashboardPage() {
-  const stats = [
+  const stats = useStore(state => state.getStats())
+
+  const statCards = [
     {
-      title: "Total Revenue",
-      value: "KES 45,231",
-      description: "+20.1% from last month",
+      title: "Total Products",
+      value: stats.totalProducts.toString(),
+      description: `${stats.publishedCount} published`,
+      icon: <Book className="h-5 w-5 text-muted-foreground/70" />,
+    },
+    {
+      title: "Total Value",
+      value: `KES ${stats.totalValue.toLocaleString()}`,
+      description: "Stock value",
       icon: <DollarSign className="h-5 w-5 text-muted-foreground/70" />,
     },
     {
-      title: "Products",
-      value: "2,350",
-      description: "120 added this month",
-      icon: <ShoppingBag className="h-5 w-5 text-muted-foreground/70" />,
-    },
-    {
       title: "Drafts",
-      value: "12",
-      description: "Products pending review",
+      value: stats.draftsCount.toString(),
+      description: "Unpublished items",
       icon: <Archive className="h-5 w-5 text-muted-foreground/70" />,
-    },
-    {
-      title: "Categories",
-      value: "6",
-      description: "Across all sections",
-      icon: <Book className="h-5 w-5 text-muted-foreground/70" />,
-    },
+    }
   ]
 
   return (
     <div className="space-y-6 p-8">
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {stats.map((stat, index) => (
+        {statCards.map((stat, index) => (
           <Card key={index}>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">
