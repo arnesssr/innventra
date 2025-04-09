@@ -2,15 +2,21 @@ import { useNavigate, Outlet, useLocation } from "react-router-dom"
 import { Tabs, TabsList, TabsTrigger } from "../../components/ui/Tabs"
 import { Button } from "../../components/ui/Button"
 import { Plus } from "lucide-react"
+import { useEffect } from "react"
 
 export function ProductsPage() {
   const navigate = useNavigate()
   const location = useLocation()
 
-  // Redirect to published if we're at /products root
-  if (location.pathname === '/products') {
-    navigate('/products/published')
-    return null
+  useEffect(() => {
+    if (location.pathname === '/products') {
+      navigate('/products/published')
+    }
+  }, [location.pathname, navigate])
+
+  const getCurrentTab = () => {
+    if (location.pathname.includes('/categories')) return "categories"
+    return "published"
   }
 
   return (
@@ -22,10 +28,9 @@ export function ProductsPage() {
         </Button>
       </div>
 
-      <Tabs defaultValue="published" onValueChange={(value) => navigate(`/products/${value}`)}>
+      <Tabs defaultValue={getCurrentTab()} onValueChange={(value) => navigate(`/products/${value}`)}>
         <TabsList>
           <TabsTrigger value="published">Published</TabsTrigger>
-          <TabsTrigger value="drafts">Drafts</TabsTrigger>
           <TabsTrigger value="categories">Categories</TabsTrigger>
         </TabsList>
       </Tabs>

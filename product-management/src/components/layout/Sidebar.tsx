@@ -2,7 +2,6 @@ import { NavLink } from 'react-router-dom'
 import { 
   LayoutDashboard, 
   Package,
-  FileText,
   Settings,
   Menu
 } from 'lucide-react'
@@ -17,7 +16,6 @@ export function Sidebar({ expanded, onToggle }: SidebarProps) {
   const menuItems = [
     { path: '/', icon: <LayoutDashboard size={22} />, label: 'Dashboard' },
     { path: '/products', icon: <Package size={22} />, label: 'Products' },
-    { path: '/drafts', icon: <FileText size={22} />, label: 'Drafts' },
     { path: '/settings', icon: <Settings size={22} />, label: 'Settings' }
   ]
 
