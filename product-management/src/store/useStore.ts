@@ -74,6 +74,7 @@ interface Store {
   products: Product[];
   categories: CategoryType[];
   addCategory: (category: Omit<CategoryType, 'id'>) => void;
+  deleteCategory: (categoryId: string) => void;
   addProduct: (product: Omit<Product, 'id'>) => void;
   getCategoryName: (categoryId: string) => string;
   getStats: () => {
@@ -91,6 +92,19 @@ export const useStore = create<Store>((set, get) => ({
   addCategory: (category) => set(state => ({
     categories: [...state.categories, { ...category, id: Date.now().toString() }]
   })),
+
+  deleteCategory: (categoryId: string) => set(state => {
+    const updatedProducts = state.products.map(product => 
+      product.category === categoryId 
+        ? { ...product, category: 'uncategorized', categoryName: 'Uncategorized' }
+        : product
+    )
+
+    return {
+      categories: state.categories.filter(c => c.id !== categoryId),
+      products: updatedProducts
+    }
+  }),
 
   addProduct: (product) => set(state => ({
     products: [...state.products, { ...product, id: Date.now().toString() } as Product]
