@@ -5,6 +5,7 @@ import { Input } from "../../components/ui/Input"
 import { Button } from "../../components/ui/Button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/Select"
 import { useStore } from "../../store/useStore"
+import { Trash } from "lucide-react"
 
 interface ProductFormProps {
   category?: string;
@@ -15,10 +16,49 @@ interface ProductFormData {
   category: string;
   price: string;
   description: string;
-  image: File | null;
-  stockQuantity: number;
+  images: File[]; // Change from single image to multiple
+  stock: number;
   status: 'draft' | 'published';
+  isbn?: string;
+  version?: string;
+  coverType?: string;
+  author?: string;
+  genre?: string;
 }
+
+const BIBLE_VERSIONS = [
+  { value: "KJV", label: "King James Version" },
+  { value: "NIV", label: "New International Version" },
+  { value: "ESV", label: "English Standard Version" },
+  { value: "NKJV", label: "New King James Version" },
+  { value: "NLT", label: "New Living Translation" }
+]
+
+const COVER_TYPES = [
+  { value: "leather", label: "Leather" },
+  { value: "hardcover", label: "Hardcover" },
+  { value: "paperback", label: "Paperback" },
+  { value: "bonded", label: "Bonded Leather" },
+  { value: "imitation", label: "Imitation Leather" }
+]
+
+const BOOK_GENRES = [
+  { value: "biblical-studies", label: "Biblical Studies" },
+  { value: "christian-living", label: "Christian Living" },
+  { value: "devotional", label: "Devotional" },
+  { value: "theology", label: "Theology" },
+  { value: "prayer", label: "Prayer" },
+  { value: "worship", label: "Worship" },
+  { value: "ministry", label: "Ministry" },
+  { value: "evangelism", label: "Evangelism" },
+  { value: "discipleship", label: "Discipleship" },
+  { value: "family", label: "Marriage & Family" },
+  { value: "leadership", label: "Leadership" },
+  { value: "youth", label: "Youth" },
+  { value: "children", label: "Children's" },
+  { value: "biography", label: "Biography" },
+  { value: "fiction", label: "Fiction" }
+]
 
 export function ProductForm() {
   const { category } = useParams() // Get category from URL
@@ -31,8 +71,8 @@ export function ProductForm() {
     category: category || "", // Set initial category from URL
     price: "",
     description: "",
-    image: null,
-    stockQuantity: 0,
+    images: [], // Initialize empty array for images
+    stock: 0,
     status: 'draft'
   })
 
@@ -63,55 +103,103 @@ export function ProductForm() {
     }
   }
 
-  const renderCategoryFields = () => {
-    switch (category) {
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || [])
+    setFormData(prev => ({ ...prev, images: [...prev.images, ...files] }))
+  }
+
+  const removeImage = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      images: prev.images.filter((_, i) => i !== index)
+    }))
+  }
+
+  const renderCategorySpecificFields = () => {
+    switch (formData.category) {
+      case 'bibles':
+        return (
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-2">
+              <label>ISBN</label>
+              <Input
+                value={formData.isbn || ''}
+                onChange={e => setFormData(prev => ({ ...prev, isbn: e.target.value }))}
+                placeholder="Enter ISBN number"
+              />
+            </div>
+            <div className="space-y-2">
+              <label>Version</label>
+              <Select
+                value={formData.version}
+                onValueChange={value => setFormData(prev => ({ ...prev, version: value }))}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select version" />
+                </SelectTrigger>
+                <SelectContent>
+                  {BIBLE_VERSIONS.map(({ value, label }) => (
+                    <SelectItem key={value} value={value}>
+                      {label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <label>Cover Type</label>
+              <Select
+                value={formData.coverType}
+                onValueChange={value => setFormData(prev => ({ ...prev, coverType: value }))}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select cover type" />
+                </SelectTrigger>
+                <SelectContent>
+                  {COVER_TYPES.map(({ value, label }) => (
+                    <SelectItem key={value} value={value}>
+                      {label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        )
       case 'books':
         return (
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <label>ISBN</label>
               <Input
-                value={formData.category}
-                onChange={e => setFormData({ ...formData, category: e.target.value })}
-                placeholder="Enter ISBN"
+                value={formData.isbn || ''}
+                onChange={e => setFormData(prev => ({ ...prev, isbn: e.target.value }))}
+                placeholder="Enter ISBN number"
               />
             </div>
             <div className="space-y-2">
               <label>Author</label>
               <Input
-                value={formData.name}
-                onChange={e => setFormData({ ...formData, name: e.target.value })}
+                value={formData.author || ''}
+                onChange={e => setFormData(prev => ({ ...prev, author: e.target.value }))}
                 placeholder="Enter author name"
               />
             </div>
-          </div>
-        )
-      case 'bibles':
-        return (
-          <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
-              <label>Version</label>
-              <Select value={formData.category} onValueChange={value => setFormData({ ...formData, category: value })}>
+              <label>Genre</label>
+              <Select
+                value={formData.genre}
+                onValueChange={value => setFormData(prev => ({ ...prev, genre: value }))}
+              >
                 <SelectTrigger>
-                  <SelectValue placeholder="Select version" />
+                  <SelectValue placeholder="Select genre" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="KJV">King James Version</SelectItem>
-                  <SelectItem value="NIV">New International Version</SelectItem>
-                  <SelectItem value="ESV">English Standard Version</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <label>Cover Type</label>
-              <Select value={formData.name} onValueChange={value => setFormData({ ...formData, name: value })}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select cover type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="leather">Leather</SelectItem>
-                  <SelectItem value="hardcover">Hardcover</SelectItem>
-                  <SelectItem value="paperback">Paperback</SelectItem>
+                  {BOOK_GENRES.map(({ value, label }) => (
+                    <SelectItem key={value} value={value}>
+                      {label}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -154,15 +242,15 @@ export function ProductForm() {
                 <label>Stock Quantity</label>
                 <Input
                   type="number"
-                  value={formData.stockQuantity}
-                  onChange={e => setFormData({ ...formData, stockQuantity: parseInt(e.target.value) })}
+                  value={formData.stock}
+                  onChange={e => setFormData({ ...formData, stock: parseInt(e.target.value) })}
                   placeholder="0"
                   required
                 />
               </div>
             </div>
 
-            {renderCategoryFields()}
+            {renderCategorySpecificFields()}
 
             <div className="space-y-2">
               <label>Description</label>
@@ -173,6 +261,48 @@ export function ProductForm() {
                 rows={4}
                 placeholder="Enter product description"
               />
+            </div>
+
+            {/* Images Upload Section */}
+            <div className="space-y-4">
+              <label>Product Images</label>
+              <div className="flex flex-wrap gap-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => document.getElementById('image-upload')?.click()}
+                >
+                  Add Images
+                </Button>
+                <input
+                  id="image-upload"
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  className="hidden"
+                  onChange={handleImageUpload}
+                />
+              </div>
+              
+              {/* Image Preview */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+                {formData.images.map((file, index) => (
+                  <div key={index} className="relative group">
+                    <img
+                      src={URL.createObjectURL(file)}
+                      alt={`Preview ${index}`}
+                      className="w-full h-32 object-cover rounded-lg"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removeImage(index)}
+                      className="absolute top-2 right-2 p-1 bg-red-500 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <Trash className="h-4 w-4" />
+                    </button>
+                  </div>
+                ))}
+              </div>
             </div>
 
             <div className="flex justify-end gap-2">

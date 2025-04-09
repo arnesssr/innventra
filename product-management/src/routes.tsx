@@ -17,9 +17,9 @@ export function AppRoutes() {
           <Route index element={<Navigate to="/products/categories" replace />} />
           <Route path="categories" element={<CategoriesPage />} />
           <Route path="categories/:category" element={<CategoryView />} />
+          <Route path="new/:category" element={<ProductForm />} />
           <Route path="published" element={<PublishedProducts />} />
           <Route path="drafts" element={<DraftsPage />} />
-          <Route path="new/:category" element={<ProductForm />} />
         </Route>
         <Route path="/settings" element={<div>Settings</div>} />
       </Route>
