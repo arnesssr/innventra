@@ -8,39 +8,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../../componen
 import { Input } from "../../components/ui/Input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/Select"
 
-const DEFAULT_CATEGORIES = [
-  {
-    id: 'bibles',
-    name: 'Bibles',
-    description: 'Holy Bibles in different versions and formats'
-  },
-  {
-    id: 'books',
-    name: 'Books',
-    description: 'Christian literature and study materials'
-  },
-  {
-    id: 'gifts',
-    name: 'Gifts & Cards',
-    description: 'Christian gifts and greeting cards'
-  },
-  {
-    id: 'stationery',
-    name: 'Stationery',
-    description: 'Office and school supplies'
-  },
-  {
-    id: 'toys',
-    name: 'Toys & Games',
-    description: 'Educational toys and games'
-  },
-  {
-    id: 'music',
-    name: 'Music & Media',
-    description: 'Christian music and multimedia resources'
-  }
-]
-
 const DEFAULT_FIELDS = [
   { name: 'name', type: 'text', label: 'Product Name', required: true },
   { name: 'price', type: 'number', label: 'Price (KES)', required: true },
@@ -64,6 +31,7 @@ export function CategoryList() {
     fields: [...DEFAULT_FIELDS] // Start with mandatory fields
   })
   const addCategory = useStore(state => state.addCategory)
+  const categories = useStore(state => state.categories) // Get all categories from store
 
   const handleSave = () => {
     addCategory({
@@ -99,9 +67,12 @@ export function CategoryList() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {DEFAULT_CATEGORIES.map((category) => (
-          <Card key={category.id} className="cursor-pointer hover:bg-accent/50" 
-                onClick={() => navigate(`/products/categories/${category.id}`)}>
+        {categories.map((category) => (
+          <Card 
+            key={category.id} 
+            className="cursor-pointer hover:bg-accent/50"
+            onClick={() => navigate(`/products/categories/${category.id}`)}
+          >
             <CardHeader>
               <CardTitle>{category.name}</CardTitle>
             </CardHeader>

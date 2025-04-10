@@ -99,9 +99,9 @@ export const useStore = create<Store>((set, get) => ({
     } as Product]
   })),
 
-  getCategoryName: (id: string) => {
-    const category = DEFAULT_CATEGORIES.find(c => c.id === id)
-    return category ? category.name : 'Product'
+  getCategoryName: (categoryId: string) => {
+    const category = get().categories.find(c => c.id === categoryId)
+    return category ? category.name : categoryId
   },
 
   getStats: () => {
