@@ -1,6 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { SignIn, SignedIn, SignedOut } from "@clerk/clerk-react"
-import { RootLayout } from './components/layout/RootLayout'
+import { RootLayout } from './components/layout'
 import { DashboardPage } from './pages/dashboard/DashboardPage'
 import { ProductsPage } from './pages/products/ProductsPage'
 import { ProductForm } from './pages/products/ProductForm'
