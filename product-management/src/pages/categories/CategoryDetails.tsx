@@ -4,15 +4,14 @@ import { Plus } from "lucide-react"
 import { useStore } from "../../store/useStore"
 import { Table, TableHeader, TableRow, TableCell, TableBody } from "../../components/ui/Table"
 
-export function CategoryView() {
-  const { category } = useParams()
+export function CategoryDetails() {
+  const { categoryId } = useParams()
   const navigate = useNavigate()
   const products = useStore(state => 
-    state.products.filter(p => p.category === category && p.status === 'published')
+    state.products.filter(p => p.category === categoryId && p.status === 'published')
   )
 
-  // Add console.log to debug
-  console.log('Category products:', products)
+  if (!categoryId) return null
 
   const categoryTitles: Record<string, string> = {
     books: 'Books',
@@ -25,9 +24,9 @@ export function CategoryView() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold">{categoryTitles[category ?? '']}</h2>
-        <Button onClick={() => navigate(`/products/new/${category}`)}>
-          <Plus className="h-4 w-4 mr-2" /> Add {categoryTitles[category ?? '']}
+        <h2 className="text-2xl font-bold">{categoryTitles[categoryId] || categoryId}</h2>
+        <Button onClick={() => navigate(`/products/new/${categoryId}`)}>
+          <Plus className="h-4 w-4 mr-2" /> Add {categoryTitles[categoryId] || 'Product'}
         </Button>
       </div>
 

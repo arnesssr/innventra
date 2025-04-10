@@ -1,6 +1,7 @@
 import { Table, TableHeader, TableBody, TableRow, TableCell } from "../../components/ui/Table"
 import { Button } from "../../components/ui/Button"
 import { Plus, Edit, Trash } from "lucide-react"
+import React from "react";
 
 type Category = {
   id: string;
