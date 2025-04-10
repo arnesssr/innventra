@@ -27,17 +27,27 @@ A web-based product management system built with React, TypeScript, and Vite for
 
 1. Install dependencies:
 ```bash
-npm install
+pnpm install
 ```
 
-2. Start development server:
+2. Install and initialize shadcn/ui:
 ```bash
-npm run dev
+pnpm dlx shadcn-ui@latest init
 ```
 
-3. Build for production:
+3. Install Clerk:
 ```bash
-npm run build
+pnpm add @clerk/clerk-react
+```
+
+4. Start development server:
+```bash
+pnpm dev
+```
+
+5. Build for production:
+```bash
+pnpm build
 ```
 
 ## Tech Stack
@@ -45,10 +55,27 @@ npm run build
 - React + TypeScript
 - Vite
 - Zustand (State Management)
+- shadcn/ui (UI Components)
+- Clerk (Authentication)
 - Tailwind CSS
-- Radix UI
 - React Router
 - Lucide Icons
+
+## Authentication
+
+The system uses Clerk for:
+- User authentication
+- Role-based access control
+- Secure session management
+- User profile management
+
+## Environment Setup
+
+1. Create a `.env` file:
+```env
+VITE_CLERK_PUBLISHABLE_KEY=your_publishable_key
+VITE_CLERK_SECRET_KEY=your_secret_key
+```
 
 ## Project Structure
 

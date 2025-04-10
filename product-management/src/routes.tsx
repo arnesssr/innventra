@@ -8,11 +8,20 @@ import { CategoriesPage } from './pages/products/CategoriesPage'
 import { CategoryView } from './pages/products/CategoryView'
 import { DraftsPage } from './pages/products/DraftsPage'
 import { CategoryCreate } from './features/categories/CategoryCreate'
+import { SignIn } from "@clerk/clerk-react"
+import { SignedIn, SignedOut } from "@clerk/clerk-react"
 
 export function AppRoutes() {
   return (
     <Routes>
-      <Route element={<RootLayout />}>
+      <Route path="/sign-in/*" element={<SignIn routing="path" path="/sign-in" />} />
+      <Route
+        element={
+          <SignedIn>
+            <RootLayout />
+          </SignedIn>
+        }
+      >
         <Route path="/" element={<DashboardPage />} />
         <Route path="/products" element={<ProductsPage />}>
           <Route index element={<Navigate to="/products/categories" replace />} />
@@ -25,6 +34,14 @@ export function AppRoutes() {
         </Route>
         <Route path="/settings" element={<div>Settings</div>} />
       </Route>
+      <Route
+        path="*"
+        element={
+          <SignedOut>
+            <Navigate to="/sign-in" replace />
+          </SignedOut>
+        }
+      />
     </Routes>
   )
 }
