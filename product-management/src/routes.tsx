@@ -5,8 +5,11 @@ import { ProductsPage } from './pages/products/ProductsPage'
 import { PublishedProducts } from './pages/products/PublishedProducts'
 import { DraftsPage } from './pages/products/DraftsPage'
 import { ProductForm } from './pages/products/ProductForm'
-import { CategoryList } from './pages/categories/CategoryList'
 import { CategoryDetails } from './pages/categories/CategoryDetails'
+
+export function CategoryList() {
+  return <div>Category List</div>;
+}
 
 export function AppRoutes() {
   return (
