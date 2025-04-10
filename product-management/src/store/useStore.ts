@@ -1,60 +1,16 @@
 import { create } from 'zustand'
-import { Category as CategoryType } from '../types/category'
 
-const DEFAULT_CATEGORIES: CategoryType[] = [
-  {
-    id: 'books',
-    name: 'Books',
-    description: 'Christian books and literature',
-    fields: [
-      { id: 'isbn', name: 'ISBN', type: 'text', required: true },
-      { id: 'author', name: 'Author', type: 'text', required: true },
-      { id: 'genre', name: 'Genre', type: 'select', required: true },
-    ]
-  },
-  {
-    id: 'bibles',
-    name: 'Bibles',
-    description: 'Holy Bibles in different versions and formats',
-    fields: [
-      { id: 'isbn', name: 'ISBN', type: 'text', required: true },
-      { id: 'version', name: 'Version', type: 'select', required: true },
-      { id: 'coverType', name: 'Cover Type', type: 'select', required: true },
-    ]
-  },
-  {
-    id: 'gifts',
-    name: 'Gifts & Cards',
-    description: 'Christian gifts and greeting cards',
-    fields: [
-      { id: 'type', name: 'Gift Type', type: 'select', required: true },
-      { id: 'occasion', name: 'Occasion', type: 'select', required: true },
-    ]
-  },
-  {
-    id: 'stationery',
-    name: 'Stationery',
-    description: 'Office and school supplies',
-    fields: [
-      { id: 'type', name: 'Item Type', type: 'select', required: true },
-      { id: 'brand', name: 'Brand', type: 'text', required: false },
-    ]
-  },
-  {
-    id: 'toys',
-    name: 'Toys & Games',
-    description: 'Educational toys and games',
-    fields: [
-      { id: 'ageGroup', name: 'Age Group', type: 'select', required: true },
-      { id: 'brand', name: 'Brand', type: 'text', required: false },
-    ]
-  }
-]
+interface Category {
+  id: string;
+  name: string;
+  description: string;
+}
 
 interface Product {
   id: string;
   name: string;
   category: string;
+  categoryName: string;
   price: number;
   description: string;
   images: File[];
@@ -63,20 +19,46 @@ interface Product {
   [key: string]: any;
 }
 
-interface Category {
-  id: string;
-  name: string;
-  description: string;
-  fields: any[];
-}
+const DEFAULT_CATEGORIES: Category[] = [
+  { 
+    id: 'bibles',
+    name: 'Bibles',
+    description: 'Holy Bibles in different versions and formats'
+  },
+  { 
+    id: 'books',
+    name: 'Books',
+    description: 'Various books across genres and topics'
+  },
+  { 
+    id: 'gifts',
+    name: 'Gifts & Cards',
+    description: 'Gift items and greeting cards for all occasions'
+  },
+  { 
+    id: 'stationery',
+    name: 'Stationery',
+    description: 'Office and school stationery supplies'
+  },
+  { 
+    id: 'toys',
+    name: 'Toys & Games',
+    description: 'Fun toys and games for children and adults'
+  },
+  { 
+    id: 'music',
+    name: 'Music & Media',
+    description: 'Music albums and media content'
+  }
+]
 
 interface Store {
   products: Product[];
-  categories: CategoryType[];
-  addCategory: (category: Omit<CategoryType, 'id'>) => void;
+  categories: Category[];
+  addCategory: (category: Omit<Category, 'id'>) => void;
   deleteCategory: (categoryId: string) => void;
   addProduct: (product: Omit<Product, 'id'>) => void;
-  getCategoryName: (categoryId: string) => string;
+  getCategoryName: (id: string) => string;
   getStats: () => {
     totalProducts: number;
     totalValue: number;
@@ -90,7 +72,10 @@ export const useStore = create<Store>((set, get) => ({
   categories: DEFAULT_CATEGORIES,
   
   addCategory: (category) => set(state => ({
-    categories: [...state.categories, { ...category, id: Date.now().toString() }]
+    categories: [...state.categories, {
+      ...category,
+      id: category.name.toLowerCase().replace(/\s+/g, '-')
+    }]
   })),
 
   deleteCategory: (categoryId: string) => set(state => {
@@ -107,12 +92,16 @@ export const useStore = create<Store>((set, get) => ({
   }),
 
   addProduct: (product) => set(state => ({
-    products: [...state.products, { ...product, id: Date.now().toString() } as Product]
+    products: [...state.products, {
+      ...product,
+      id: Date.now().toString(),
+      categoryName: state.categories.find(c => c.id === product.category)?.name || product.category
+    } as Product]
   })),
 
-  getCategoryName: (categoryId: string) => {
-    const category = get().categories.find(c => c.id === categoryId)
-    return category?.name || categoryId
+  getCategoryName: (id: string) => {
+    const category = DEFAULT_CATEGORIES.find(c => c.id === id)
+    return category ? category.name : 'Product'
   },
 
   getStats: () => {
@@ -125,3 +114,5 @@ export const useStore = create<Store>((set, get) => ({
     }
   }
 }))
+
+export type { Category }

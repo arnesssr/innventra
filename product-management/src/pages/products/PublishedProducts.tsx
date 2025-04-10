@@ -14,19 +14,15 @@ export function PublishedProducts() {
             <TableCell>Category</TableCell>
             <TableCell>Price</TableCell>
             <TableCell>Stock</TableCell>
-            <TableCell>Status</TableCell>
           </TableRow>
         </TableHeader>
         <TableBody>
           {products.map((product) => (
             <TableRow key={product.id}>
               <TableCell>{product.name}</TableCell>
-              <TableCell className="capitalize">{getCategoryName(product.category)}</TableCell>
+              <TableCell>{getCategoryName(product.category)}</TableCell>
               <TableCell>KES {product.price.toLocaleString()}</TableCell>
               <TableCell>{product.stock}</TableCell>
-              <TableCell>
-                <span className="text-green-500">Published</span>
-              </TableCell>
             </TableRow>
           ))}
         </TableBody>

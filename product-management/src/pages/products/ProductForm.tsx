@@ -143,7 +143,7 @@ export function ProductForm() {
     }
     
     addProduct(submitData)
-    navigate(status === 'draft' ? '/products/drafts' : `/products/categories/${category}`)
+    navigate(status === 'draft' ? '/products/drafts' : '/products/published')
   }
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -208,7 +208,7 @@ export function ProductForm() {
     <div className="space-y-6 p-6">
       <Card>
         <CardHeader>
-          <CardTitle>Add {category ? category.charAt(0).toUpperCase() + category.slice(1) : 'New Product'}</CardTitle>
+          <CardTitle>Add {getCategoryName(category || '')} Product</CardTitle>
         </CardHeader>
         <CardContent>
           <form className="space-y-6" onSubmit={e => e.preventDefault()}>
