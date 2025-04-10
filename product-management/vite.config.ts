@@ -10,7 +10,8 @@ export default defineConfig({
     },
   },
   server: {
-    port: 3000,
-    open: true,
+    port: 5173, // Default Vite port
+    host: true, // Listen on all network interfaces
+    open: true, // Open browser automatically
   },
 })
