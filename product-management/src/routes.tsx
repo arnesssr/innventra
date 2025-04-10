@@ -6,10 +6,7 @@ import { PublishedProducts } from './pages/products/PublishedProducts'
 import { DraftsPage } from './pages/products/DraftsPage'
 import { ProductForm } from './pages/products/ProductForm'
 import { CategoryDetails } from './pages/categories/CategoryDetails'
-
-export function CategoryList() {
-  return <div>Category List</div>;
-}
+import { CategoryList } from './pages/categories/CategoryList'
 
 export function AppRoutes() {
   return (
@@ -28,3 +25,4 @@ export function AppRoutes() {
     </Routes>
   )
 }
+
