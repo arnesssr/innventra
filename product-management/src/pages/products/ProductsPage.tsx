@@ -1,16 +1,9 @@
 import { useNavigate, Outlet, useLocation } from "react-router-dom"
 import { Tabs, TabsList, TabsTrigger } from "../../components/ui/Tabs"
-import { useEffect } from "react"
 
 export function ProductsPage() {
   const navigate = useNavigate()
   const location = useLocation()
-
-  useEffect(() => {
-    if (location.pathname === '/products') {
-      navigate('/products/categories')
-    }
-  }, [location.pathname, navigate])
 
   return (
     <div className="space-y-6 p-6">
@@ -18,7 +11,10 @@ export function ProductsPage() {
         <h1 className="text-3xl font-bold">Products</h1>
       </div>
 
-      <Tabs defaultValue="categories" onValueChange={(value) => navigate(`/products/${value}`)}>
+      <Tabs 
+        defaultValue="categories" 
+        onValueChange={(value) => navigate(`/products/${value}`)}
+      >
         <TabsList>
           <TabsTrigger value="categories">Categories</TabsTrigger>
           <TabsTrigger value="published">Published</TabsTrigger>

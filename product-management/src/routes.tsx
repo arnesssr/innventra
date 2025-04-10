@@ -1,4 +1,5 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
+import { SignIn, SignedIn, SignedOut } from "@clerk/clerk-react"
 import { RootLayout } from './components/layout/RootLayout'
 import { DashboardPage } from './pages/dashboard/DashboardPage'
 import { ProductsPage } from './pages/products/ProductsPage'
@@ -8,20 +9,20 @@ import { CategoriesPage } from './pages/products/CategoriesPage'
 import { CategoryView } from './pages/products/CategoryView'
 import { DraftsPage } from './pages/products/DraftsPage'
 import { CategoryCreate } from './features/categories/CategoryCreate'
-import { SignIn } from "@clerk/clerk-react"
-import { SignedIn, SignedOut } from "@clerk/clerk-react"
 
 export function AppRoutes() {
+  console.log('Rendering routes...') // Debug log
+
   return (
     <Routes>
       <Route path="/sign-in/*" element={<SignIn routing="path" path="/sign-in" />} />
-      <Route
-        element={
-          <SignedIn>
-            <RootLayout />
-          </SignedIn>
-        }
-      >
+      
+      <Route element={
+        <SignedIn>
+          <RootLayout />
+        </SignedIn>
+      }>
+        <Route index element={<DashboardPage />} />
         <Route path="/" element={<DashboardPage />} />
         <Route path="/products" element={<ProductsPage />}>
           <Route index element={<Navigate to="/products/categories" replace />} />
@@ -34,14 +35,12 @@ export function AppRoutes() {
         </Route>
         <Route path="/settings" element={<div>Settings</div>} />
       </Route>
-      <Route
-        path="*"
-        element={
-          <SignedOut>
-            <Navigate to="/sign-in" replace />
-          </SignedOut>
-        }
-      />
+
+      <Route path="*" element={
+        <SignedOut>
+          <Navigate to="/sign-in" replace />
+        </SignedOut>
+      } />
     </Routes>
   )
 }

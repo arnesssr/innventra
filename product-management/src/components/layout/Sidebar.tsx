@@ -13,10 +13,10 @@ interface SidebarProps {
 }
 
 export function Sidebar({ expanded, onToggle }: SidebarProps) {
-  const menuItems = [
-    { path: '/', icon: <LayoutDashboard size={22} />, label: 'Dashboard' },
-    { path: '/products', icon: <Package size={22} />, label: 'Products' },
-    { path: '/settings', icon: <Settings size={22} />, label: 'Settings' }
+  const links = [
+    { href: "/", label: "Dashboard", icon: LayoutDashboard },
+    { href: "/products", label: "Products", icon: Package },
+    { href: "/settings", label: "Settings", icon: Settings },
   ]
 
   return (
@@ -35,11 +35,11 @@ export function Sidebar({ expanded, onToggle }: SidebarProps) {
       
       <div className="flex-1 overflow-y-auto py-4">
         <nav className="px-4 space-y-3">
-          {menuItems.map(({ path, icon, label }) => (
+          {links.map((link) => (
             <NavLink
-              key={path}
-              to={path}
-              title={!expanded ? label : undefined}
+              key={link.href}
+              to={link.href}
+              title={!expanded ? link.label : undefined}
               className={({ isActive }) => cn(
                 "flex items-center gap-3 p-3 rounded-lg transition-colors min-h-[48px]",
                 "hover:bg-accent hover:text-accent-foreground",
@@ -47,10 +47,8 @@ export function Sidebar({ expanded, onToggle }: SidebarProps) {
                 isActive ? "bg-primary text-primary-foreground" : "text-muted-foreground"
               )}
             >
-              <div className="flex-shrink-0">
-                {icon}
-              </div>
-              {expanded && <span className="text-base font-medium">{label}</span>}
+              <link.icon className="w-5 h-5" />
+              {expanded && <span className="text-base font-medium">{link.label}</span>}
             </NavLink>
           ))}
         </nav>
