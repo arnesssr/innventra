@@ -5,7 +5,7 @@ import { Plus } from "lucide-react"
 
 export function StockMovements() {
   const inventory = useStore(state => state.inventory)
-  
+
   return (
     <div className="space-y-4">
       <div className="flex justify-end">
@@ -31,7 +31,7 @@ export function StockMovements() {
               <TableRow key={movement.id}>
                 <TableCell>{new Date(movement.date).toLocaleDateString()}</TableCell>
                 <TableCell>{item.productName}</TableCell>
-                <TableCell>{movement.type}</TableCell>
+                <TableCell className="capitalize">{movement.type}</TableCell>
                 <TableCell>{movement.quantity}</TableCell>
                 <TableCell>{movement.notes}</TableCell>
               </TableRow>
