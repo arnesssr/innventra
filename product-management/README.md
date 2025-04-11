@@ -1,6 +1,6 @@
 # Product Management System
 
-A web-based product management system built with React, TypeScript, and Vite for managing inventory and products.
+A React-based product management system for bookstores and Christian literature shops.
 
 ## Features
 
@@ -22,6 +22,36 @@ A web-based product management system built with React, TypeScript, and Vite for
   - Total products overview
   - Product value calculation
   - Drafts monitoring
+
+### Inventory Management
+- Stock level tracking
+- Stock movements (in/out)
+- Low stock alerts
+- Stock history and transactions
+- Inventory reports
+- Stock adjustments
+
+## Todo List
+- [ ] Inventory Management
+  - [ ] Add stock movement tracking
+  - [ ] Implement low stock alerts
+  - [ ] Add stock history view
+  - [ ] Create inventory reports
+  - [ ] Add stock adjustments feature
+- [ ] Product Features
+  - [ ] Bulk product import/export
+  - [ ] Product variants
+  - [ ] Product categories reordering
+  - [ ] Product images optimization
+- [ ] Dashboard
+  - [ ] Sales analytics
+  - [ ] Stock level indicators
+  - [ ] Low stock warnings
+  - [ ] Popular products tracking
+- [ ] User Management
+  - [ ] Role-based access control
+  - [ ] Activity logging
+  - [ ] User permissions
 
 ## Getting Started
 
