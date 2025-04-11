@@ -11,11 +11,27 @@ export function StockLevels() {
   const [selectedProduct, setSelectedProduct] = useState<string>()
   const inventory = useStore(state => state.inventory)
   const updateMinimumStock = useStore(state => state.updateMinimumStock)
+  const addStockMovement = useStore(state => state.addStockMovement)
 
   const getStockStatus = (current: number, minimum: number) => {
     if (current <= 0) return { label: 'Out of Stock', color: 'text-red-500', icon: AlertTriangle }
     if (current <= minimum) return { label: 'Low Stock', color: 'text-amber-500', icon: AlertTriangle }
     return { label: 'In Stock', color: 'text-green-500', icon: CheckCircle }
+  }
+
+  const handleStockAdjustment = (productId: string, newStock: number) => {
+    const currentStock = inventory[productId]?.currentStock || 0
+    const difference = newStock - currentStock
+
+    if (difference !== 0) {
+      addStockMovement({
+        productId,
+        type: 'adjustment',
+        quantity: Math.abs(difference),
+        notes: `Stock adjusted from ${currentStock} to ${newStock}`,
+        date: new Date().toISOString()
+      })
+    }
   }
 
   return (
@@ -86,6 +102,7 @@ export function StockLevels() {
           setSelectedProduct(undefined)
         }}
         productId={selectedProduct}
+        onSave={handleStockAdjustment}
       />
     </div>
   )

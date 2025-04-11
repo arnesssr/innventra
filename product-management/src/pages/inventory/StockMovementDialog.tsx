@@ -14,10 +14,10 @@ interface StockMovementDialogProps {
 export function StockMovementDialog({ open, onClose, productId }: StockMovementDialogProps) {
   const products = useStore(state => state.products)
   const addStockMovement = useStore(state => state.addStockMovement)
-  
+
   const [formData, setFormData] = useState({
     productId: productId || '',
-    type: 'in' as const,
+    type: 'in' as 'in' | 'out' | 'adjustment',
     quantity: '',
     notes: ''
   })
@@ -29,12 +29,18 @@ export function StockMovementDialog({ open, onClose, productId }: StockMovementD
       productId: formData.productId,
       type: formData.type,
       quantity: parseInt(formData.quantity),
-      notes: formData.notes,
+      notes: formData.notes || `Stock ${formData.type}`,
       date: new Date().toISOString()
     })
-    
+
     onClose()
-    setFormData({ productId: '', type: 'in', quantity: '', notes: '' })
+    // Reset form
+    setFormData({
+      productId: '',
+      type: 'in',
+      quantity: '',
+      notes: ''
+    })
   }
 
   return (
@@ -62,7 +68,7 @@ export function StockMovementDialog({ open, onClose, productId }: StockMovementD
 
           <div className="space-y-2">
             <label>Movement Type</label>
-            <Select value={formData.type} onValueChange={v => setFormData(prev => ({ ...prev, type: v as 'in' | 'out' }))}>
+            <Select value={formData.type} onValueChange={v => setFormData(prev => ({ ...prev, type: v as typeof formData.type }))}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
@@ -93,7 +99,7 @@ export function StockMovementDialog({ open, onClose, productId }: StockMovementD
             />
           </div>
 
-          <div className="flex justify-end gap-2">
+          <div className="flex justify-end gap-2 pt-4">
             <Button variant="outline" onClick={onClose}>Cancel</Button>
             <Button onClick={handleSubmit}>Save Movement</Button>
           </div>

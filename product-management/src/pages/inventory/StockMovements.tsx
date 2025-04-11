@@ -7,12 +7,12 @@ import { StockMovementDialog } from "./StockMovementDialog"
 
 export function StockMovements() {
   const inventory = useStore(state => state.inventory)
-  const [showNewMovement, setShowNewMovement] = useState(false)
+  const [showDialog, setShowDialog] = useState(false)
 
   return (
     <div className="space-y-4">
       <div className="flex justify-end">
-        <Button onClick={() => setShowNewMovement(true)}>
+        <Button onClick={() => setShowDialog(true)}>
           <Plus className="h-4 w-4 mr-2" />
           New Movement
         </Button>
@@ -44,8 +44,8 @@ export function StockMovements() {
       </Table>
 
       <StockMovementDialog 
-        open={showNewMovement}
-        onClose={() => setShowNewMovement(false)}
+        open={showDialog}
+        onClose={() => setShowDialog(false)}
       />
     </div>
   )
