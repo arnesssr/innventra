@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom"
-import { LayoutDashboard, Package, Settings, ChevronRight } from "lucide-react"
+import { LayoutDashboard, Store, Boxes, Settings, ChevronRight } from "lucide-react"
 import { cn } from "../../lib/utils"
 import { Button } from "../ui/Button"
 
@@ -11,7 +11,8 @@ interface SidebarProps {
 export function Sidebar({ expanded, onToggle }: SidebarProps) {
   const links = [
     { href: "/", icon: LayoutDashboard, label: "Dashboard" },
-    { href: "/products", icon: Package, label: "Products" },
+    { href: "/products", icon: Store, label: "Products" },
+    { href: "/inventory", icon: Boxes, label: "Inventory" },
     { href: "/settings", icon: Settings, label: "Settings" },
   ]
 

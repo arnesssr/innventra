@@ -7,6 +7,7 @@ import { DraftsPage } from './pages/products/DraftsPage'
 import { ProductForm } from './pages/products/ProductForm'
 import { CategoryDetails } from './pages/categories/CategoryDetails'
 import { CategoryList } from './pages/categories/CategoryList'
+import { InventoryPage } from './pages/inventory/InventoryPage'
 
 export function AppRoutes() {
   return (
@@ -21,6 +22,7 @@ export function AppRoutes() {
           <Route path="published" element={<PublishedProducts />} />
           <Route path="drafts" element={<DraftsPage />} />
         </Route>
+        <Route path="/inventory" element={<InventoryPage />} />
       </Route>
     </Routes>
   )
