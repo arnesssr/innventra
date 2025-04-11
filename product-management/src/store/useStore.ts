@@ -110,7 +110,7 @@ export const useStore = create<Store>((set, get) => ({
         movements: [{
           id: Date.now().toString(),
           productId: product.id,
-          type: 'in',
+          type: 'in' as const,
           quantity: product.stock,
           date: new Date().toISOString(),
           notes: 'Initial stock'
