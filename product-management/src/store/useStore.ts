@@ -1,10 +1,16 @@
 import { create } from 'zustand'
 import { StockMovement, InventoryItem } from '../features/inventory/types'
 
+interface CategoryField {
+  name: string;
+  value: string;
+}
+
 interface Category {
   id: string;
   name: string;
   description: string;
+  fields: CategoryField[];
 }
 
 interface Product {
@@ -24,32 +30,38 @@ const DEFAULT_CATEGORIES: Category[] = [
   { 
     id: 'bibles',
     name: 'Bibles',
-    description: 'Holy Bibles in different versions and formats'
+    description: 'Holy Bibles in different versions and formats',
+    fields: []
   },
   { 
     id: 'books',
     name: 'Books',
-    description: 'Various books across genres and topics'
+    description: 'Various books across genres and topics',
+    fields: []
   },
   { 
     id: 'gifts',
     name: 'Gifts & Cards',
-    description: 'Gift items and greeting cards for all occasions'
+    description: 'Gift items and greeting cards for all occasions',
+    fields: []
   },
   { 
     id: 'stationery',
     name: 'Stationery',
-    description: 'Office and school stationery supplies'
+    description: 'Office and school stationery supplies',
+    fields: []
   },
   { 
     id: 'toys',
     name: 'Toys & Games',
-    description: 'Fun toys and games for children and adults'
+    description: 'Fun toys and games for children and adults',
+    fields: []
   },
   { 
     id: 'music',
     name: 'Music & Media',
-    description: 'Music albums and media content'
+    description: 'Music albums and media content',
+    fields: []
   }
 ]
 
@@ -76,10 +88,10 @@ export const useStore = create<Store>((set, get) => ({
   categories: DEFAULT_CATEGORIES,
   inventory: {},
   
-  addCategory: (category) => set(state => ({
+  addCategory: (categoryData) => set(state => ({
     categories: [...state.categories, {
-      ...category,
-      id: category.name.toLowerCase().replace(/\s+/g, '-')
+      ...categoryData,
+      id: categoryData.name.toLowerCase().replace(/\s+/g, '-')
     }]
   })),
 

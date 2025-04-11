@@ -2,14 +2,17 @@ import { Table, TableHeader, TableRow, TableCell, TableBody } from "../../compon
 import { Button } from "../../components/ui/Button"
 import { useStore } from "../../store/useStore"
 import { Plus } from "lucide-react"
+import { useState } from "react"
+import { StockMovementDialog } from "./StockMovementDialog"
 
 export function StockMovements() {
   const inventory = useStore(state => state.inventory)
+  const [showNewMovement, setShowNewMovement] = useState(false)
 
   return (
     <div className="space-y-4">
       <div className="flex justify-end">
-        <Button>
+        <Button onClick={() => setShowNewMovement(true)}>
           <Plus className="h-4 w-4 mr-2" />
           New Movement
         </Button>
@@ -39,6 +42,11 @@ export function StockMovements() {
           )}
         </TableBody>
       </Table>
+
+      <StockMovementDialog 
+        open={showNewMovement}
+        onClose={() => setShowNewMovement(false)}
+      />
     </div>
   )
 }
