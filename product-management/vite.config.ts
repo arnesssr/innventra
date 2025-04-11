@@ -4,7 +4,7 @@ import path from 'path'
 
 export default defineConfig({
   plugins: [react()],
-  base: '/product-management/', // Only add this if deploying to a subfolder
+  base: process.env.NODE_ENV === 'production' ? '/product-management/' : '/',
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
@@ -15,8 +15,8 @@ export default defineConfig({
     sourcemap: true
   },
   server: {
-    port: 3000, // Updated port
-    host: true, // Listen on all network interfaces
-    open: true, // Open browser automatically
-  },
+    port: 3000,
+    host: true,
+    open: true
+  }
 })
