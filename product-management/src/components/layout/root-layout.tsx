@@ -1,5 +1,6 @@
 import { Outlet } from 'react-router-dom'
 import { ThemeProvider } from '../../context/theme-context'
+import React from 'react'
 
 export function RootLayout() {
   return (

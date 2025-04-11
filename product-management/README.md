@@ -1,54 +1,90 @@
-# React + TypeScript + Vite
+# Product Management System
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A web-based product management system built with React, TypeScript, and Vite for managing inventory and products.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Product Management**
+  - Add, edit, and delete products
+  - Support for multiple product categories
+  - Image upload for products
+  - Draft and published states
+  - Category-specific fields
 
-## Expanding the ESLint configuration
+- **Category Management**
+  - Create custom categories
+  - Define category-specific fields
+  - Edit and delete categories
+  - Default categories (Books, Bibles, Gifts, etc.)
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- **Dashboard**
+  - Real-time stock tracking
+  - Total products overview
+  - Product value calculation
+  - Drafts monitoring
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+## Getting Started
+
+1. Install dependencies:
+```bash
+pnpm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+2. Install and initialize shadcn/ui:
+```bash
+pnpm dlx shadcn-ui@latest init
+```
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+3. Install Clerk:
+```bash
+pnpm add @clerk/clerk-react
+```
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
+4. Start development server:
+```bash
+pnpm dev
+```
+
+5. Build for production:
+```bash
+pnpm build
+```
+
+## Tech Stack
+
+- React + TypeScript
+- Vite
+- Zustand (State Management)
+- shadcn/ui (UI Components)
+- Clerk (Authentication)
+- Tailwind CSS
+- React Router
+- Lucide Icons
+
+## Authentication
+
+The system uses Clerk for:
+- User authentication
+- Role-based access control
+- Secure session management
+- User profile management
+
+## Environment Setup
+
+1. Create a `.env` file:
+```env
+VITE_CLERK_PUBLISHABLE_KEY=your_publishable_key
+VITE_CLERK_SECRET_KEY=your_secret_key
+```
+
+## Project Structure
+
+```
+src/
+├── components/     # Reusable UI components
+├── features/       # Feature-specific components
+├── pages/         # Page components
+├── store/         # Zustand store
+├── types/         # TypeScript types
+└── lib/           # Utilities and helpers
 ```

@@ -1,56 +1,57 @@
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/Card"
-import { Book, DollarSign, ShoppingBag, Archive } from "lucide-react"
+import { Package, DollarSign, Archive } from "lucide-react"
+import { useStore } from "../../store/useStore"
+import { formatCurrency } from "../../lib/utils"
 
 export function DashboardPage() {
-  const stats = [
-    {
-      title: "Total Revenue",
-      value: "KES 45,231",
-      description: "+20.1% from last month",
-      icon: <DollarSign className="h-5 w-5 text-muted-foreground/70" />,
-    },
-    {
-      title: "Products",
-      value: "2,350",
-      description: "120 added this month",
-      icon: <ShoppingBag className="h-5 w-5 text-muted-foreground/70" />,
-    },
-    {
-      title: "Drafts",
-      value: "12",
-      description: "Products pending review",
-      icon: <Archive className="h-5 w-5 text-muted-foreground/70" />,
-    },
-    {
-      title: "Categories",
-      value: "6",
-      description: "Across all sections",
-      icon: <Book className="h-5 w-5 text-muted-foreground/70" />,
-    },
-  ]
+  const stats = useStore(state => ({
+    totalProducts: state.products.length,
+    publishedCount: state.products.filter(p => p.status === 'published').length,
+    draftsCount: state.products.filter(p => p.status === 'draft').length,
+    totalValue: state.products.reduce((sum, p) => sum + (p.price * p.stock), 0)
+  }))
 
   return (
-    <div className="space-y-6 p-8">
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {stats.map((stat, index) => (
-          <Card key={index}>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                {stat.title}
-              </CardTitle>
-              {stat.icon}
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stat.value}</div>
-              <p className="text-xs text-muted-foreground pt-1">
-                {stat.description}
-              </p>
-            </CardContent>
-          </Card>
-        ))}
+    <div className="space-y-6">
+      <h1 className="text-3xl font-bold">Dashboard</h1>
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium">Products</CardTitle>
+            <Package className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.totalProducts}</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium">Published</CardTitle>
+            <Archive className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.publishedCount}</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium">Drafts</CardTitle>
+            <Archive className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.draftsCount}</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium">Total Value</CardTitle>
+            <DollarSign className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{formatCurrency(stats.totalValue)}</div>
+          </CardContent>
+        </Card>
       </div>
-      
-      {/* Add more dashboard sections here */}
     </div>
   )
 }

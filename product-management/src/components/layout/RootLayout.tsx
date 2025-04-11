@@ -1,21 +1,17 @@
 import { Outlet } from 'react-router-dom'
 import { Sidebar } from './Sidebar'
 import { useState } from 'react'
-import { cn } from '../../lib/utils'
-import { Header } from './Header'
+import { TopBar } from './TopBar'
 
 export function RootLayout() {
-  const [isSidebarExpanded, setIsSidebarExpanded] = useState(false)
+  const [expanded, setExpanded] = useState(false)
 
   return (
-    <div className="min-h-screen bg-background flex">
-      <Sidebar expanded={isSidebarExpanded} onToggle={setIsSidebarExpanded} />
-      <div className={cn(
-        "flex-1 transition-all duration-300",
-        isSidebarExpanded ? "ml-64" : "ml-16"
-      )}>
-        <Header />
-        <main className="container mx-auto p-6">
+    <div className="min-h-screen flex bg-background">
+      <Sidebar expanded={expanded} onToggle={() => setExpanded(!expanded)} />
+      <div className="flex-1 flex flex-col">
+        <TopBar />
+        <main className="flex-1">
           <Outlet />
         </main>
       </div>

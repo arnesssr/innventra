@@ -1,20 +1,32 @@
-import { Button } from "../../components/ui/Button"
-import { Plus } from "lucide-react"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, Outlet, useLocation } from "react-router-dom"
+import { Tabs, TabsList, TabsTrigger } from "../../components/ui/Tabs"
 
 export function ProductsPage() {
   const navigate = useNavigate()
+  const location = useLocation()
+  const currentPath = location.pathname.includes('published') ? 'published'
+    : location.pathname.includes('drafts') ? 'drafts'
+    : 'categories'
 
   return (
-    <div className="space-y-6 p-6">
+    <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">Products</h1>
-        <Button onClick={() => navigate('/products/new')}>
-          <Plus className="mr-2 h-4 w-4" /> Add Product
-        </Button>
       </div>
-      <div className="rounded-md border">
-        {/* Product table will go here */}
+
+      <Tabs 
+        value={currentPath}
+        onValueChange={(value) => navigate(`/products/${value}`)}
+      >
+        <TabsList>
+          <TabsTrigger value="categories">Categories</TabsTrigger>
+          <TabsTrigger value="published">Published</TabsTrigger>
+          <TabsTrigger value="drafts">Drafts</TabsTrigger>
+        </TabsList>
+      </Tabs>
+
+      <div className="mt-4">
+        <Outlet />
       </div>
     </div>
   )

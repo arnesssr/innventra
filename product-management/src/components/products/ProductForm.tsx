@@ -147,7 +147,7 @@ export function ProductForm() {
               <Input
                 value={formData.isbn || ''}
                 onChange={(e) => handleFieldChange('isbn', e.target.value)}
-                placeholder="Enter ISBN"
+                placeholder="Enter ISBN number"
               />
             </div>
             <div className="space-y-2">
@@ -170,7 +170,7 @@ export function ProductForm() {
               <Input
                 value={formData.isbn || ''}
                 onChange={(e) => handleFieldChange('isbn', e.target.value)}
-                placeholder="Enter ISBN"
+                placeholder="Enter ISBN number"
               />
             </div>
             <div className="space-y-2">
@@ -180,11 +180,11 @@ export function ProductForm() {
                 onValueChange={(value) => handleFieldChange('version', value)}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Select Bible version" />
+                  <SelectValue placeholder="Select version" />
                 </SelectTrigger>
                 <SelectContent>
                   {BIBLE_VERSIONS.map((version) => (
-                    <SelectItem key={version} value={version.toLowerCase()}>
+                    <SelectItem key={version} value={version}>
                       {version}
                     </SelectItem>
                   ))}
@@ -202,7 +202,7 @@ export function ProductForm() {
                 </SelectTrigger>
                 <SelectContent>
                   {COVER_TYPES.map((type) => (
-                    <SelectItem key={type} value={type.toLowerCase()}>
+                    <SelectItem key={type} value={type}>
                       {type}
                     </SelectItem>
                   ))}
