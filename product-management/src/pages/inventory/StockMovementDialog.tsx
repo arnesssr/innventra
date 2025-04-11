@@ -8,15 +8,16 @@ import { useState } from "react"
 interface StockMovementDialogProps {
   open: boolean
   onClose: () => void
+  productId?: string
 }
 
-export function StockMovementDialog({ open, onClose }: StockMovementDialogProps) {
+export function StockMovementDialog({ open, onClose, productId }: StockMovementDialogProps) {
   const products = useStore(state => state.products)
   const addStockMovement = useStore(state => state.addStockMovement)
   
   const [formData, setFormData] = useState({
-    productId: '',
-    type: 'in' as 'in' | 'out' | 'adjustment',
+    productId: productId || '',
+    type: 'in' as const,
     quantity: '',
     notes: ''
   })
@@ -40,22 +41,24 @@ export function StockMovementDialog({ open, onClose }: StockMovementDialogProps)
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>New Stock Movement</DialogTitle>
+          <DialogTitle>Stock Movement</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
-          <div className="space-y-2">
-            <label>Product</label>
-            <Select value={formData.productId} onValueChange={v => setFormData(prev => ({ ...prev, productId: v }))}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select product" />
-              </SelectTrigger>
-              <SelectContent>
-                {products.map(product => (
-                  <SelectItem key={product.id} value={product.id}>{product.name}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          {!productId && (
+            <div className="space-y-2">
+              <label>Product</label>
+              <Select value={formData.productId} onValueChange={v => setFormData(prev => ({ ...prev, productId: v }))}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select product" />
+                </SelectTrigger>
+                <SelectContent>
+                  {products.map(product => (
+                    <SelectItem key={product.id} value={product.id}>{product.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
 
           <div className="space-y-2">
             <label>Movement Type</label>
