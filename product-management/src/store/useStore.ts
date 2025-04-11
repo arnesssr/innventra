@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { StockMovement, InventoryItem } from '../features/inventory/types'
+import type { Category } from '../types/productTypes'
 
 export interface CategoryField {
   name: string;
@@ -193,5 +194,3 @@ export const useStore = create<Store>((set, get) => ({
     }
   }))
 }))
-
-export type { Category }
