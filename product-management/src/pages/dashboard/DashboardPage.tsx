@@ -119,42 +119,24 @@ export function DashboardPage() {
       .flatMap(item => item.movements ?? [])
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
 
-    // Add trend data calculation
-    const trendData = Object.values(inventory)
-      .flatMap(item => item.movements ?? [])
-      .reduce((acc, movement) => {
-        const date = new Date(movement.date)
-        const dateKey = format(date, 'MMM dd')
-        const existing = acc.find(d => d.date === dateKey)
-        
-        if (existing) {
-          existing.total += movement.type === 'in' ? movement.quantity : -movement.quantity
-          existing.volume += movement.quantity
-          existing.high = Math.max(existing.high, existing.total)
-          existing.low = Math.min(existing.low, existing.total)
-        } else {
-          acc.push({
-            date: dateKey,
-            total: movement.type === 'in' ? movement.quantity : -movement.quantity,
-            volume: movement.quantity,
-            high: movement.type === 'in' ? movement.quantity : 0,
-            low: movement.type === 'out' ? -movement.quantity : 0
-          })
-        }
-        return acc
-      }, [] as Array<{
-        date: string
-        total: number
-        volume: number
-        high: number
-        low: number
-      }>)
-      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+    // Add value comparison data
+    const valueComparisonData = categories.map(category => {
+      const categoryProducts = products.filter(p => p.category === category.id)
+      const currentValue = categoryProducts.reduce((acc, curr) => 
+        acc + ((curr.price ?? 0) * (curr.stock ?? 0)), 0)
+
+      return {
+        name: category.name,
+        currentValue: currentValue,
+        previousValue: currentValue * 0.85, // Simplified previous value
+        change: ((currentValue - (currentValue * 0.85)) / (currentValue * 0.85) * 100).toFixed(1)
+      }
+    }).sort((a, b) => b.currentValue - a.currentValue)
 
     return { 
       categoryData: categoryData.filter(d => d.stock > 0 || d.value > 0),
       movements,
-      trendData
+      valueComparisonData
     }
   }, [categories, products, inventory])
 
@@ -293,132 +275,46 @@ export function DashboardPage() {
             </CardContent>
           </Card>
 
-          {/* Stock Movement Trends */}
+          {/* Inventory Value by Category */}
           <Card className="chart-card">
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle>Stock Movement Trends</CardTitle>
-              <div className="flex gap-2">
-                <Button
-                  size="sm"
-                  variant={trendChartType === 'area' ? 'default' : 'outline'}
-                  onClick={() => setTrendChartType('area')}
-                >
-                  Area
-                </Button>
-                <Button
-                  size="sm"
-                  variant={trendChartType === 'bar' ? 'default' : 'outline'}
-                  onClick={() => setTrendChartType('bar')}
-                >
-                  Bar
-                </Button>
-                <Button
-                  size="sm"
-                  variant={trendChartType === 'line' ? 'default' : 'outline'}
-                  onClick={() => setTrendChartType('line')}
-                >
-                  Line
-                </Button>
-              </div>
+            <CardHeader>
+              <CardTitle>Inventory Value by Category</CardTitle>
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={400}>
-                {trendChartType === 'area' ? (
-                  <ComposedChart data={chartData.trendData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
-                    <defs>
-                      <linearGradient id="trendGradient" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3} />
-                        <stop offset="95%" stopColor="#6366f1" stopOpacity={0.05} />
-                      </linearGradient>
-                      <linearGradient id="volumeGradient" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#94a3b8" stopOpacity={0.3} />
-                        <stop offset="95%" stopColor="#94a3b8" stopOpacity={0.05} />
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                    <XAxis 
-                      dataKey="date" 
-                      axisLine={false} 
-                      tickLine={false}
-                      tick={{ fill: '#64748b', fontSize: 12 }}
-                    />
-                    <YAxis 
-                      yAxisId="left"
-                      axisLine={false} 
-                      tickLine={false}
-                      tick={{ fill: '#64748b', fontSize: 12 }}
-                    />
-                    <YAxis 
-                      yAxisId="right"
-                      orientation="right"
-                      axisLine={false}
-                      tickLine={false}
-                      tick={{ fill: '#94a3b8', fontSize: 12 }}
-                    />
-                    <Tooltip 
-                      contentStyle={{
-                        backgroundColor: 'rgba(255, 255, 255, 0.98)',
-                        borderRadius: '8px',
-                        border: 'none',
-                        boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                        padding: '12px'
-                      }}
-                      labelFormatter={(label) => `Date: ${label}`}
-                    />
-                    <Area
-                      yAxisId="left"
-                      type="monotone"
-                      dataKey="total"
-                      stroke="#6366f1"
-                      fill="url(#trendGradient)"
-                      strokeWidth={2}
-                    />
-                    <Bar
-                      yAxisId="right"
-                      dataKey="volume"
-                      fill="url(#volumeGradient)"
-                      radius={[4, 4, 0, 0]}
-                      opacity={0.5}
-                    />
-                  </ComposedChart>
-                ) : trendChartType === 'bar' ? (
-                  <BarChart data={chartData.trendData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                    <XAxis dataKey="date" axisLine={false} tickLine={false} />
-                    <YAxis axisLine={false} tickLine={false} />
-                    <Tooltip contentStyle={{
-                      backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                <BarChart 
+                  data={chartData.valueComparisonData} 
+                  margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
+                  layout="vertical"
+                >
+                  <CartesianGrid strokeDasharray="3 3" horizontal={false} />
+                  <XAxis type="number" axisLine={false} tickLine={false} />
+                  <YAxis 
+                    dataKey="name" 
+                    type="category" 
+                    axisLine={false} 
+                    tickLine={false} 
+                    width={100}
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: 'rgba(255, 255, 255, 0.98)',
                       borderRadius: '8px',
                       border: 'none',
-                      boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
-                    }} />
-                    <Bar
-                      dataKey="total"
-                      fill="#6366f1"
-                      radius={[4, 4, 0, 0]}
-                    />
-                  </BarChart>
-                ) : (
-                  <LineChart data={chartData.trendData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                    <XAxis dataKey="date" axisLine={false} tickLine={false} />
-                    <YAxis axisLine={false} tickLine={false} />
-                    <Tooltip contentStyle={{
-                      backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                      borderRadius: '8px',
-                      border: 'none',
-                      boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
-                    }} />
-                    <Line
-                      type="monotone"
-                      dataKey="total"
-                      stroke="#6366f1"
-                      strokeWidth={2}
-                      dot={{ fill: '#6366f1', strokeWidth: 2 }}
-                      activeDot={{ r: 6, fill: '#6366f1' }}
-                    />
-                  </LineChart>
-                )}
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                      padding: '12px'
+                    }}
+                    formatter={(value: number) => `KES ${value.toLocaleString()}`}
+                  />
+                  <Bar dataKey="currentValue" fill="#6366f1" radius={[0, 4, 4, 0]}>
+                    {chartData.valueComparisonData.map((entry, index) => (
+                      <Cell 
+                        key={`cell-${index}`}
+                        fill={Number(entry.change) > 0 ? '#4ade80' : '#f43f5e'}
+                      />
+                    ))}
+                  </Bar>
+                </BarChart>
               </ResponsiveContainer>
             </CardContent>
           </Card>
