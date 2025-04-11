@@ -1,53 +1,46 @@
 # Product Management System
 
-A React-based product management system for bookstores and Christian literature shops.
+A comprehensive React-based inventory and product management system for retail businesses. Manage products, track inventory, and handle stock movements efficiently.
 
 ## Features
 
-- **Product Management**
-  - Add, edit, and delete products
-  - Support for multiple product categories
-  - Image upload for products
-  - Draft and published states
-  - Category-specific fields
-
-- **Category Management**
-  - Create custom categories
-  - Define category-specific fields
-  - Edit and delete categories
-  - Default categories (Books, Bibles, Gifts, etc.)
-
-- **Dashboard**
-  - Real-time stock tracking
-  - Total products overview
-  - Product value calculation
-  - Drafts monitoring
-
-### Inventory Management
-- Stock level tracking
-- Stock movements (in/out)
-- Low stock alerts
-- Stock history and transactions
-- Inventory reports
-- Stock adjustments
+- Product Management (categories, drafts, published)
+- Inventory Tracking
+- Stock Movement History
+- Low Stock Alerts
+- Dashboard Analytics
+- Multi-category Support
+- Image Management
+- Stock Level Controls
 
 ## Todo List
+- [ ] E-commerce Integration
+  - [ ] Create e-commerce website frontend
+  - [ ] Product catalog display
+  - [ ] Shopping cart functionality
+  - [ ] Payment gateway integration (M-Pesa, Cards)
+  - [ ] Order management system
+  - [ ] Customer accounts
+
 - [ ] Inventory Management
-  - [ ] Add stock movement tracking
-  - [ ] Implement low stock alerts
-  - [ ] Add stock history view
-  - [ ] Create inventory reports
-  - [ ] Add stock adjustments feature
+  - [ ] Stock movement tracking
+  - [ ] Low stock alerts
+  - [ ] Stock history view
+  - [ ] Inventory reports
+  - [ ] Stock adjustments feature
+
 - [ ] Product Features
   - [ ] Bulk product import/export
   - [ ] Product variants
   - [ ] Product categories reordering
   - [ ] Product images optimization
+
 - [ ] Dashboard
   - [ ] Sales analytics
   - [ ] Stock level indicators
   - [ ] Low stock warnings
   - [ ] Popular products tracking
+
 - [ ] User Management
   - [ ] Role-based access control
   - [ ] Activity logging

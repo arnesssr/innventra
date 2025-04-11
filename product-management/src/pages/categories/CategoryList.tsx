@@ -22,6 +22,13 @@ interface CategoryField {
   options?: string[];
 }
 
+interface Category {
+  id: string;
+  name: string;
+  description: string;
+  fields: CategoryField[];
+}
+
 export function CategoryList() {
   const navigate = useNavigate()
   const [showNewCategory, setShowNewCategory] = useState(false)

@@ -4,11 +4,16 @@ import { Input } from "../../components/ui/Input"
 import { Button } from "../../components/ui/Button"
 import { Plus, Trash } from "lucide-react"
 import { useStore } from "../../store/useStore"
-import { Field, Category, DEFAULT_FIELDS } from "../../types/category"
+import { Category, DEFAULT_FIELDS } from "../../types/category"
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "../../components/ui/Select"
 import { useNavigate } from "react-router-dom"
+import type { CategoryField } from "../../types/productTypes"
 
-interface CustomField extends Omit<Field, 'id'> {}
+interface CustomField {
+  name: string;
+  type: 'text' | 'select' | 'number';
+  required: boolean;
+}
 
 export function CategoryCreate() {
   const navigate = useNavigate()
@@ -38,11 +43,21 @@ export function CategoryCreate() {
   }
 
   const handleSave = () => {
-    const newCategory: Category = {
-      id: Date.now().toString(),
+    if (!category.name) return;
+
+    const newCategory = {
       name: category.name,
       description: category.description,
-      fields: [...DEFAULT_FIELDS, ...customFields]
+      fields: [
+        ...DEFAULT_FIELDS.map(field => ({
+          ...field,
+          label: field.name
+        })),
+        ...customFields.map(field => ({
+          ...field,
+          label: field.name
+        }))
+      ]
     }
     
     addCategory(newCategory)
