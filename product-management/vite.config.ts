@@ -9,8 +9,12 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  build: {
+    outDir: 'dist',
+    sourcemap: true
+  },
   server: {
-    port: 5173, // Default Vite port
+    port: 3000, // Updated port
     host: true, // Listen on all network interfaces
     open: true, // Open browser automatically
   },
