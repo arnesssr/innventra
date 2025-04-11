@@ -4,7 +4,7 @@ import path from 'path'
 
 export default defineConfig({
   plugins: [react()],
-  base: '/',  // Add this line for proper asset loading
+  base: '/product-management/', // Only add this if deploying to a subfolder
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
