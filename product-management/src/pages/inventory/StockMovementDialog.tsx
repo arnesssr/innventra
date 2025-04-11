@@ -9,9 +9,10 @@ interface StockMovementDialogProps {
   open: boolean
   onClose: () => void
   productId?: string
+  onSave?: (productId: string, quantity: number) => void
 }
 
-export function StockMovementDialog({ open, onClose, productId }: StockMovementDialogProps) {
+export function StockMovementDialog({ open, onClose, productId, onSave }: StockMovementDialogProps) {
   const products = useStore(state => state.products)
   const addStockMovement = useStore(state => state.addStockMovement)
 
@@ -25,13 +26,17 @@ export function StockMovementDialog({ open, onClose, productId }: StockMovementD
   const handleSubmit = () => {
     if (!formData.productId || !formData.quantity) return
 
-    addStockMovement({
-      productId: formData.productId,
-      type: formData.type,
-      quantity: parseInt(formData.quantity),
-      notes: formData.notes || `Stock ${formData.type}`,
-      date: new Date().toISOString()
-    })
+    if (formData.type === 'adjustment' && onSave) {
+      onSave(formData.productId, parseInt(formData.quantity))
+    } else {
+      addStockMovement({
+        productId: formData.productId,
+        type: formData.type,
+        quantity: parseInt(formData.quantity),
+        notes: formData.notes || `Stock ${formData.type}`,
+        date: new Date().toISOString()
+      })
+    }
 
     onClose()
     // Reset form
