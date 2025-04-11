@@ -1,12 +1,15 @@
 import { create } from 'zustand'
 import { StockMovement, InventoryItem } from '../features/inventory/types'
 
-interface CategoryField {
+export interface CategoryField {
   name: string;
-  value: string;
+  type: 'text' | 'select' | 'number';
+  label: string;
+  required: boolean;
+  options?: string[];
 }
 
-interface Category {
+export interface Category {
   id: string;
   name: string;
   description: string;
@@ -36,7 +39,7 @@ const DEFAULT_CATEGORIES: Category[] = [
   { 
     id: 'books',
     name: 'Books',
-    description: 'Various books across genres and topics',
+    description: 'Christian literature and study materials',
     fields: []
   },
   { 
