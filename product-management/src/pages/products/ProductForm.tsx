@@ -130,15 +130,47 @@ export function ProductForm() {
     status: 'draft'
   })
 
+  const [errors, setErrors] = useState<Record<string, string>>({})
+
   useEffect(() => {
     if (category) {
       setFormData(prev => ({ ...prev, category }))
     }
   }, [category])
 
+  const validateForm = (status: 'draft' | 'published'): boolean => {
+    const newErrors: Record<string, string> = {}
+
+    // Only validate thoroughly for published items
+    if (status === 'published') {
+      if (!formData.name.trim()) newErrors.name = 'Product name is required'
+      if (!formData.price || parseFloat(formData.price) <= 0) newErrors.price = 'Valid price is required'
+      if (!formData.description.trim()) newErrors.description = 'Description is required'
+      if (formData.stock < 0) newErrors.stock = 'Stock cannot be negative'
+      if (formData.images.length === 0) newErrors.images = 'At least one image is required'
+
+      // Validate category-specific fields
+      if (category && CATEGORY_FIELDS[category]) {
+        Object.entries(CATEGORY_FIELDS[category]).forEach(([key, field]) => {
+          if (field.required && !formData[key]) {
+            newErrors[key] = `${field.label} is required`
+          }
+        })
+      }
+    }
+
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
+  }
+
   const handleSubmit = (e: React.FormEvent, status: 'draft' | 'published') => {
     e.preventDefault()
     if (!category) return
+
+    if (!validateForm(status)) {
+      // Show error message
+      return
+    }
 
     const submitData = {
       ...formData,
@@ -198,13 +230,17 @@ export function ProductForm() {
                 </SelectContent>
               </Select>
             ) : (
-              <Input
-                type={field.type}
-                value={typeof formData[key] === 'string' || typeof formData[key] === 'number' ? formData[key] : ''}
-                onChange={(e) => handleFieldChange(key, e.target.value)}
-                placeholder={`Enter ${field.label.toLowerCase()}`}
-                required={field.required}
-              />
+              <>
+                <Input
+                  type={field.type}
+                  value={typeof formData[key] === 'string' || typeof formData[key] === 'number' ? formData[key] : ''}
+                  onChange={(e) => handleFieldChange(key, e.target.value)}
+                  placeholder={`Enter ${field.label.toLowerCase()}`}
+                  required={field.required}
+                  className={errors[key] ? 'border-red-500' : ''}
+                />
+                {errors[key] && <span className="text-sm text-red-500">{errors[key]}</span>}
+              </>
             )}
           </div>
         ))}
@@ -228,7 +264,9 @@ export function ProductForm() {
                   onChange={e => setFormData({ ...formData, name: e.target.value })}
                   placeholder="Enter product name"
                   required
+                  className={errors.name ? 'border-red-500' : ''}
                 />
+                {errors.name && <span className="text-sm text-red-500">{errors.name}</span>}
               </div>
               <div className="space-y-2">
                 <label>Price (KES)</label>
@@ -238,7 +276,9 @@ export function ProductForm() {
                   onChange={e => setFormData({ ...formData, price: e.target.value })}
                   placeholder="0.00"
                   required
+                  className={errors.price ? 'border-red-500' : ''}
                 />
+                {errors.price && <span className="text-sm text-red-500">{errors.price}</span>}
               </div>
               <div className="space-y-2">
                 <label>Stock Quantity</label>
@@ -248,7 +288,9 @@ export function ProductForm() {
                   onChange={e => setFormData({ ...formData, stock: parseInt(e.target.value) })}
                   placeholder="0"
                   required
+                  className={errors.stock ? 'border-red-500' : ''}
                 />
+                {errors.stock && <span className="text-sm text-red-500">{errors.stock}</span>}
               </div>
             </div>
 
@@ -257,12 +299,13 @@ export function ProductForm() {
             <div className="space-y-2">
               <label>Description</label>
               <textarea
-                className="w-full rounded-md border p-2"
+                className={`w-full rounded-md border p-2 ${errors.description ? 'border-red-500' : ''}`}
                 value={formData.description}
                 onChange={e => setFormData({ ...formData, description: e.target.value })}
                 rows={4}
                 placeholder="Enter product description"
               />
+              {errors.description && <span className="text-sm text-red-500">{errors.description}</span>}
             </div>
 
             <div className="space-y-4">
@@ -303,6 +346,7 @@ export function ProductForm() {
                   </div>
                 ))}
               </div>
+              {errors.images && <span className="text-sm text-red-500">{errors.images}</span>}
             </div>
 
             <div className="flex justify-end gap-2">

@@ -1,30 +1,75 @@
-import { Routes, Route, Navigate } from 'react-router-dom'
-import { RootLayout } from './components/layout/RootLayout'
-import { DashboardPage } from './pages/dashboard/DashboardPage'
-import { ProductsPage } from './pages/products/ProductsPage'
-import { PublishedProducts } from './pages/products/PublishedProducts'
-import { DraftsPage } from './pages/products/DraftsPage'
-import { ProductForm } from './pages/products/ProductForm'
-import { CategoryDetails } from './pages/categories/CategoryDetails'
-import { CategoryList } from './pages/categories/CategoryList'
-import { InventoryPage } from './pages/inventory/InventoryPage'
+import { createBrowserRouter, Link, RouterProvider } from "react-router-dom"
+import { Layout } from "./components/layout"
+import { DashboardPage } from "./pages/dashboard/DashboardPage"
+import { ProductsPage } from "./pages/products/ProductsPage"
+import { CategoryList } from "./pages/categories/CategoryList" // Fixed path
+import { ProductForm } from "./pages/products/ProductForm"
+import { InventoryPage } from "./pages/inventory/InventoryPage"
+import { SettingsPage } from "./pages/settings/SettingsPage"
+import { Button } from "./components/ui/Button"
+
+export const router = createBrowserRouter([
+  {
+    element: <Layout />,
+    children: [
+      {
+        path: "/",
+        element: <DashboardPage />
+      },
+      {
+        path: "products",
+        element: <ProductsPage />,
+        children: [
+          {
+            path: "categories",
+            element: <CategoryList />
+          },
+          {
+            path: "published",
+            element: <ProductsPage />
+          },
+          {
+            path: "drafts",
+            element: <ProductsPage />
+          },
+          {
+            path: "new/:category",
+            element: <ProductForm />
+          },
+          {
+            path: ":id",
+            element: <ProductForm />
+          }
+        ]
+      },
+      {
+        path: "inventory",
+        element: <InventoryPage />
+      },
+      {
+        path: "settings",
+        element: <SettingsPage />
+      }
+    ],
+    errorElement: <ErrorPage />
+  }
+])
+
+function ErrorPage() {
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="text-center space-y-4">
+        <h1 className="text-4xl font-bold">Page Not Found</h1>
+        <p className="text-muted-foreground">The page you're looking for doesn't exist.</p>
+        <Button asChild>
+          <Link to="/">Go back home</Link>
+        </Button>
+      </div>
+    </div>
+  )
+}
 
 export function AppRoutes() {
-  return (
-    <Routes>
-      <Route element={<RootLayout />}>
-        <Route path="/" element={<DashboardPage />} />
-        <Route path="/products" element={<ProductsPage />}>
-          <Route index element={<Navigate to="categories" replace />} />
-          <Route path="categories" element={<CategoryList />} />
-          <Route path="categories/:categoryId" element={<CategoryDetails />} />
-          <Route path="new/:category" element={<ProductForm />} />
-          <Route path="published" element={<PublishedProducts />} />
-          <Route path="drafts" element={<DraftsPage />} />
-        </Route>
-        <Route path="/inventory" element={<InventoryPage />} />
-      </Route>
-    </Routes>
-  )
+  return <RouterProvider router={router} />
 }
 

@@ -5,6 +5,7 @@ import { Input } from "../../components/ui/Input"
 import { Plus, Trash } from "lucide-react"
 import { Checkbox } from "../../components/ui/Checkbox"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/Select"
+import React from "react"
 
 interface Field {
   name: string;
