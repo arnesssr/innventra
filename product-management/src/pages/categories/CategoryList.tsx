@@ -7,32 +7,19 @@ import { useStore } from "../../store/useStore"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../../components/ui/Dialog"
 import { Input } from "../../components/ui/Input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/Select"
+import { type Category, type CategoryField } from '../../types/productTypes'
 
-const DEFAULT_FIELDS = [
+const DEFAULT_FIELDS: CategoryField[] = [
   { name: 'name', type: 'text', label: 'Product Name', required: true },
   { name: 'price', type: 'number', label: 'Price (KES)', required: true },
   { name: 'stock', type: 'number', label: 'Stock Quantity', required: true },
   { name: 'description', type: 'text', label: 'Description', required: true }
 ]
 
-interface CategoryField {
-  type: 'text' | 'select' | 'number';
-  label: string;
-  required: boolean;
-  options?: string[];
-}
-
-interface Category {
-  id: string;
-  name: string;
-  description: string;
-  fields: CategoryField[];
-}
-
 export function CategoryList() {
   const navigate = useNavigate()
   const [showNewCategory, setShowNewCategory] = useState(false)
-  const [newCategory, setNewCategory] = useState({
+  const [newCategory, setNewCategory] = useState<Omit<Category, 'id'>>({
     name: '',
     description: '',
     fields: [...DEFAULT_FIELDS] // Start with mandatory fields
@@ -41,10 +28,11 @@ export function CategoryList() {
   const categories = useStore(state => state.categories) // Get all categories from store
 
   const handleSave = () => {
-    addCategory({
+    const categoryData: Category = {
       ...newCategory,
       id: newCategory.name.toLowerCase().replace(/\s+/g, '-')
-    })
+    }
+    addCategory(categoryData)
     setShowNewCategory(false)
     setNewCategory({ name: '', description: '', fields: [...DEFAULT_FIELDS] })
   }
@@ -78,7 +66,7 @@ export function CategoryList() {
           <Card 
             key={category.id} 
             className="cursor-pointer hover:bg-accent/50"
-            onClick={() => navigate(`/products/categories/${category.id}`)}
+            onClick={() => navigate(`/products/new/${category.id}`)} // Fixed navigation path
           >
             <CardHeader>
               <CardTitle>{category.name}</CardTitle>

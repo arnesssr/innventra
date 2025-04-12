@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { StockMovement, InventoryItem } from '../features/inventory/types'
-import type { Category } from '../types/productTypes'
+import type { Category as ProductCategory } from '../types/productTypes'
 
 export interface CategoryField {
   name: string;
