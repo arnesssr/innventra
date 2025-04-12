@@ -1,5 +1,60 @@
 # System Architecture
 
+## Overview
+
+```mermaid
+graph TD
+    subgraph PMS[Product Management System]
+        A[Product Creation] --> B[Validation Layer]
+        B --> C[State Management]
+        C --> D[E-commerce Bridge]
+    end
+
+    subgraph ECOM[E-commerce Integration]
+        D --> E[API Gateway]
+        E --> F[Queue System]
+        F --> G[Platform Adapters]
+    end
+
+    subgraph PLATFORMS[E-commerce Platforms]
+        G --> H[Shopify]
+        G --> I[WooCommerce]
+        G --> J[Custom Platform]
+    end
+```
+
+## Core Components
+
+### 1. Product Management Layer
+- Product creation and validation
+- Category management
+- Image processing
+- Inventory tracking
+
+### 2. State Management
+- Zustand store
+- Real-time updates
+- Cache management
+- Optimistic updates
+
+### 3. E-commerce Bridge
+```mermaid
+sequenceDiagram
+    participant PM as Product Manager
+    participant Bridge as E-com Bridge
+    participant Queue as Message Queue
+    participant Store as E-com Store
+
+    PM->>Bridge: Publish Product
+    Bridge->>Queue: Process Request
+    Queue->>Store: Create/Update
+    Store-->>Queue: Confirm
+    Queue-->>Bridge: Update Status
+    Bridge-->>PM: Complete
+```
+
+[Detailed component descriptions continue...]
+
 ## Product Lifecycle Flow
 
 ```mermaid
