@@ -17,6 +17,11 @@ export interface Category {
   fields: CategoryField[];
 }
 
+interface ImageWithPreview {
+  file: File;
+  previewUrl: string;
+}
+
 interface Product {
   id: string;
   name: string;
@@ -24,10 +29,13 @@ interface Product {
   categoryName: string;
   price: number;
   description: string;
-  images: File[];
+  images: ImageWithPreview[];
+  imageUrls: string[];
   stock: number;
   status: 'draft' | 'published' | 'archived';
   archivedAt?: string;
+  updatedAt: string;
+  createdAt: string;
   [key: string]: any;
 }
 
@@ -90,6 +98,7 @@ interface Store {
   restoreProduct: (productId: string) => void;
   updateProduct: (productId: string, updates: Partial<Product>) => void;
   deleteProduct: (productId: string) => void;
+  adjustProductStock: (productId: string, adjustment: number) => void;
 }
 
 export const useStore = create<Store>((set, get) => ({
@@ -121,31 +130,43 @@ export const useStore = create<Store>((set, get) => ({
   }),
 
   addProduct: (product) => set(state => {
-    // Create inventory entry when product is added
-    const inventory = {
-      ...state.inventory,
-      [product.id]: {
-        productId: product.id,
-        productName: product.name,
-        categoryId: product.category,
-        currentStock: product.stock,
-        minimumStock: 5, // Default minimum
-        lastUpdated: new Date().toISOString(),
-        movements: [{
-          id: Date.now().toString(),
-          productId: product.id,
-          type: 'in' as const,
-          quantity: product.stock,
-          date: new Date().toISOString(),
-          notes: 'Initial stock'
-        }]
+    // Create preview URLs only for new File objects
+    const imageUrls = product.images.map(img => {
+      if (img instanceof File) {
+        return URL.createObjectURL(img)
       }
-    }
+      return img.previewUrl || ''
+    })
+
+    const newProduct = {
+      ...product,
+      imageUrls,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
 
     return {
-      products: [...state.products, product],
-      inventory
-    }
+      products: [...state.products, newProduct],
+      inventory: {
+        ...state.inventory,
+        [product.id]: {
+          productId: product.id,
+          productName: product.name,
+          categoryId: product.category,
+          currentStock: product.stock,
+          minimumStock: 5,
+          lastUpdated: new Date().toISOString(),
+          movements: [{
+            id: Date.now().toString(),
+            productId: product.id,
+            type: 'in',
+            quantity: product.stock,
+            date: new Date().toISOString(),
+            notes: 'Initial stock'
+          }]
+        }
+      }
+    };
   }),
 
   getCategoryName: (categoryId: string) => {
@@ -226,15 +247,37 @@ export const useStore = create<Store>((set, get) => ({
     )
   })),
 
-  updateProduct: (productId, updates) => set(state => ({
-    products: state.products.map(product =>
-      product.id === productId 
-        ? { ...product, ...updates }
-        : product
-    )
-  })),
+  updateProduct: (productId, updates) => set(state => {
+    if (updates.images) {
+      const oldProduct = state.products.find(p => p.id === productId)
+      oldProduct?.imageUrls?.forEach(url => URL.revokeObjectURL(url))
+      
+      const imageUrls = updates.images.map(img => URL.createObjectURL(img.file))
+      updates = { ...updates, imageUrls }
+    }
+
+    return {
+      products: state.products.map(product =>
+        product.id === productId 
+          ? { ...product, ...updates }
+          : product
+      )
+    }
+  }),
 
   deleteProduct: (productId) => set(state => ({
     products: state.products.filter(product => product.id !== productId)
+  })),
+
+  adjustProductStock: (productId: string, adjustment: number) => set(state => ({
+    products: state.products.map(product => 
+      product.id === productId 
+        ? { 
+            ...product, 
+            stock: Math.max(0, product.stock + adjustment),
+            updatedAt: new Date().toISOString()
+          }
+        : product
+    )
   }))
 }))

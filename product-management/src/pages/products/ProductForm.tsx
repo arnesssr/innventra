@@ -1,3 +1,4 @@
+// Import required dependencies and components
 import { useState, useEffect } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/Card"
@@ -7,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { useStore } from "../../store/useStore"
 import { Trash } from "lucide-react"
 
+// Define interfaces for form field types and category configuration
 interface CategoryField {
   type: 'text' | 'select' | 'number';
   label: string;
@@ -20,6 +22,7 @@ interface CategoryFields {
   };
 }
 
+// Category-specific field configurations
 const CATEGORY_FIELDS: CategoryFields = {
   books: {
     isbn: { type: 'text', label: 'ISBN', required: true },
@@ -96,6 +99,13 @@ const CATEGORY_FIELDS: CategoryFields = {
   }
 }
 
+// Interface for image handling
+interface ImageWithPreview {
+  file: File;
+  previewUrl: string;
+}
+
+// Main form data interface
 interface ProductFormData {
   name: string;
   category: string;
@@ -111,37 +121,106 @@ interface ProductFormData {
   coverType?: string;
   type?: string;
   ageGroup?: string;
+  createdAt?: string;
+  updatedAt?: string;
   [key: string]: string | number | File[] | undefined;
 }
 
+/**
+ * ProductForm Component
+ * Handles creation and editing of products with dynamic category-specific fields
+ * Features:
+ * - Dynamic form fields based on category
+ * - Image upload and preview
+ * - Validation for required fields
+ * - Draft and publish functionality
+ * - Error handling
+ */
 export function ProductForm() {
-  const { category } = useParams()
+  // Get route parameters and navigation
+  const { id, category } = useParams()
   const navigate = useNavigate()
+
+  // Get store actions and state
+  const products = useStore(state => state.products)
   const addProduct = useStore(state => state.addProduct)
+  const updateProduct = useStore(state => state.updateProduct)
   const getCategoryName = useStore(state => state.getCategoryName)
 
-  const [formData, setFormData] = useState<ProductFormData>({
-    name: "",
-    category: category || "",
-    price: "",
-    description: "",
-    images: [],
-    stock: 0,
-    status: 'draft'
+  /**
+   * Initializes form data from existing product or creates new empty form
+   */
+  const initializeFormData = (existingProduct: any = null): ProductFormData => {
+    if (existingProduct) {
+      const validImages = existingProduct.images?.filter((img: any) => img instanceof File) || []
+
+      return {
+        name: existingProduct.name || '',
+        category: existingProduct.category || category || '',
+        price: existingProduct.price?.toString() || '',
+        description: existingProduct.description || '',
+        images: validImages,
+        stock: existingProduct.stock || 0,
+        status: existingProduct.status || 'draft',
+        createdAt: existingProduct.createdAt || new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        ...Object.entries(existingProduct).reduce((acc, [key, value]) => {
+          if (!['name', 'category', 'price', 'description', 'images', 'stock', 'status', 'createdAt', 'updatedAt'].includes(key)) {
+            acc[key] = value
+          }
+          return acc
+        }, {} as Record<string, any>)
+      }
+    }
+
+    return {
+      name: '',
+      category: category || '',
+      price: '',
+      description: '',
+      images: [],
+      stock: 0,
+      status: 'draft',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    }
+  }
+
+  // Form state management
+  const [formData, setFormData] = useState<ProductFormData>(() => {
+    if (id) {
+      const existingProduct = products.find(p => p.id === id)
+      if (existingProduct) {
+        return initializeFormData(existingProduct)
+      }
+    }
+    return initializeFormData()
   })
 
+  // Error and image handling state
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const [imageUrls, setImageUrls] = useState<string[]>([])
 
+  // Effect hooks for category changes and cleanup
   useEffect(() => {
     if (category) {
       setFormData(prev => ({ ...prev, category }))
     }
   }, [category])
 
+  useEffect(() => {
+    return () => {
+      imageUrls.forEach(url => URL.revokeObjectURL(url))
+    }
+  }, [imageUrls])
+
+  /**
+   * Validates form data based on product status
+   * More stringent validation for published products
+   */
   const validateForm = (status: 'draft' | 'published'): boolean => {
     const newErrors: Record<string, string> = {}
 
-    // Only validate thoroughly for published items
     if (status === 'published') {
       if (!formData.name.trim()) newErrors.name = 'Product name is required'
       if (!formData.price || parseFloat(formData.price) <= 0) newErrors.price = 'Valid price is required'
@@ -149,7 +228,6 @@ export function ProductForm() {
       if (formData.stock < 0) newErrors.stock = 'Stock cannot be negative'
       if (formData.images.length === 0) newErrors.images = 'At least one image is required'
 
-      // Validate category-specific fields
       if (category && CATEGORY_FIELDS[category]) {
         Object.entries(CATEGORY_FIELDS[category]).forEach(([key, field]) => {
           if (field.required && !formData[key]) {
@@ -163,45 +241,82 @@ export function ProductForm() {
     return Object.keys(newErrors).length === 0
   }
 
+  /**
+   * Handles form submission for both draft and published states
+   */
   const handleSubmit = (e: React.FormEvent, status: 'draft' | 'published') => {
-    e.preventDefault()
-    if (!category) return
+    e.preventDefault();
+    if (!category) return;
 
     if (!validateForm(status)) {
-      return
+      return;
     }
 
-    const submitData = {
-      ...formData,
-      status,
-      price: parseFloat(formData.price) || 0,
-      stock: parseInt(String(formData.stock)) || 0,
-      category,
-      categoryName: getCategoryName(category),
-      id: Date.now().toString()
+    try {
+      const submitData = {
+        ...formData,
+        status,
+        price: parseFloat(formData.price) || 0,
+        stock: parseInt(String(formData.stock)) || 0,
+        category,
+        categoryName: getCategoryName(category),
+        id: id || Date.now().toString(),
+        images: formData.images.map((file: File): ImageWithPreview => ({
+          file,
+          previewUrl: URL.createObjectURL(file)
+        })),
+        imageUrls: formData.images.map((file: File) => URL.createObjectURL(file)),
+        updatedAt: new Date().toISOString(),
+        createdAt: formData.createdAt || new Date().toISOString()
+      };
+
+      if (id) {
+        updateProduct(id, submitData);
+      } else {
+        addProduct(submitData);
+      }
+
+      navigate(status === 'draft' ? '/app/products/drafts' : '/app/products/published');
+    } catch (error) {
+      console.error('Error saving product:', error);
+      // Add error handling/notification here
     }
-    
-    addProduct(submitData)
-    // Update navigation path based on status
-    navigate(status === 'draft' ? '/app/products/drafts' : '/app/products/published')
   }
 
+  /**
+   * Handles image upload and preview generation
+   */
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || [])
     setFormData(prev => ({ ...prev, images: [...prev.images, ...files] }))
+    
+    const newUrls = files.map(file => URL.createObjectURL(file))
+    setImageUrls(prev => [...prev, ...newUrls])
   }
 
+  /**
+   * Removes image from form and revokes object URL
+   */
   const removeImage = (index: number) => {
+    URL.revokeObjectURL(imageUrls[index])
+    
     setFormData(prev => ({
       ...prev,
       images: prev.images.filter((_, i) => i !== index)
     }))
+    setImageUrls(prev => prev.filter((_, i) => i !== index))
   }
 
+  /**
+   * Updates form field values
+   */
   const handleFieldChange = (key: string, value: any) => {
     setFormData(prev => ({ ...prev, [key]: value }))
   }
 
+  /**
+   * Renders category-specific form fields dynamically
+   */
   const renderCategoryFields = () => {
     if (!category) return null
     
@@ -248,11 +363,12 @@ export function ProductForm() {
     )
   }
 
+  // Component render
   return (
     <div className="space-y-6 p-6">
       <Card>
         <CardHeader>
-          <CardTitle>Add {getCategoryName(category || '')} Product</CardTitle>
+          <CardTitle>{id ? 'Edit' : 'Add'} {getCategoryName(category || '')} Product</CardTitle>
         </CardHeader>
         <CardContent>
           <form className="space-y-6" onSubmit={e => e.preventDefault()}>
@@ -332,7 +448,7 @@ export function ProductForm() {
                 {formData.images.map((file, index) => (
                   <div key={index} className="relative group">
                     <img
-                      src={URL.createObjectURL(file)}
+                      src={imageUrls[index]}
                       alt={`Preview ${index}`}
                       className="w-full h-32 object-cover rounded-lg"
                     />

@@ -1,28 +1,30 @@
 import { useStore } from "../../store/useStore"
 import { Table, TableHeader, TableBody, TableRow, TableCell } from "../../components/ui/Table"
-import { Card, CardContent } from "../../components/ui/Card"
+import { Card } from "../../components/ui/Card"
 import { Button } from "../../components/ui/Button"
-import { RefreshCw } from "lucide-react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../../components/ui/Dialog"
+import { Undo, Trash2 } from "lucide-react"
 import { useState } from "react"
 
 export function ArchivedProducts() {
-  const products = useStore(state => state.products.filter(p => p.status === 'archived'))
+  const archived = useStore(state => state.products.filter(p => p.status === 'archived'))
   const getCategoryName = useStore(state => state.getCategoryName)
   const restoreProduct = useStore(state => state.restoreProduct)
-  const [showRestoreConfirm, setShowRestoreConfirm] = useState(false)
-  const [productToRestore, setProductToRestore] = useState<string | null>(null)
+  const deleteProduct = useStore(state => state.deleteProduct)
+  
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [selectedProduct, setSelectedProduct] = useState<string | null>(null)
 
-  const handleRestoreClick = (productId: string) => {
-    setProductToRestore(productId)
-    setShowRestoreConfirm(true)
+  const handleDelete = (productId: string) => {
+    setSelectedProduct(productId)
+    setShowDeleteConfirm(true)
   }
 
-  const confirmRestore = () => {
-    if (productToRestore) {
-      restoreProduct(productToRestore)
-      setShowRestoreConfirm(false)
-      setProductToRestore(null)
+  const confirmDelete = () => {
+    if (selectedProduct) {
+      deleteProduct(selectedProduct)
+      setShowDeleteConfirm(false)
+      setSelectedProduct(null)
     }
   }
 
@@ -32,7 +34,7 @@ export function ArchivedProducts() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableCell>Name</TableCell>
+              <TableCell>Product</TableCell>
               <TableCell>Category</TableCell>
               <TableCell>Price</TableCell>
               <TableCell>Archived Date</TableCell>
@@ -40,40 +42,83 @@ export function ArchivedProducts() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {products.map((product) => (
+            {archived.map((product) => (
               <TableRow key={product.id}>
-                <TableCell className="font-medium">{product.name}</TableCell>
+                <TableCell>
+                  <div className="flex items-center gap-3">
+                    {product.images[0] && (
+                      <img
+                        src={URL.createObjectURL(product.images[0].file)}
+                        alt={product.name}
+                        className="w-10 h-10 rounded-lg object-cover"
+                      />
+                    )}
+                    <div>
+                      <div className="font-medium">{product.name}</div>
+                      <div className="text-sm text-muted-foreground">
+                        {product.description.slice(0, 50)}...
+                      </div>
+                    </div>
+                  </div>
+                </TableCell>
                 <TableCell>{getCategoryName(product.category)}</TableCell>
                 <TableCell>KES {product.price.toLocaleString()}</TableCell>
-                <TableCell>{new Date(product.archivedAt || '').toLocaleDateString()}</TableCell>
                 <TableCell>
-                  <Button 
-                    variant="ghost" 
-                    size="sm"
-                    onClick={() => handleRestoreClick(product.id)}
-                  >
-                    <RefreshCw className="h-4 w-4 mr-2" />
-                    Restore
-                  </Button>
+                  {product.archivedAt 
+                    ? new Date(product.archivedAt).toLocaleDateString()
+                    : 'Unknown'
+                  }
+                </TableCell>
+                <TableCell>
+                  <div className="flex items-center gap-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => restoreProduct(product.id)}
+                    >
+                      <Undo className="h-4 w-4 mr-2" />
+                      Restore
+                    </Button>
+                    <Button
+                      variant="default"
+                      size="sm"
+                      className="bg-red-600 hover:bg-red-700"
+                      onClick={() => handleDelete(product.id)}
+                    >
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      Delete
+                    </Button>
+                  </div>
                 </TableCell>
               </TableRow>
             ))}
+            {archived.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={5} className="text-center py-8">
+                  <p className="text-muted-foreground">No archived products</p>
+                </TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
       </Card>
 
-      <Dialog open={showRestoreConfirm} onOpenChange={setShowRestoreConfirm}>
+      <Dialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Restore Product</DialogTitle>
+            <DialogTitle>Permanently Delete Product</DialogTitle>
           </DialogHeader>
-          <p>Are you sure you want to restore this product?</p>
-          <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={() => setShowRestoreConfirm(false)}>
+          <p>Are you sure you want to permanently delete this product? This action cannot be undone.</p>
+          <div className="flex justify-end space-x-2">
+            <Button variant="outline" onClick={() => setShowDeleteConfirm(false)}>
               Cancel
             </Button>
-            <Button onClick={confirmRestore}>
-              Restore
+            <Button 
+              variant="default"
+              className="bg-red-600 hover:bg-red-700 text-white" 
+              onClick={confirmDelete}
+            >
+              Delete Forever
             </Button>
           </div>
         </DialogContent>

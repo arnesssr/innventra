@@ -113,7 +113,13 @@ export function DraftsPage() {
             <Button variant="outline" onClick={() => setShowDeleteConfirm(false)}>
               Cancel
             </Button>
-            <Button onClick={confirmDelete}>Confirm</Button>
+            <Button 
+              variant="default"
+              className="bg-red-600 hover:bg-red-700 text-white"
+              onClick={confirmDelete}
+            >
+              Delete Forever
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
