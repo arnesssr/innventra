@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="faviconGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#8a2be2"/>
+      <stop offset="100%" stop-color="#ff3a8c"/>
+    </linearGradient>
+  </defs>
+  <rect width="32" height="32" rx="8" fill="#1a1f2e"/>
+  <path 
+    d="M16 8 L16 24"
+    stroke="url(#faviconGradient)"
+    stroke-width="3"
+    stroke-linecap="round"
+  />
+  <circle cx="16" cy="8" r="3" fill="url(#faviconGradient)"/>
+</svg>

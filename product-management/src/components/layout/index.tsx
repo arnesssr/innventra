@@ -1,20 +1,17 @@
 import { Outlet } from 'react-router-dom'
 import { Sidebar } from './Sidebar'
-import { UserNav } from './UserNav'
+import { TopBar } from './TopBar'
 import { useState } from 'react'
 
 export const Layout = () => {
-  const [expanded, setExpanded] = useState(true)
+  const [expanded, setExpanded] = useState(false);
 
   return (
     <div className="min-h-screen flex">
-      <Sidebar 
-        expanded={expanded} 
-        onToggle={() => setExpanded(prev => !prev)} 
-      />
+      <Sidebar expanded={expanded} onToggle={() => setExpanded(!expanded)} />
       <div className="flex-1">
-        <UserNav />
-        <main>
+        <TopBar />
+        <main className="p-6">
           <Outlet />
         </main>
       </div>
@@ -22,4 +19,4 @@ export const Layout = () => {
   )
 }
 
-export { Sidebar, UserNav }
+export { Sidebar }

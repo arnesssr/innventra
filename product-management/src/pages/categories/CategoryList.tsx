@@ -1,12 +1,13 @@
 import { useNavigate } from "react-router-dom"
 import { Button } from "../../components/ui/Button"
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/Card"
-import { Plus, Trash } from "lucide-react"
+import { Plus, MoreVertical, Pen, Trash2, Book, BookOpen, Gift, PenTool, Baby } from "lucide-react"
 import { useState } from "react"
 import { useStore } from "../../store/useStore"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../../components/ui/Dialog"
 import { Input } from "../../components/ui/Input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/Select"
+import { Checkbox } from "../../components/ui/Checkbox"
 import { type Category, type CategoryField } from '../../types/productTypes'
 
 const DEFAULT_FIELDS: CategoryField[] = [
@@ -16,39 +17,109 @@ const DEFAULT_FIELDS: CategoryField[] = [
   { name: 'description', type: 'text', label: 'Description', required: true }
 ]
 
+const CATEGORY_ICONS: Record<string, JSX.Element> = {
+  books: <Book className="h-5 w-5" />,
+  bibles: <BookOpen className="h-5 w-5" />,
+  gifts: <Gift className="h-5 w-5" />,
+  stationery: <PenTool className="h-5 w-5" />,
+  toys: <Baby className="h-5 w-5" />,
+}
+
 export function CategoryList() {
   const navigate = useNavigate()
   const [showNewCategory, setShowNewCategory] = useState(false)
   const [newCategory, setNewCategory] = useState<Omit<Category, 'id'>>({
     name: '',
     description: '',
-    fields: [...DEFAULT_FIELDS] // Start with mandatory fields
+    fields: [...DEFAULT_FIELDS]
   })
+  const [customFields, setCustomFields] = useState<CategoryField[]>([])
+
   const addCategory = useStore(state => state.addCategory)
-  const categories = useStore(state => state.categories) // Get all categories from store
+  const categories = useStore(state => state.categories)
+  const deleteCategory = useStore(state => state.deleteCategory)
+  const [showEditDialog, setShowEditDialog] = useState(false)
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null)
+
+  const handleAddCustomField = () => {
+    setCustomFields([...customFields, {
+      name: '',
+      type: 'text',
+      label: '',
+      required: false,
+      options: []
+    }])
+  }
+
+  const handleCustomFieldChange = (index: number, field: Partial<CategoryField>) => {
+    const updatedFields = [...customFields]
+    updatedFields[index] = { ...updatedFields[index], ...field }
+    setCustomFields(updatedFields)
+  }
+
+  const handleRemoveCustomField = (index: number) => {
+    setCustomFields(customFields.filter((_, i) => i !== index))
+  }
 
   const handleSave = () => {
+    if (!newCategory.name.trim()) {
+      // Add validation - show error if name is empty
+      return;
+    }
+
     const categoryData: Category = {
       ...newCategory,
-      id: newCategory.name.toLowerCase().replace(/\s+/g, '-')
+      id: newCategory.name.toLowerCase().replace(/\s+/g, '-'),
+      fields: [
+        ...DEFAULT_FIELDS,
+        ...customFields // Add custom fields to category
+      ]
     }
+
     addCategory(categoryData)
     setShowNewCategory(false)
-    setNewCategory({ name: '', description: '', fields: [...DEFAULT_FIELDS] })
+    
+    // Reset form
+    setNewCategory({
+      name: '',
+      description: '',
+      fields: [...DEFAULT_FIELDS]
+    })
+    setCustomFields([])
   }
 
-  const handleAddField = () => {
-    setNewCategory(prev => ({
-      ...prev,
-      fields: [...prev.fields, { name: '', type: 'text', label: '', required: false }]
-    }))
+  const handleEdit = (e: React.MouseEvent, category: Category) => {
+    e.stopPropagation()
+    setSelectedCategory(category)
+    setShowEditDialog(true)
   }
 
-  const handleRemoveField = (index: number) => {
-    setNewCategory(prev => ({
-      ...prev,
-      fields: prev.fields.filter((_, i) => i !== index)
-    }))
+  const handleDelete = (e: React.MouseEvent, category: Category) => {
+    e.stopPropagation()
+    setSelectedCategory(category)
+    setShowDeleteDialog(true)
+  }
+
+  const confirmDelete = () => {
+    if (selectedCategory) {
+      deleteCategory(selectedCategory.id)
+      setShowDeleteDialog(false)
+      setSelectedCategory(null)
+    }
+  }
+
+  const handleEditSubmit = (updatedCategory: Omit<Category, 'id'>) => {
+    if (selectedCategory) {
+      // Update category with new data but keep the same ID
+      const categoryData = {
+        ...updatedCategory,
+        id: selectedCategory.id
+      }
+      addCategory(categoryData) // This will overwrite the existing category
+      setShowEditDialog(false)
+      setSelectedCategory(null)
+    }
   }
 
   return (
@@ -65,122 +136,190 @@ export function CategoryList() {
         {categories.map((category) => (
           <Card 
             key={category.id} 
-            className="cursor-pointer hover:bg-accent/50"
-            onClick={() => navigate(`/products/new/${category.id}`)} // Fixed navigation path
+            className="group relative hover:shadow-lg transition-all duration-300"
           >
-            <CardHeader>
-              <CardTitle>{category.name}</CardTitle>
+            <CardHeader className="space-y-4">
+              <div className="flex items-start justify-between">
+                <div className="space-y-3">
+                  <div className="p-2.5 rounded-lg bg-primary/10 w-fit">
+                    {CATEGORY_ICONS[category.id] || <Book className="h-5 w-5 text-primary" />}
+                  </div>
+                  <CardTitle className="group-hover:text-primary transition-colors">
+                    {category.name}
+                  </CardTitle>
+                </div>
+                <div className="flex gap-2">
+                  <Button 
+                    variant="ghost" 
+                    size="icon"
+                    onClick={(e) => handleEdit(e, category)}
+                  >
+                    <Pen className="h-4 w-4" />
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="icon"
+                    className="text-destructive"
+                    onClick={(e) => handleDelete(e, category)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-muted-foreground">{category.description}</p>
+              <p className="text-sm text-muted-foreground line-clamp-2">
+                {category.description}
+              </p>
+              <Button 
+                className="w-full mt-4"
+                onClick={() => navigate(`/app/products/new/${category.id}`)}
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Add Product
+              </Button>
             </CardContent>
           </Card>
         ))}
       </div>
 
-      <Dialog open={showNewCategory} onOpenChange={setShowNewCategory}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+      {/* Edit Dialog */}
+      <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
+        <DialogContent>
           <DialogHeader>
-            <DialogTitle>Create New Category</DialogTitle>
+            <DialogTitle>Edit Category</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <label>Category Name</label>
-              <Input
-                value={newCategory.name}
-                onChange={e => setNewCategory(prev => ({ ...prev, name: e.target.value }))}
-                placeholder="Enter category name"
-              />
-            </div>
-            <div className="space-y-2">
-              <label>Description</label>
-              <textarea
-                className="w-full rounded-md border p-2"
-                value={newCategory.description}
-                onChange={e => setNewCategory(prev => ({ ...prev, description: e.target.value }))}
-                placeholder="Enter category description"
-                rows={3}
-              />
-            </div>
-
-            <div className="space-y-4">
-              <div className="flex justify-between items-center">
-                <label className="text-lg font-semibold">Product Fields</label>
-                <Button type="button" onClick={handleAddField} size="sm">
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add Field
-                </Button>
-              </div>
-
-              {newCategory.fields.map((field, index) => (
-                <div key={index} className="grid grid-cols-4 gap-4 items-end border p-4 rounded-lg">
-                  <div>
-                    <label>Field Name</label>
-                    <Input
-                      value={field.name}
-                      onChange={e => {
-                        const fields = [...newCategory.fields]
-                        fields[index] = { ...field, name: e.target.value }
-                        setNewCategory(prev => ({ ...prev, fields }))
-                      }}
-                      placeholder="e.g. ISBN"
-                      disabled={index < DEFAULT_FIELDS.length} // Disable default fields
-                    />
-                  </div>
-                  <div>
-                    <label>Label</label>
-                    <Input
-                      value={field.label}
-                      onChange={e => {
-                        const fields = [...newCategory.fields]
-                        fields[index] = { ...field, label: e.target.value }
-                        setNewCategory(prev => ({ ...prev, fields }))
-                      }}
-                      placeholder="e.g. ISBN Number"
-                      disabled={index < DEFAULT_FIELDS.length} // Disable default fields
-                    />
-                  </div>
-                  <div>
-                    <label>Type</label>
-                    <Select
-                      value={field.type}
-                      onValueChange={value => {
-                        const fields = [...newCategory.fields]
-                        fields[index] = { ...field, type: value as 'text' | 'select' | 'number' }
-                        setNewCategory(prev => ({ ...prev, fields }))
-                      }}
-                      disabled={index < DEFAULT_FIELDS.length} // Disable default fields
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="text">Text</SelectItem>
-                        <SelectItem value="number">Number</SelectItem>
-                        <SelectItem value="select">Select</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  {index >= DEFAULT_FIELDS.length && (
-                    <Button 
-                      variant="destructive" 
-                      size="icon"
-                      onClick={() => handleRemoveField(index)}
-                    >
-                      <Trash className="h-4 w-4" />
-                    </Button>
-                  )}
-                </div>
-              ))}
-            </div>
-
-            <div className="flex justify-end gap-2 pt-4">
-              <Button variant="outline" onClick={() => setShowNewCategory(false)}>Cancel</Button>
-              <Button onClick={handleSave}>Save Category</Button>
-            </div>
+          <div className="space-y-4">
+            <Input 
+              placeholder="Category Name" 
+              value={selectedCategory?.name || ''} 
+              onChange={(e) => setSelectedCategory(prev => 
+                prev ? { ...prev, name: e.target.value } : null
+              )}
+            />
+            <Input 
+              placeholder="Description" 
+              value={selectedCategory?.description || ''} 
+              onChange={(e) => setSelectedCategory(prev => 
+                prev ? { ...prev, description: e.target.value } : null
+              )}
+            />
+            <Button onClick={() => selectedCategory && handleEditSubmit(selectedCategory)}>
+              Save Changes
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Category</DialogTitle>
+          </DialogHeader>
+          <p>Are you sure you want to delete this category? This action cannot be undone.</p>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setShowDeleteDialog(false)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={confirmDelete}>
+              Delete
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {showNewCategory && (
+        <Dialog open={showNewCategory} onOpenChange={setShowNewCategory}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Create New Category</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <Input 
+                placeholder="Category Name" 
+                value={newCategory.name} 
+                onChange={(e) => setNewCategory({ ...newCategory, name: e.target.value })}
+              />
+              <Input 
+                placeholder="Description" 
+                value={newCategory.description} 
+                onChange={(e) => setNewCategory({ ...newCategory, description: e.target.value })}
+              />
+
+              <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <h3 className="font-medium">Custom Fields</h3>
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    size="sm"
+                    onClick={handleAddCustomField}
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Custom Field
+                  </Button>
+                </div>
+
+                {customFields.map((field, index) => (
+                  <div key={index} className="grid grid-cols-2 gap-4 p-4 border rounded-lg">
+                    <div className="space-y-2">
+                      <label>Field Name</label>
+                      <Input
+                        value={field.name}
+                        onChange={(e) => handleCustomFieldChange(index, { name: e.target.value })}
+                        placeholder="e.g. Publisher"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label>Field Type</label>
+                      <Select
+                        value={field.type}
+                        onValueChange={(value) => handleCustomFieldChange(index, { type: value as 'text' | 'select' | 'number' })}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="text">Text</SelectItem>
+                          <SelectItem value="number">Number</SelectItem>
+                          <SelectItem value="select">Select</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <label>Display Label</label>
+                      <Input
+                        value={field.label}
+                        onChange={(e) => handleCustomFieldChange(index, { label: e.target.value })}
+                        placeholder="e.g. Publisher Name"
+                      />
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Checkbox
+                        checked={field.required}
+                        onCheckedChange={(checked) => handleCustomFieldChange(index, { required: !!checked })}
+                      />
+                      <label>Required field</label>
+                    </div>
+                    <Button 
+                      variant="destructive"
+                      size="icon"
+                      onClick={() => handleRemoveCustomField(index)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+
+              <Button onClick={handleSave}>
+                Save
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   )
 }

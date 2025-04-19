@@ -168,7 +168,6 @@ export function ProductForm() {
     if (!category) return
 
     if (!validateForm(status)) {
-      // Show error message
       return
     }
 
@@ -183,7 +182,8 @@ export function ProductForm() {
     }
     
     addProduct(submitData)
-    navigate(status === 'draft' ? '/products/drafts' : '/products/published')
+    // Update navigation path based on status
+    navigate(status === 'draft' ? '/app/products/drafts' : '/app/products/published')
   }
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {

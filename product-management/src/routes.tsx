@@ -1,57 +1,82 @@
-import { createBrowserRouter, Link, RouterProvider } from "react-router-dom"
+import { createBrowserRouter, Link, RouterProvider, Navigate } from "react-router-dom"
 import { Layout } from "./components/layout"
 import { DashboardPage } from "./pages/dashboard/DashboardPage"
 import { ProductsPage } from "./pages/products/ProductsPage"
-import { CategoryList } from "./pages/categories/CategoryList" // Fixed path
+import { CategoryList } from "./pages/categories/CategoryList"
 import { ProductForm } from "./pages/products/ProductForm"
 import { InventoryPage } from "./pages/inventory/InventoryPage"
 import { SettingsPage } from "./pages/settings/SettingsPage"
 import { Button } from "./components/ui/Button"
+import { LandingPage } from "./pages/landing/LandingPage"
+import { SignIn, SignUp, SignedIn, SignedOut, RedirectToSignIn } from "@clerk/clerk-react"
+import { PublishedProducts } from "./pages/products/PublishedProducts"
+import { DraftsPage } from "./pages/products/DraftsPage"
+import { ArchivedProducts } from "./pages/products/ArchivedProducts"
+
+function AuthLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-background p-6">
+      <div className="w-full max-w-[400px]">
+        {children}
+      </div>
+    </div>
+  )
+}
 
 export const router = createBrowserRouter([
   {
-    element: <Layout />,
+    path: "/",
+    element: <LandingPage />
+  },
+  {
+    path: "/sign-in/*",
+    element: (
+      <AuthLayout>
+        <SignIn routing="path" path="/sign-in" afterSignInUrl="/app" />
+      </AuthLayout>
+    )
+  },
+  {
+    path: "/sign-up/*",
+    element: (
+      <AuthLayout>
+        <SignUp routing="path" path="/sign-up" afterSignUpUrl="/app" />
+      </AuthLayout>
+    )
+  },
+  {
+    path: "/app/*",
+    element: (
+      <SignedIn>
+        <Layout />
+      </SignedIn>
+    ),
     children: [
-      {
-        path: "/",
-        element: <DashboardPage />
-      },
+      { index: true, element: <DashboardPage /> },
       {
         path: "products",
         element: <ProductsPage />,
         children: [
-          {
-            path: "categories",
-            element: <CategoryList />
-          },
-          {
-            path: "published",
-            element: <ProductsPage />
-          },
-          {
-            path: "drafts",
-            element: <ProductsPage />
-          },
-          {
-            path: "new/:category",
-            element: <ProductForm />
-          },
-          {
-            path: ":id",
-            element: <ProductForm />
-          }
+          { index: true, element: <Navigate to="categories" replace /> },
+          { path: "categories", element: <CategoryList /> },
+          { path: "published", element: <PublishedProducts /> },
+          { path: "drafts", element: <DraftsPage /> },
+          { path: "archived", element: <ArchivedProducts /> },
+          { path: "new/:category", element: <ProductForm /> },
+          { path: ":id", element: <ProductForm /> }
         ]
       },
-      {
-        path: "inventory",
-        element: <InventoryPage />
-      },
-      {
-        path: "settings",
-        element: <SettingsPage />
-      }
-    ],
-    errorElement: <ErrorPage />
+      { path: "inventory", element: <InventoryPage /> },
+      { path: "settings", element: <SettingsPage /> }
+    ]
+  },
+  {
+    path: "*",
+    element: (
+      <SignedOut>
+        <RedirectToSignIn />
+      </SignedOut>
+    )
   }
 ])
 

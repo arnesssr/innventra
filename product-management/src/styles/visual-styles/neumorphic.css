@@ -1,0 +1,300 @@
+@layer base {
+  .style-neumorphic {
+    /* Refined base variables */
+    --neuo-bg: var(--background);
+    --neuo-size: 1;
+    --neuo-depth: 0.8; /* Reduced depth for subtler effect */
+    --neuo-distance: calc(4px * var(--neuo-size));
+    --neuo-blur: calc(8px * var(--neuo-size));
+    
+    /* Refined shadow calculations */
+    --neuo-dark-shadow: rgba(0, 0, 0, calc(0.15 * var(--neuo-depth)));
+    --neuo-light-shadow: rgba(255, 255, 255, calc(0.1 * var(--neuo-depth)));
+    
+    /* Button-specific shadows */
+    --neuo-button-shadow: 
+      var(--neuo-distance) var(--neuo-distance) var(--neuo-blur) var(--neuo-dark-shadow),
+      calc(var(--neuo-distance) * -1) calc(var(--neuo-distance) * -1) var(--neuo-blur) var(--neuo-light-shadow);
+    
+    --neuo-button-pressed: 
+      inset var(--neuo-distance) var(--neuo-distance) var(--neuo-blur) var(--neuo-dark-shadow),
+      inset calc(var(--neuo-distance) * -1) calc(var(--neuo-distance) * -1) var(--neuo-blur) var(--neuo-light-shadow);
+
+    /* Theme toggle specific styles */
+    --neuo-icon-color: var(--foreground);
+    --neuo-icon-hover-color: var(--primary);
+    --neuo-icon-active-color: var(--primary);
+    --neuo-icon-size: 1.2rem;
+    --neuo-toggle-bg: var(--background);
+    --neuo-toggle-shadow: 
+      var(--neuo-distance) var(--neuo-distance) var(--neuo-blur) var(--neuo-dark-shadow),
+      calc(var(--neuo-distance) * -1) calc(var(--neuo-distance) * -1) var(--neuo-blur) var(--neuo-light-shadow);
+
+    /* Additional neumorphic variables */
+    --neuo-convex-gradient: linear-gradient(
+      145deg,
+      rgba(255, 255, 255, 0.1) 0%,
+      rgba(0, 0, 0, 0.1) 100%
+    );
+    --neuo-concave-gradient: linear-gradient(
+      145deg,
+      rgba(0, 0, 0, 0.1) 0%,
+      rgba(255, 255, 255, 0.1) 100%
+    );
+  }
+
+  /* Enhanced Button Styles */
+  .style-neumorphic .button {
+    background: var(--primary);
+    color: var(--primary-foreground);
+    border: none;
+    border-radius: var(--radius);
+    padding: 0.6rem 1.2rem;
+    font-weight: 500;
+    box-shadow: var(--neuo-button-shadow);
+    transition: all 0.2s ease;
+    position: relative;
+  }
+
+  .style-neumorphic .button:hover {
+    transform: translateY(-1px);
+    box-shadow: 
+      calc(var(--neuo-distance) * 1.2) calc(var(--neuo-distance) * 1.2) var(--neuo-blur) var(--neuo-dark-shadow),
+      calc(var(--neuo-distance) * -1.2) calc(var(--neuo-distance) * -1.2) var(--neuo-blur) var(--neuo-light-shadow);
+  }
+
+  .style-neumorphic .button:active {
+    transform: translateY(1px);
+    box-shadow: var(--neuo-button-pressed);
+  }
+
+  /* Button Variants */
+  .style-neumorphic .button[data-variant="secondary"] {
+    background: var(--secondary);
+    color: var(--secondary-foreground);
+  }
+
+  .style-neumorphic .button[data-variant="outline"] {
+    background: transparent;
+    border: 1px solid var(--primary);
+    color: var(--primary);
+  }
+
+  .style-neumorphic .button[data-variant="ghost"] {
+    background: transparent;
+    color: var(--primary);
+    box-shadow: none;
+  }
+
+  /* Theme toggle and icon buttons */
+  .style-neumorphic .button[data-size="icon"] {
+    width: 2.5rem;
+    height: 2.5rem;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--neuo-icon-color);
+    background: transparent;
+    border: none;
+    box-shadow: none;
+  }
+
+  .style-neumorphic .button[data-size="icon"] svg {
+    width: 1.2rem;
+    height: 1.2rem;
+  }
+
+  .style-neumorphic .button[data-size="icon"]:hover {
+    color: var(--neuo-icon-hover-color);
+    transform: none;
+    box-shadow: none;
+  }
+
+  .style-neumorphic .button[data-size="icon"]:active {
+    color: var(--neuo-icon-active-color);
+    transform: none;
+    box-shadow: none;
+  }
+
+  /* Card with enhanced depth */
+  .style-neumorphic .card {
+    background: var(--neuo-bg);
+    border: none;
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    box-shadow: var(--neuo-button-shadow);
+    position: relative;
+  }
+
+  .style-neumorphic .card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: var(--neuo-gradient);
+    opacity: 0.05;
+  }
+
+  /* Input fields */
+  .style-neumorphic .input {
+    background: var(--neuo-bg);
+    border: none;
+    border-radius: var(--radius);
+    padding: 0.75rem 1rem;
+    box-shadow: var(--neuo-button-pressed);
+    transition: all 0.2s ease;
+    color: var(--foreground);
+  }
+
+  .style-neumorphic .input:focus {
+    outline: none;
+    box-shadow: var(--neuo-button-shadow);
+  }
+
+  /* Dropdown/Select improvements */
+  .style-neumorphic .select {
+    background: var(--neuo-bg);
+    border: none;
+    border-radius: var(--radius);
+    padding: 0.75rem 1rem;
+    box-shadow: var(--neuo-button-pressed);
+    color: var(--foreground);
+    position: relative;
+    background-image: var(--neuo-convex-gradient);
+  }
+
+  /* Toggles and Checkboxes */
+  .style-neumorphic .checkbox,
+  .style-neumorphic .radio {
+    appearance: none;
+    width: 1.5rem;
+    height: 1.5rem;
+    background: var(--neuo-bg);
+    border-radius: var(--radius);
+    box-shadow: var(--neuo-button-shadow);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .style-neumorphic .radio {
+    border-radius: 50%;
+  }
+
+  .style-neumorphic .checkbox:checked,
+  .style-neumorphic .radio:checked {
+    box-shadow: var(--neuo-button-pressed);
+    background: var(--primary);
+  }
+
+  /* Navigation */
+  .style-neumorphic .nav-item {
+    background: var(--neuo-bg);
+    border-radius: var(--radius);
+    padding: 0.75rem 1rem;
+    box-shadow: var(--neuo-button-shadow);
+    transition: all 0.2s ease;
+  }
+
+  .style-neumorphic .nav-item:hover {
+    transform: translateY(-1px);
+  }
+
+  .style-neumorphic .nav-item[data-active="true"] {
+    box-shadow: var(--neuo-button-pressed);
+    background: var(--primary);
+    color: var(--primary-foreground);
+  }
+
+  /* Metrics and Stats */
+  .style-neumorphic .metric-card {
+    background: var(--neuo-bg);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    box-shadow: var(--neuo-button-shadow);
+    transition: transform 0.2s ease;
+  }
+
+  .style-neumorphic .metric-card:hover {
+    transform: translateY(-2px);
+  }
+
+  /* Popover and Dialog enhancements */
+  .style-neumorphic .popover,
+  .style-neumorphic .dialog {
+    background: var(--neuo-bg);
+    border-radius: var(--radius);
+    box-shadow: var(--neuo-button-shadow);
+    background-image: var(--neuo-convex-gradient);
+  }
+
+  /* Search input specific styling */
+  .style-neumorphic .search-wrapper {
+    background: var(--neuo-bg);
+    border-radius: var(--radius);
+    box-shadow: var(--neuo-button-pressed);
+    padding: 0.5rem;
+  }
+
+  /* Tabs improvements */
+  .style-neumorphic .tabs {
+    background: var(--neuo-bg);
+    padding: 0.5rem;
+    border-radius: var(--radius);
+    box-shadow: var(--neuo-button-pressed);
+  }
+
+  .style-neumorphic .tab[data-state="active"] {
+    background-image: var(--neuo-convex-gradient);
+    box-shadow: var(--neuo-button-shadow);
+  }
+
+  /* Badge enhancement */
+  .style-neumorphic .badge {
+    background: var(--neuo-bg);
+    border-radius: 9999px;
+    padding: 0.25rem 0.75rem;
+    box-shadow: var(--neuo-button-shadow);
+    background-image: var(--neuo-convex-gradient);
+  }
+
+  /* Scrollbar styling */
+  .style-neumorphic ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  .style-neumorphic ::-webkit-scrollbar-track {
+    background: var(--neuo-bg);
+    border-radius: var(--radius);
+    box-shadow: var(--neuo-button-pressed);
+  }
+
+  .style-neumorphic ::-webkit-scrollbar-thumb {
+    background: var(--neuo-bg);
+    border-radius: var(--radius);
+    box-shadow: var(--neuo-button-shadow);
+    background-image: var(--neuo-convex-gradient);
+  }
+
+  /* Dark mode adjustments */
+  .dark .style-neumorphic {
+    --neuo-dark-shadow: rgba(0, 0, 0, calc(0.25 * var(--neuo-depth)));
+    --neuo-light-shadow: rgba(255, 255, 255, calc(0.05 * var(--neuo-depth)));
+
+    --neuo-convex-gradient: linear-gradient(
+      145deg,
+      rgba(255, 255, 255, 0.05) 0%,
+      rgba(0, 0, 0, 0.1) 100%
+    );
+    --neuo-concave-gradient: linear-gradient(
+      145deg,
+      rgba(0, 0, 0, 0.1) 0%,
+      rgba(255, 255, 255, 0.05) 100%
+    );
+  }
+
+  .dark .style-neumorphic .button[data-size="icon"] {
+    color: var(--neuo-icon-color);
+  }
+}

@@ -1,0 +1,334 @@
+@layer base {
+  .style-flat {
+    /* Base Variables */
+    --flat-bg: var(--background);
+    --flat-text: var(--foreground);
+    --flat-border: var(--border);
+    --flat-radius: var(--radius);
+    
+    /* Improved button variables for better visibility */
+    --flat-button-bg: color-mix(in srgb, var(--primary) 100%, transparent);
+    --flat-button-hover: color-mix(in srgb, var(--primary) 85%, white);
+    --flat-button-active: color-mix(in srgb, var(--primary) 75%, black);
+    
+    /* Improved contrast for content */
+    --flat-card-bg: color-mix(in srgb, var(--card) 98%, transparent);
+    --flat-input-bg: color-mix(in srgb, var(--background) 98%, transparent);
+
+    /* Interactive States */
+    --flat-hover-opacity: 0.9;
+    --flat-active-opacity: 0.8;
+    --flat-focus-ring: 0 0 0 2px var(--primary);
+    
+    /* Transitions */
+    --flat-transition: all 0.2s ease;
+
+    /* Force remove any shadows */
+    --card-shadow: none !important;
+    --button-shadow: none !important;
+    --input-shadow: none !important;
+    --shadow-none: none !important;
+
+    /* Component-specific variables */
+    --flat-card-border: var(--border);
+    --flat-button-bg: var(--primary);
+    --flat-button-hover: color-mix(in srgb, var(--primary) 90%, white);
+    --flat-input-border: var(--input);
+
+    /* Add standardized button sizes */
+    --button-height-sm: 2rem;    /* 32px */
+    --button-height-md: 2.5rem;  /* 40px */
+    --button-height-lg: 3rem;    /* 48px */
+    --button-icon-size: 1.25rem; /* 20px */
+  }
+
+  /* Button Base */
+  .style-flat .button {
+    height: var(--button-height-md);
+    min-width: max-content;
+    padding: 0 1rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background: var(--flat-button-bg);
+    color: var(--primary-foreground);
+    border: none;
+    border-radius: var(--flat-radius);
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+    cursor: pointer;
+    box-shadow: var(--shadow-none);
+  }
+
+  .style-flat .button:hover {
+    background: var(--flat-button-hover);
+  }
+
+  .style-flat .button:active {
+    background: var(--flat-button-active);
+  }
+
+  .style-flat .button:focus-visible {
+    outline: none;
+    box-shadow: var(--flat-focus-ring);
+  }
+
+  /* Button Variants */
+  .style-flat .button[data-variant="secondary"] {
+    background-color: var(--secondary);
+    color: var(--secondary-foreground);
+  }
+
+  .style-flat .button[data-variant="outline"] {
+    background-color: transparent;
+    border: 1px solid var(--primary);
+    color: var(--primary);
+  }
+
+  .style-flat .button[data-variant="ghost"] {
+    background-color: transparent;
+    color: var(--primary);
+  }
+
+  /* Button sizes */
+  .style-flat .button[data-size="sm"] {
+    height: var(--button-height-sm);
+    padding: 0 0.75rem;
+    font-size: 0.875rem;
+  }
+
+  .style-flat .button[data-size="lg"] {
+    height: var(--button-height-lg);
+    padding: 0 1.5rem;
+    font-size: 1.125rem;
+  }
+
+  /* Icon button styles */
+  .style-flat .button[data-size="icon"] {
+    width: var(--button-height-md);
+    height: var(--button-height-md);
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .style-flat .button[data-size="icon"][data-size="sm"] {
+    width: var(--button-height-sm);
+    height: var(--button-height-sm);
+  }
+
+  .style-flat .button[data-size="icon"][data-size="lg"] {
+    width: var(--button-height-lg);
+    height: var(--button-height-lg);
+  }
+
+  /* Card */
+  .style-flat .card {
+    background: var(--flat-card-bg);
+    border: 1px solid var(--flat-card-border);
+    border-radius: var(--flat-radius);
+    box-shadow: var(--shadow-none);
+    padding: 1rem;
+    transition: border-color 0.2s ease;
+  }
+
+  /* Metric Cards */
+  .style-flat .metric-card {
+    background: var(--flat-card-bg);
+    border: 1px solid var(--flat-card-border);
+    border-radius: var(--flat-radius);
+    box-shadow: var(--shadow-none);
+  }
+
+  /* Chart Cards */
+  .style-flat .chart-card {
+    background: var(--flat-card-bg);
+    border: 1px solid var(--flat-card-border);
+    border-radius: var(--flat-radius);
+    box-shadow: var(--shadow-none);
+  }
+
+  /* Input Fields */
+  .style-flat .input,
+  .style-flat .select,
+  .style-flat .textarea {
+    background: var(--flat-input-bg);
+    border: 2px solid var(--flat-input-border);
+    border-radius: var(--flat-radius);
+    box-shadow: var(--shadow-none);
+    transition: border-color 0.2s ease;
+  }
+
+  .style-flat .input:hover {
+    border-color: var(--primary);
+  }
+
+  .style-flat .input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: var(--flat-focus-ring);
+  }
+
+  /* Select */
+  .style-flat .select {
+    appearance: none;
+    background-color: var(--flat-bg);
+    border: 2px solid var(--flat-border);
+    border-radius: var(--flat-radius);
+    padding: 0.5rem 2rem 0.5rem 0.75rem;
+    width: 100%;
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='currentColor' viewBox='0 0 12 12'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 4 4 4 4-4'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 0.75rem;
+  }
+
+  /* Checkbox and Radio */
+  .style-flat .checkbox,
+  .style-flat .radio {
+    appearance: none;
+    background-color: var(--flat-bg);
+    border: 2px solid var(--primary);
+    width: 1.25rem;
+    height: 1.25rem;
+    cursor: pointer;
+  }
+
+  .style-flat .checkbox {
+    border-radius: 0.25rem;
+  }
+
+  .style-flat .radio {
+    border-radius: 50%;
+  }
+
+  .style-flat .checkbox:checked,
+  .style-flat .radio:checked {
+    background-color: var(--primary);
+    border-color: var(--primary);
+  }
+
+  /* Dialog */
+  .style-flat .dialog {
+    background-color: var(--flat-bg);
+    border: 1px solid var(--flat-border);
+    border-radius: var(--flat-radius);
+    padding: 1.5rem;
+    box-shadow: var(--shadow-none) !important;
+  }
+
+  /* Badge */
+  .style-flat .badge {
+    background-color: var(--primary);
+    color: var(--primary-foreground);
+    border-radius: 9999px;
+    padding: 0.25rem 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+
+  /* Override any component that might have shadows */
+  .style-flat .dashboard-container,
+  .style-flat .sidebar,
+  .style-flat .topbar,
+  .style-flat .dropdown-content,
+  .style-flat .popover {
+    box-shadow: var(--shadow-none) !important;
+  }
+
+  /* Tables */
+  .style-flat .table {
+    border: 1px solid var(--flat-border);
+    background: var(--flat-bg);
+  }
+
+  .style-flat .table th,
+  .style-flat .table td {
+    border-bottom: 1px solid var(--flat-border);
+  }
+
+  /* Layout components */
+  .style-flat .sidebar,
+  .style-flat .topbar {
+    background: var(--flat-bg);
+    border: 1px solid var(--flat-border);
+    box-shadow: var(--shadow-none);
+  }
+
+  /* All cards (including metric and chart cards) */
+  .style-flat .card,
+  .style-flat .metric-card,
+  .style-flat .chart-card {
+    background: var(--flat-bg);
+    border: 1px solid var(--flat-border);
+    border-radius: var(--flat-radius);
+    box-shadow: var(--shadow-none);
+    transition: border-color var(--flat-transition);
+  }
+
+  /* All buttons */
+  .style-flat .button,
+  .style-flat [class*="btn-"] {
+    background: var(--primary);
+    color: var(--primary-foreground);
+    border: none;
+    border-radius: var(--flat-radius);
+    box-shadow: var(--shadow-none);
+    transform: none !important; /* Prevent any transform effects */
+    transition: background-color var(--flat-transition);
+  }
+
+  /* Search and inputs */
+  .style-flat .input,
+  .style-flat .search-input,
+  .style-flat [class*="input-"] {
+    background: var(--flat-bg);
+    border: 1px solid var(--flat-border);
+    border-radius: var(--flat-radius);
+    box-shadow: var(--shadow-none);
+  }
+
+  /* Navigation items */
+  .style-flat .nav-item,
+  .style-flat [class*="nav-"] {
+    background: transparent;
+    border-radius: var(--flat-radius);
+    transition: background-color var(--flat-transition);
+  }
+
+  /* Dashboard specific components */
+  .style-flat .dashboard-container,
+  .style-flat .metrics-grid,
+  .style-flat .chart-controls {
+    background: var(--flat-bg);
+    box-shadow: var(--shadow-none);
+  }
+
+  /* Activity items */
+  .style-flat .activity-item {
+    border: 1px solid var(--flat-border);
+    background: var(--flat-bg);
+    border-radius: var(--flat-radius);
+  }
+
+  /* Override any Tailwind classes that might add shadows */
+  .style-flat .shadow,
+  .style-flat .shadow-sm,
+  .style-flat .shadow-md,
+  .style-flat .shadow-lg,
+  .style-flat .shadow-xl,
+  .style-flat .shadow-2xl,
+  .style-flat [class*="shadow-"] {
+    box-shadow: var(--shadow-none) !important;
+  }
+
+  /* Override backdrop blur effects */
+  .style-flat .backdrop-blur,
+  .style-flat [class*="backdrop-"] {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+}
