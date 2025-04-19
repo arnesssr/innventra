@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    // ...existing meta tags...
+    
+    <!-- Add Content Security Policy -->
+    <meta http-equiv="Content-Security-Policy" 
+      content="
+        default-src 'self';
+        script-src 'self' 'unsafe-inline' 'unsafe-eval';
+        style-src 'self' 'unsafe-inline';
+        img-src 'self' data: https:;
+        connect-src 'self' https://*.your-api-domain.com;
+        frame-ancestors 'none';
+      "
+    >
+    // ...rest of head content...
+  </head>
+  // ...rest of html...
+</html>

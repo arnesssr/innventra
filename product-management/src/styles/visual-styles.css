@@ -1,0 +1,392 @@
+@layer base {
+  /* Base styles */
+  :root {
+    --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    --button-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    --input-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+  }
+
+  /* Make default style distinct from flat style */
+  :root {
+    /* Use regular shadows and borders by default */
+    --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    --button-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    --input-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+  }
+
+  /* Common classes that the themes.css targets */
+  .style-flat,
+  .style-neumorphic,
+  .style-glassmorphic {
+    /* These components use the theme variables: */
+    --component-targets: {
+      /* Cards */
+      .card,
+      [class*="card-"],
+
+      /* Buttons */
+      .button,
+      [class*="btn-"],
+
+      /* Inputs */
+      .input,
+      [class*="input-"],
+
+      /* Utility classes */
+      .bg-background,
+      .text-foreground,
+      .border-border,
+      .ring-ring
+    }
+  }
+
+  /* Flat Design - Complete Implementation */
+  .style-flat {
+    /* Base Variables */
+    --element-bg: var(--background);
+    --element-border: var(--border);
+    --element-radius: 0.5rem;
+    --button-hover: color-mix(in srgb, var(--primary) 95%, transparent);
+    --input-focus: var(--ring);
+
+    /* Override any inherited shadows */
+    --card-shadow: none !important;
+    --button-shadow: none !important;
+    --input-shadow: none !important;
+  }
+
+  /* Cards - Flat Style */
+  .style-flat .card {
+    background: var(--element-bg);
+    border: 1px solid var(--element-border);
+    border-radius: var(--element-radius);
+    box-shadow: none;
+    padding: 1rem;
+    transition: border-color 0.2s ease;
+  }
+
+  .style-flat .card:hover {
+    border-color: var(--border);
+  }
+
+  /* Buttons - Flat Style */
+  .style-flat .button {
+    background: var(--primary);
+    color: var(--primary-foreground);
+    border: none;
+    border-radius: var(--element-radius);
+    box-shadow: none;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+  }
+
+  .style-flat .button:hover {
+    background: var(--button-hover);
+    transform: none;
+    box-shadow: none;
+  }
+
+  .style-flat .button:active {
+    transform: none;
+    box-shadow: none;
+  }
+
+  .style-flat .button[data-variant="outline"] {
+    background: transparent;
+    border: 1px solid var(--primary);
+    color: var(--primary);
+  }
+
+  .style-flat .button[data-variant="ghost"] {
+    background: transparent;
+    color: var(--primary);
+  }
+
+  .style-flat .button[data-variant="secondary"] {
+    background: var(--secondary);
+    color: var(--secondary-foreground);
+  }
+
+  /* Form Inputs */
+  .style-flat .input {
+    background: var(--background);
+    border: 2px solid var(--element-border);
+    border-radius: var(--element-radius);
+    box-shadow: none;
+    padding: 0.5rem 0.75rem;
+    transition: all 0.2s ease;
+  }
+
+  .style-flat .input:hover {
+    border-color: var(--primary);
+  }
+
+  .style-flat .input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 30%, transparent);
+    outline: none;
+  }
+
+  /* Select Dropdowns */
+  .style-flat .select {
+    background: var(--background);
+    border: 1px solid var(--element-border);
+    border-radius: var(--element-radius);
+    padding: 0.5rem 2rem 0.5rem 0.75rem;
+  }
+
+  /* Checkbox and Radio */
+  .style-flat .checkbox,
+  .style-flat .radio {
+    border: 2px solid var(--primary);
+    background: var(--background);
+  }
+
+  .style-flat .checkbox:checked,
+  .style-flat .radio:checked {
+    background: var(--primary);
+    border-color: var(--primary);
+  }
+
+  /* Dialog/Modal */
+  .style-flat .dialog {
+    background: var(--background);
+    border: 1px solid var(--border);
+    border-radius: var(--element-radius);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Tabs */
+  .style-flat .tabs {
+    border-bottom: 1px solid var(--border);
+  }
+
+  .style-flat .tab {
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s ease;
+  }
+
+  .style-flat .tab[data-state="active"] {
+    border-bottom-color: var(--primary);
+    color: var(--primary);
+  }
+
+  /* Alerts and Notifications */
+  .style-flat .alert {
+    border: 1px solid var(--border);
+    border-radius: var(--element-radius);
+    padding: 1rem;
+  }
+
+  .style-flat .alert[data-variant="destructive"] {
+    border-color: var(--destructive);
+    color: var(--destructive);
+  }
+
+  /* Tables */
+  .style-flat .table {
+    border: 1px solid var(--border);
+    border-radius: var(--element-radius);
+    overflow: hidden;
+  }
+
+  .style-flat .table th,
+  .style-flat .table td {
+    border-bottom: 1px solid var(--border);
+    padding: 0.75rem 1rem;
+  }
+
+  /* Neumorphic Style */
+  .style-neumorphic {
+    /* Enhanced base variables for more realistic neumorphism */
+    --neuo-bg: var(--background);
+    --neuo-size: 1;  /* Scale factor for all shadow sizes */
+    --neuo-depth: 1; /* Depth factor for shadow intensity */
+    --neuo-distance: calc(6px * var(--neuo-size));
+    --neuo-blur: calc(12px * var(--neuo-size));
+    --neuo-spread: calc(1px * var(--neuo-size));
+    
+    /* Improved shadow opacity calculations */
+    --neuo-intensity: calc(0.2 * var(--neuo-depth));
+    --neuo-light-opacity: calc(0.07 * var(--neuo-depth));
+    --neuo-dark-opacity: calc(0.15 * var(--neuo-depth));
+
+    /* Gradient overlays for depth */
+    --neuo-surface-gradient: linear-gradient(
+      145deg,
+      rgba(255, 255, 255, 0.05) 0%,
+      rgba(0, 0, 0, 0.05) 100%
+    );
+
+    /* Enhanced shadows with multi-layer effect */
+    --neuo-outer-shadow: 
+      var(--neuo-distance) var(--neuo-distance) var(--neuo-blur) var(--neuo-spread) var(--neuo-dark-shadow),
+      calc(var(--neuo-distance) * -1) calc(var(--neuo-distance) * -1) var(--neuo-blur) var(--neuo-spread) var(--neuo-light-shadow),
+      inset 0 0 0 rgba(0, 0, 0, 0);
+
+    --neuo-pressed-shadow:
+      0 0 0 rgba(0, 0, 0, 0),
+      0 0 0 rgba(255, 255, 255, 0),
+      inset var(--neuo-distance) var(--neuo-distance) var(--neuo-blur) var(--neuo-dark-shadow),
+      inset calc(var(--neuo-distance) * -1) calc(var(--neuo-distance) * -1) var(--neuo-blur) var(--neuo-light-shadow);
+  }
+
+  /* Improved neumorphic component styles */
+  .style-neumorphic .button,
+  .style-neumorphic .card,
+  .style-neumorphic .input {
+    background: var(--background);
+    border-radius: var(--radius);
+    border: none;
+    position: relative;
+    transition: all 0.2s ease;
+  }
+
+  .style-neumorphic .button {
+    background-image: var(--neuo-surface-gradient);
+    position: relative;
+    isolation: isolate;
+  }
+
+  .style-neumorphic .button::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: var(--neuo-surface-gradient);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    z-index: -1;
+  }
+
+  .style-neumorphic .button:hover::before {
+    opacity: 1;
+  }
+
+  .style-neumorphic .button:hover {
+    transform: translateY(-1px);
+    box-shadow: 
+      calc(var(--neuo-distance) * var(--neuo-hover-intensity)) 
+      calc(var(--neuo-distance) * var(--neuo-hover-intensity)) 
+      calc(var(--neuo-blur) * var(--neuo-hover-intensity)) 
+      var(--neuo-dark-shadow),
+      calc(var(--neuo-distance) * -1 * var(--neuo-hover-intensity)) 
+      calc(var(--neuo-distance) * -1 * var(--neuo-hover-intensity)) 
+      calc(var(--neuo-blur) * var(--neuo-hover-intensity)) 
+      var(--neuo-light-shadow);
+  }
+
+  .style-neumorphic .button:active {
+    transform: translateY(1px);
+    box-shadow: var(--neuo-pressed-shadow);
+  }
+
+  /* Dark mode refinements */
+  .dark .style-neumorphic {
+    --neuo-light-opacity: calc(0.05 * var(--neuo-depth));
+    --neuo-dark-opacity: calc(0.25 * var(--neuo-depth));
+    --neuo-surface-gradient: linear-gradient(
+      145deg,
+      rgba(255, 255, 255, 0.03) 0%,
+      rgba(0, 0, 0, 0.1) 100%
+    );
+  }
+
+  /* Icons and circles */
+  .style-neumorphic .icon-wrapper {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--neuo-bg);
+    box-shadow: var(--neuo-outer-shadow);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+  }
+
+  .style-neumorphic .icon-wrapper:hover {
+    box-shadow: var(--neuo-inner-shadow);
+  }
+
+  /* Select dropdowns */
+  .style-neumorphic .select {
+    background: var(--neuo-bg);
+    border-radius: 12px;
+    box-shadow: var(--neuo-inner-shadow);
+    border: none;
+    padding: 12px 16px;
+    transition: all 0.2s ease;
+  }
+
+  /* Radio and Checkbox */
+  .style-neumorphic .radio,
+  .style-neumorphic .checkbox {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--neuo-bg);
+    box-shadow: var(--neuo-outer-shadow);
+    border: none;
+    transition: all 0.2s ease;
+  }
+
+  .style-neumorphic .radio:checked,
+  .style-neumorphic .checkbox:checked {
+    box-shadow: var(--neuo-pressed-shadow);
+  }
+
+  /* Tabs */
+  .style-neumorphic .tabs-list {
+    background: var(--neuo-bg);
+    border-radius: 12px;
+    padding: 4px;
+    box-shadow: var(--neuo-inner-shadow);
+  }
+
+  .style-neumorphic .tab {
+    border-radius: 8px;
+    transition: all 0.2s ease;
+  }
+
+  .style-neumorphic .tab[data-state="active"] {
+    box-shadow: var(--neuo-outer-shadow);
+  }
+
+  /* Dialog/Modal */
+  .style-neumorphic .dialog {
+    background: var(--neuo-bg);
+    border-radius: 24px;
+    box-shadow: var(--neuo-outer-shadow);
+    border: none;
+  }
+
+  /* Glassmorphic Style */
+  .style-glassmorphic {
+    --element-bg: color-mix(in srgb, var(--background) 97%, transparent);
+    --element-border: color-mix(in srgb, var(--primary) 10%, var(--border));
+    --element-shadow: 0 8px 32px color-mix(in srgb, var(--primary) 5%, rgba(0, 0, 0, 0.1));
+    --element-backdrop: blur(8px);
+  }
+
+  .style-glassmorphic .card,
+  .style-glassmorphic [class*="card-"],
+  .style-glassmorphic .button,
+  .style-glassmorphic [class*="btn-"],
+  .style-glassmorphic .input,
+  .style-glassmorphic [class*="input-"] {
+    background: var(--element-bg);
+    border: 1px solid var(--element-border);
+    box-shadow: var(--element-shadow);
+    backdrop-filter: var(--element-backdrop);
+    transition: all 0.2s ease;
+  }
+
+  .style-glassmorphic .button:hover,
+  .style-glassmorphic [class*="btn-"]:hover,
+  .style-glassmorphic .input:focus,
+  .style-glassmorphic [class*="input-"]:focus {
+    border-color: color-mix(in srgb, var(--primary) 30%, var(--border));
+    box-shadow: 0 8px 32px color-mix(in srgb, var(--primary) 10%, rgba(0, 0, 0, 0.2));
+  }
+}

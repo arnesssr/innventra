@@ -1,4 +1,36 @@
-# Product Management System
+# StockBridge
+
+> Bridge the gap between inventory and e-commerce
+
+## Project Description
+A modern, unified product management system that bridges the gap between inventory management and e-commerce platforms. Built with React, TypeScript, and modern web technologies, this system enables businesses to:
+
+🚀 **Key Features**
+- One-click product publishing to e-commerce platforms
+- Real-time inventory synchronization
+- Dynamic category-based product forms
+- Automated stock management
+- Advanced image handling and CDN integration
+
+🎯 **Perfect For**
+- Retail businesses managing multiple product lines
+- E-commerce stores needing inventory automation
+- Businesses with multi-platform presence
+- Companies wanting to reduce manual data entry
+
+💡 **Why This Project?**
+- Eliminates duplicate data entry
+- Reduces human error in inventory management
+- Saves time with automated synchronization
+- Provides unified dashboard for all operations
+- Supports multiple e-commerce platforms
+
+🛠️ **Tech Stack**
+- Frontend: React + TypeScript
+- State: Zustand
+- UI: Shadcn/ui + Tailwind
+- Routing: React Router
+- Storage: Local + CDN ready
 
 ## Overview
 A unified product management and e-commerce integration system that enables:

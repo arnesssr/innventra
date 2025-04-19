@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom"
-import { LayoutDashboard, Store, Boxes, Settings, ChevronRight, BarChart, ShoppingCart, Users, Tag, Truck } from "lucide-react"
+import { LayoutDashboard, Store, Boxes, Settings, ChevronRight, BarChart, FileText, Tags } from "lucide-react"
 import { cn } from "../../lib/utils"
 import { Button } from "../ui/Button"
 
@@ -10,14 +10,13 @@ interface SidebarProps {
 
 export function Sidebar({ expanded, onToggle }: SidebarProps) {
   const links = [
-    { href: "/", icon: LayoutDashboard, label: "Dashboard" },
-    { href: "/products", icon: Store, label: "Products" },
-    { href: "/inventory", icon: Boxes, label: "Inventory" },
-    { href: "/orders", icon: ShoppingCart, label: "Orders" },
-    { href: "/suppliers", icon: Truck, label: "Suppliers" },
-    { href: "/reports", icon: BarChart, label: "Reports" },
-    { href: "/pricing", icon: Tag, label: "Pricing" },
-    { href: "/settings", icon: Settings, label: "Settings" },
+    { href: "/app", icon: LayoutDashboard, label: "Dashboard" },
+    { href: "/app/products", icon: Store, label: "Products" },
+    { href: "/app/inventory", icon: Boxes, label: "Inventory" },
+    { href: "/app/categories", icon: Tags, label: "Categories" },
+    { href: "/app/reports", icon: BarChart, label: "Analytics" },
+    { href: "/app/drafts", icon: FileText, label: "Drafts" },
+    { href: "/app/settings", icon: Settings, label: "Settings" }
   ]
 
   return (
@@ -25,7 +24,8 @@ export function Sidebar({ expanded, onToggle }: SidebarProps) {
       "h-screen sticky top-0 border-r bg-card transition-all duration-300",
       expanded ? "w-64" : "w-[70px]"
     )}>
-      <div className="flex h-16 items-center border-b px-4">
+      <div className="flex h-16 items-center border-b px-4 justify-between">
+        {expanded && <span className="font-semibold text-lg">StockBridge</span>}
         <Button variant="ghost" size="icon" onClick={onToggle}>
           <ChevronRight className={cn(
             "h-4 w-4 transition-transform",

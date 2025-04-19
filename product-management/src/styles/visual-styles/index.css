@@ -1,0 +1,10 @@
+@import './flat.css';
+@import './neumorphic.css';
+@import './glassmorphic.css';
+
+@layer base {
+  :root {
+    --transition-base: all 0.2s ease;
+    --radius-base: 0.5rem;
+  }
+}

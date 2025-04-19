@@ -26,7 +26,8 @@ interface Product {
   description: string;
   images: File[];
   stock: number;
-  status: 'draft' | 'published';
+  status: 'draft' | 'published' | 'archived';
+  archivedAt?: string;
   [key: string]: any;
 }
 
@@ -85,6 +86,10 @@ interface Store {
   };
   addStockMovement: (movement: Omit<StockMovement, 'id'>) => void;
   updateMinimumStock: (productId: string, minimum: number) => void;
+  archiveProduct: (productId: string) => void;
+  restoreProduct: (productId: string) => void;
+  updateProduct: (productId: string, updates: Partial<Product>) => void;
+  deleteProduct: (productId: string) => void;
 }
 
 export const useStore = create<Store>((set, get) => ({
@@ -92,11 +97,14 @@ export const useStore = create<Store>((set, get) => ({
   categories: DEFAULT_CATEGORIES,
   inventory: {},
   
-  addCategory: (categoryData) => set(state => ({
-    categories: [...state.categories, {
-      ...categoryData,
-      id: categoryData.name.toLowerCase().replace(/\s+/g, '-')
-    }]
+  addCategory: (categoryData) => set((state) => ({
+    categories: [
+      ...state.categories,
+      {
+        ...categoryData,
+        id: categoryData.name.toLowerCase().replace(/\s+/g, '-')
+      }
+    ]
   })),
 
   deleteCategory: (categoryId: string) => set(state => {
@@ -192,5 +200,41 @@ export const useStore = create<Store>((set, get) => ({
         minimumStock: minimum
       }
     }
+  })),
+
+  archiveProduct: (productId: string) => set(state => ({
+    products: state.products.map(product => 
+      product.id === productId 
+        ? { 
+            ...product, 
+            status: 'archived', 
+            archivedAt: new Date().toISOString() 
+          }
+        : product
+    )
+  })),
+
+  restoreProduct: (productId: string) => set(state => ({
+    products: state.products.map(product => 
+      product.id === productId 
+        ? { 
+            ...product, 
+            status: 'published', 
+            archivedAt: undefined 
+          }
+        : product
+    )
+  })),
+
+  updateProduct: (productId, updates) => set(state => ({
+    products: state.products.map(product =>
+      product.id === productId 
+        ? { ...product, ...updates }
+        : product
+    )
+  })),
+
+  deleteProduct: (productId) => set(state => ({
+    products: state.products.filter(product => product.id !== productId)
   }))
 }))

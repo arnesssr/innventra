@@ -1,36 +1,155 @@
+@import './themes.css';
+@import './visual-styles/flat.css';  /* Only import flat.css */
+@import './visual-styles/neumorphic.css';  /* Add neumorphic import */
+@import './visual-styles/glassmorphic.css';  /* Add glassmorphic import */
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
-  :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 221.2 83.2% 53.3%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 221.2 83.2% 53.3%;
-  }
-}
-
-@layer base {
+  /* Move theme variables to themes.css and only keep base styles here */
   * {
     @apply border-border;
   }
+  
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground transition-colors duration-300;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    @apply scroll-pt-24; /* Accounts for fixed header */
+    -webkit-text-size-adjust: var(--text-size);
+    text-size-adjust: var(--text-size);
+    -moz-text-size-adjust: var(--text-size);
+  }
+}
+
+@keyframes orbit {
+  0% {
+    transform: translate(-50%, -50%) rotate(var(--angle)) translateX(var(--radius)) rotate(calc(-1 * var(--angle)));
+  }
+  100% {
+    transform: translate(-50%, -50%) rotate(calc(var(--angle) + 360deg)) translateX(var(--radius)) rotate(calc(-1 * (var(--angle) + 360deg)));
+  }
+}
+
+@keyframes orbitReverse {
+  0% {
+    transform: translate(-50%, -50%) rotate(var(--angle)) translateX(var(--radius)) rotate(calc(-1 * var(--angle)));
+  }
+  100% {
+    transform: translate(-50%, -50%) rotate(calc(var(--angle) - 360deg)) translateX(var(--radius)) rotate(calc(-1 * (var(--angle) - 360deg)));
+  }
+}
+
+.animate-orbit {
+  animation: orbit var(--duration) linear infinite;
+}
+
+.animate-orbit-reverse {
+  animation: orbitReverse var(--duration) linear infinite;
+}
+
+.size-full {
+  width: 100%;
+  height: 100%;
+}
+
+@layer utilities {
+  .backdrop-blur {
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+  }
+
+  .supports-backdrop-filter\:backdrop-blur {
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+  }
+}
+
+@layer components {
+  /* Dashboard Layout */
+  .dashboard-container {
+    @apply p-6 space-y-6 bg-background min-h-screen;
+  }
+
+  .dashboard-grid {
+    @apply grid grid-cols-12 gap-6;
+  }
+
+  .metrics-grid {
+    @apply grid grid-cols-2 md:grid-cols-4 gap-4;
+  }
+
+  /* Cards */
+  .chart-card {
+    @apply bg-card text-card-foreground shadow-lg backdrop-blur-sm;
+  }
+
+  .chart-content {
+    @apply space-y-6;
+  }
+
+  /* Controls */
+  .chart-controls {
+    @apply flex gap-4;
+  }
+
+  .chart-type-switch {
+    @apply flex items-center gap-2;
+  }
+
+  .time-range-selector {
+    @apply flex gap-2;
+  }
+
+  /* Metric Cards */
+  .metric-card {
+    @apply bg-card text-card-foreground shadow-lg backdrop-blur-sm 
+    transition-all hover:shadow-xl;
+  }
+
+  .metric-content {
+    @apply p-6;
+  }
+
+  .metric-header {
+    @apply flex justify-between items-start;
+  }
+
+  .metric-info {
+    @apply space-y-1;
+  }
+
+  .metric-title {
+    @apply text-sm text-muted-foreground;
+  }
+
+  .metric-value {
+    @apply text-2xl font-bold;
+  }
+
+  .metric-trend {
+    @apply mt-4 flex items-center gap-2;
+  }
+
+  /* Activity Feed */
+  .activity-item {
+    @apply flex items-center justify-between p-2 rounded-lg 
+    transition-colors hover:bg-accent/50;
+  }
+
+  .activity-icon {
+    @apply flex items-center gap-2;
+  }
+
+  .activity-quantity {
+    @apply font-medium;
+  }
+
+  .activity-date {
+    @apply text-sm text-muted-foreground;
   }
 }

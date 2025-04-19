@@ -5,7 +5,6 @@ import { Button } from "../../components/ui/Button"
 import { AlertTriangle, Package, TrendingUp, Clock, ArrowUp, ArrowDown, RefreshCw } from "lucide-react"
 import { BarChart, Bar, XAxis, YAxis, Tooltip, PieChart, Pie, Cell, ResponsiveContainer, AreaChart, Area, LineChart, Line, CartesianGrid, ComposedChart } from 'recharts'
 import { useState, useMemo } from "react"
-import '../../styles/dashboard.css'
 import { calculateMetrics } from '../../utils/dashboardCalculations'
 import { format } from 'date-fns'
 
@@ -152,25 +151,25 @@ export function DashboardPage() {
             <MetricCard
               title="Total Products"
               value={metrics.products.current}
-              icon={<Package className="h-5 w-5" />}
+              icon={<Package className="h-5 w-5 text-primary" />}
               trend={metrics.products.trend}
             />
             <MetricCard
               title="Inventory Value"
               value={metrics.value.formatted}
-              icon={<TrendingUp className="h-5 w-5" />}
+              icon={<TrendingUp className="h-5 w-5 text-primary" />}
               trend={metrics.value.trend}
             />
             <MetricCard
               title="Low Stock Alert"
               value={metrics.alerts.current}
-              icon={<AlertTriangle className="h-5 w-5" />}
+              icon={<AlertTriangle className="h-5 w-5 text-primary" />}
               trend={metrics.alerts.trend}
             />
             <MetricCard
               title="Recent Activity"
               value={metrics.activity.current}
-              icon={<Clock className="h-5 w-5" />}
+              icon={<Clock className="h-5 w-5 text-primary" />}
               trend={metrics.activity.trend}
             />
           </div>
@@ -407,12 +406,12 @@ function MetricCard({ title, value, icon, trend }: {
             <p className="metric-title">{title}</p>
             <p className="metric-value">{value}</p>
           </div>
-          <div className={`p-2 rounded-full ${trend > 0 ? 'bg-green-100' : 'bg-red-100'}`}>
+          <div className={`p-2 rounded-full bg-primary/10 dark:bg-primary/20`}>
             {icon}
           </div>
         </div>
         <div className="metric-trend">
-          <span className={trend > 0 ? 'text-green-600' : 'text-red-600'}>
+          <span className={trend > 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}>
             {trend > 0 ? '↑' : '↓'} {Math.abs(trend)}%
           </span>
           <span className="text-sm text-muted-foreground">vs last period</span>

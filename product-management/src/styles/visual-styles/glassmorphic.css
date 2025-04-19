@@ -1,0 +1,105 @@
+@layer base {
+  .style-glassmorphic {
+    /* Ultra minimal transparency - almost invisible */
+    --glass-bg: rgba(255, 255, 255, 0.005);    /* Reduced from 0.01 */
+    --glass-border: rgba(255, 255, 255, 0.008); /* Reduced from 0.02 */
+    --glass-shadow: 0 8px 32px rgba(31, 38, 135, 0.005);
+    --glass-blur: 0.2px;                        /* Reduced from 0.5px */
+    --glass-radius: 14px;
+    --content-bg: rgba(255, 255, 255, 0.002);   /* Reduced from 0.005 */
+    --hover-bg: rgba(255, 255, 255, 0.007);     /* Reduced from 0.015 */
+  }
+
+  /* Container components with modern glass effect */
+  .style-glassmorphic .card,
+  .style-glassmorphic .metric-card,
+  .style-glassmorphic .chart-card,
+  .style-glassmorphic .dialog,
+  .style-glassmorphic .dropdown-menu,
+  .style-glassmorphic .nav-item,
+  .style-glassmorphic .tabs,
+  .style-glassmorphic .tooltip,
+  .style-glassmorphic .popover {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border-radius: var(--glass-radius);
+    transition: transform 0.3s ease;
+  }
+
+  /* Card hover effect */
+  .style-glassmorphic .card:hover,
+  .style-glassmorphic .metric-card:hover {
+    transform: scale(1.02);
+    background: var(--hover-bg);
+  }
+
+  /* Normal button styles */
+  .style-glassmorphic .button:not([data-variant="ghost"]):not([data-variant="link"]) {
+    background: rgba(58, 109, 240, 0.85);
+    border: none;
+    padding: 8px 26px;
+    color: #fff;
+    border-radius: 20px;
+    transition: 0.3s;
+  }
+
+  /* Ghost and link variants should remain transparent */
+  .style-glassmorphic .button[data-variant="ghost"],
+  .style-glassmorphic .button[data-variant="link"] {
+    background: transparent;
+    color: var(--foreground);
+    border: none;
+  }
+
+  /* Button hover and active states */
+  .style-glassmorphic .button:not([data-variant="ghost"]):not([data-variant="link"]):hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+  }
+
+  .style-glassmorphic .button:not([data-variant="ghost"]):not([data-variant="link"]):active {
+    transform: translateY(0);
+  }
+
+  /* Icon buttons should remain transparent */
+  .style-glassmorphic .button[data-variant="ghost"][size="icon"],
+  .style-glassmorphic .button[size="icon"] {
+    background: transparent;
+    color: var(--foreground);
+  }
+
+  /* Remove nested glass effects */
+  .style-glassmorphic .card *,
+  .style-glassmorphic .metric-card *,
+  .style-glassmorphic .chart-card * {
+    background: transparent !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border: none !important;
+  }
+
+  /* Keep button styling inside cards normal */
+  .style-glassmorphic .card .button {
+    background: var(--primary) !important;
+    color: var(--primary-foreground) !important;
+    border: none !important;
+  }
+
+  /* Keep interactive elements styling */
+  .style-glassmorphic .card .input,
+  .style-glassmorphic .card .select {
+    border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  }
+}
+
+/* Dark mode - ultra minimal transparency */
+.dark .style-glassmorphic {
+  --glass-bg: rgba(16, 18, 27, 0.005);         /* Reduced from 0.01 */
+  --glass-border: rgba(255, 255, 255, 0.002);   /* Reduced from 0.005 */
+  --content-bg: rgba(146, 151, 179, 0.001);     /* Reduced from 0.002 */
+  --hover-bg: rgba(12, 15, 25, 0.007);          /* Reduced from 0.015 */
+}
