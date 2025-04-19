@@ -86,9 +86,9 @@ function ErrorPage() {
       <div className="text-center space-y-4">
         <h1 className="text-4xl font-bold">Page Not Found</h1>
         <p className="text-muted-foreground">The page you're looking for doesn't exist.</p>
-        <Button asChild>
-          <Link to="/">Go back home</Link>
-        </Button>
+        <Link to="/" className="inline-flex">
+          <Button>Go back home</Button>
+        </Link>
       </div>
     </div>
   )
