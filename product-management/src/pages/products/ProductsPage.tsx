@@ -10,17 +10,22 @@ export function ProductsPage() {
   const currentPath = location.pathname.split('/').pop() || 'categories'
   const [searchTerm, setSearchTerm] = useState("")
 
+  // Filter products based on search term
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value)
+  }
+
   return (
     <div className="p-6 space-y-6">
-      {/* Reduced width search bar */}
+      {/* Updated search bar with onChange handler */}
       <div className="flex-1 relative max-w-md lg:max-w-lg">
         <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 max-w-[320px]">
           <Search className="h-4 w-4 text-muted-foreground" />
           <input 
             type="text" 
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search items..." 
+            onChange={handleSearch}
+            placeholder="Search products..." 
             className="bg-transparent text-sm text-foreground placeholder:text-muted-foreground flex-1 outline-none"
           />
         </div>

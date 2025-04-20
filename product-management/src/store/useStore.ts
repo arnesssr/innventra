@@ -101,6 +101,21 @@ interface Store {
   adjustProductStock: (productId: string, adjustment: number) => void;
 }
 
+const generateSKU = (categoryId: string, name: string, variant?: Record<string, string>) => {
+  const catPrefix = categoryId.substring(0, 3).toUpperCase();
+  const prodCode = name.replace(/\s+/g, '').substring(0, 3).toUpperCase();
+  const timestamp = Date.now().toString().slice(-4);
+  
+  if (variant) {
+    const variantCode = Object.entries(variant)
+      .map(([_, value]) => value.substring(0, 2).toUpperCase())
+      .join('');
+    return `${catPrefix}-${prodCode}-${variantCode}-${timestamp}`;
+  }
+  
+  return `${catPrefix}-${prodCode}-${timestamp}`;
+};
+
 export const useStore = create<Store>((set, get) => ({
   products: [],
   categories: DEFAULT_CATEGORIES,
@@ -130,6 +145,12 @@ export const useStore = create<Store>((set, get) => ({
   }),
 
   addProduct: (product) => set(state => {
+    const baseSKU = generateSKU(product.category, product.name);
+    const variants = product.variants?.map(variant => ({
+      ...variant,
+      sku: generateSKU(product.category, product.name, variant.combination)
+    }));
+
     // Create preview URLs only for new File objects
     const imageUrls = product.images.map(img => {
       if (img instanceof File) {
@@ -140,6 +161,8 @@ export const useStore = create<Store>((set, get) => ({
 
     const newProduct = {
       ...product,
+      sku: baseSKU,
+      variants,
       imageUrls,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()

@@ -7,8 +7,12 @@ import { RadioGroup, RadioGroupItem } from "../../components/ui/RadioGroup"
 import { Label } from "../../components/ui/Label"
 import { VisualStyleSettings } from "../../components/settings/VisualStyleSettings"
 
+// Import Theme type from context
+import { Theme } from '../../context/theme-context'
+
 // Define theme types to match available CSS files
-type AvailableTheme = 'default' | 'theme-red' | 'theme-rose' | 'theme-orange' | 'theme-yellow' | 'theme-violet' | 'theme-indigo' | 'theme-amber'
+type AvailableTheme = Theme | 'default' | 'theme-red' | 'theme-rose' | 'theme-orange' | 'theme-yellow' | 'theme-violet' | 'theme-indigo' | 'theme-amber'
+
 
 const themes: Array<{
   name: string;
@@ -30,7 +34,7 @@ export function SettingsPage() {
   const { theme, setTheme } = useTheme()
 
   const handleThemeChange = (newTheme: string) => {
-    const root = document.documentElement
+const root = document.documentElement
     
     // First remove all theme classes
     root.classList.remove(
@@ -39,12 +43,12 @@ export function SettingsPage() {
       'theme-violet', 'theme-indigo', 'theme-amber'
     )
 
-    if (newTheme === 'default') {
-      // Handle default theme
-      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
-      root.classList.add(systemTheme)
-      setTheme('system')
-    } else {
+if (newTheme === 'default') {
+  // Handle default theme
+  const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+  root.classList.add(systemTheme)
+  setTheme('system')
+} else {
       // Handle custom themes
       const currentMode = localStorage.getItem('color-mode') || 
                          (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
