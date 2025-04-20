@@ -12,15 +12,15 @@ export function ProductsPage() {
 
   return (
     <div className="p-6 space-y-6">
-      {/* Search bar styled to match header */}
-      <div className="flex-1 relative max-w-xl">
-        <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10">
+      {/* Reduced width search bar */}
+      <div className="flex-1 relative max-w-md lg:max-w-lg">
+        <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 max-w-[320px]">
           <Search className="h-4 w-4 text-muted-foreground" />
           <input 
             type="text" 
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search all items..." 
+            placeholder="Search items..." 
             className="bg-transparent text-sm text-foreground placeholder:text-muted-foreground flex-1 outline-none"
           />
         </div>
