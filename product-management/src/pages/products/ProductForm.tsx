@@ -284,13 +284,38 @@ export function ProductForm() {
   }
 
   /**
-   * Handles image upload and preview generation
+   * Safely creates object URLs for images and handles file uploads
    */
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || [])
-    setFormData(prev => ({ ...prev, images: [...prev.images, ...files] }))
     
-    const newUrls = files.map(file => URL.createObjectURL(file))
+    // Validate files
+    const validFiles = files.filter(file => {
+      // Only allow images
+      if (!file.type.startsWith('image/')) {
+        return false
+      }
+      // Size limit (e.g., 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        return false
+      }
+      return true
+    })
+
+    // Create safe URLs
+    const newUrls = validFiles.map(file => {
+      try {
+        return URL.createObjectURL(file)
+      } catch (error) {
+        console.error('Error creating object URL:', error)
+        return ''
+      }
+    }).filter(Boolean) // Remove any failed URLs
+
+    setFormData(prev => ({ 
+      ...prev, 
+      images: [...prev.images, ...validFiles] 
+    }))
     setImageUrls(prev => [...prev, ...newUrls])
   }
 
@@ -415,7 +440,7 @@ export function ProductForm() {
             <div className="space-y-2">
               <label>Description</label>
               <textarea
-                className={`w-full rounded-md border p-2 ${errors.description ? 'border-red-500' : ''}`}
+                className="w-full min-h-[100px] rounded-md border bg-background text-foreground p-3 text-sm"
                 value={formData.description}
                 onChange={e => setFormData({ ...formData, description: e.target.value })}
                 rows={4}
@@ -449,8 +474,12 @@ export function ProductForm() {
                   <div key={index} className="relative group">
                     <img
                       src={imageUrls[index]}
-                      alt={`Preview ${index}`}
+                      alt={`Product preview ${index + 1}`}
                       className="w-full h-32 object-cover rounded-lg"
+                      onError={(e) => {
+                        e.currentTarget.src = '/fallback-image.png' // Add a fallback image
+                        console.error('Error loading image preview')
+                      }}
                     />
                     <button
                       type="button"
