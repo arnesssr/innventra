@@ -1,7 +1,6 @@
 import { useNavigate, Outlet, useLocation } from "react-router-dom"
 import { Tabs, TabsList, TabsTrigger } from "../../components/ui/Tabs"
 import { Search } from "lucide-react"
-import { Input } from "../../components/ui/Input"
 import { useState } from "react"
 import { FolderKanban, PackageCheck, FileEdit, Archive } from 'lucide-react' // Import icons
 
@@ -13,15 +12,18 @@ export function ProductsPage() {
 
   return (
     <div className="p-6 space-y-6">
-      {/* Enhanced Search bar with better visibility */}
-      <div className="flex-1 relative max-w-md">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          placeholder="Search all items..."
-          className="pl-9 h-11 bg-background border-border/50 shadow-sm hover:border-primary/50 focus:border-primary transition-colors"
-        />
+      {/* Search bar styled to match header */}
+      <div className="flex-1 relative max-w-xl">
+        <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10">
+          <Search className="h-4 w-4 text-muted-foreground" />
+          <input 
+            type="text" 
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Search all items..." 
+            className="bg-transparent text-sm text-foreground placeholder:text-muted-foreground flex-1 outline-none"
+          />
+        </div>
       </div>
 
       <Tabs 

@@ -4,7 +4,7 @@ import { Card, CardContent } from "../../components/ui/Card"
 import { Input } from "../../components/ui/Input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/Select"
 import { Button } from "../../components/ui/Button"
-import { Search, Filter, ArrowUpDown, Edit, Archive, MinusCircle, PlusCircle, Loader2, FileDown } from "lucide-react"
+import { Filter, ArrowUpDown, Edit, Archive, MinusCircle, PlusCircle, Loader2, FileDown } from "lucide-react"
 import { useState, useEffect } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../../components/ui/Dialog"
 import { useNavigate } from "react-router-dom"
@@ -15,7 +15,6 @@ import { useToast } from "../../components/ui/use-toast"
  * PublishedProducts Component
  * Displays a filterable, sortable table of published products with quick actions
  * Features:
- * - Text search
  * - Category filtering
  * - Price range filtering
  * - Stock level filtering
@@ -35,7 +34,6 @@ export function PublishedProducts() {
   const adjustProductStock = useStore(state => state.adjustProductStock)
 
   // Filter and sort state
-  const [search, setSearch] = useState("")
   const [categoryFilter, setCategoryFilter] = useState("all")
   const [sort, setSort] = useState<'name' | 'price' | 'stock'>('name')
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc')
@@ -164,14 +162,11 @@ export function PublishedProducts() {
 
   /**
    * Applies all active filters and sorting to products
-   * Filtering order: search > category > price > stock
+   * Filtering order: category > price > stock
    * Then applies selected sorting
    */
   const filteredProducts = products
     .filter(product => {
-      // Apply text search filter
-      const matchesSearch = product.name.toLowerCase().includes(search.toLowerCase())
-      
       // Apply category filter
       const matchesCategory = categoryFilter === "all" || product.category === categoryFilter
       
@@ -184,7 +179,7 @@ export function PublishedProducts() {
                           (stockFilter === 'low' && product.stock <= 10 && product.stock > 0) ||
                           (stockFilter === 'out' && product.stock <= 0)
       
-      return matchesSearch && matchesCategory && matchesPriceRange && matchesStock
+      return matchesCategory && matchesPriceRange && matchesStock
     })
     .sort((a, b) => {
       const modifier = sortDir === 'asc' ? 1 : -1
@@ -210,85 +205,74 @@ export function PublishedProducts() {
     <div className="space-y-4">
       <Card>
         <CardContent className="p-4">
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <div className="flex gap-2 flex-wrap md:flex-nowrap">
+            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+              <SelectTrigger className="w-[180px]">
+                <Filter className="h-4 w-4 mr-2" />
+                <SelectValue placeholder="Filter by category" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Categories</SelectItem>
+                {categories.map(cat => (
+                  <SelectItem key={cat.id} value={cat.id}>
+                    {cat.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <div className="flex gap-2 items-center">
               <Input
-                value={search}
-                placeholder="Search products..."
-                onChange={e => setSearch(e.target.value)}
-                className="pl-9"
+                type="number"
+                placeholder="Min price"
+                value={priceRange.min}
+                onChange={e => setPriceRange(prev => ({ ...prev, min: e.target.value }))}
+                className="w-24"
+              />
+              <span>-</span>
+              <Input
+                type="number"
+                placeholder="Max price"
+                value={priceRange.max}
+                onChange={e => setPriceRange(prev => ({ ...prev, max: e.target.value }))}
+                className="w-24"
               />
             </div>
-            <div className="flex gap-2 flex-wrap md:flex-nowrap">
-              <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-                <SelectTrigger className="w-[180px]">
-                  <Filter className="h-4 w-4 mr-2" />
-                  <SelectValue placeholder="Filter by category" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Categories</SelectItem>
-                  {categories.map(cat => (
-                    <SelectItem key={cat.id} value={cat.id}>
-                      {cat.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <div className="flex gap-2 items-center">
-                <Input
-                  type="number"
-                  placeholder="Min price"
-                  value={priceRange.min}
-                  onChange={e => setPriceRange(prev => ({ ...prev, min: e.target.value }))}
-                  className="w-24"
-                />
-                <span>-</span>
-                <Input
-                  type="number"
-                  placeholder="Max price"
-                  value={priceRange.max}
-                  onChange={e => setPriceRange(prev => ({ ...prev, max: e.target.value }))}
-                  className="w-24"
-                />
-              </div>
-              <Select value={stockFilter} onValueChange={(value: typeof stockFilter) => setStockFilter(value)}>
-                <SelectTrigger className="w-[150px]">
-                  <SelectValue placeholder="Stock level" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All stock levels</SelectItem>
-                  <SelectItem value="low">Low stock</SelectItem>
-                  <SelectItem value="out">Out of stock</SelectItem>
-                </SelectContent>
-              </Select>
-              <Select value={sort} onValueChange={(value: 'name' | 'price' | 'stock') => {
-                if (sort === value) {
-                  setSortDir(current => current === 'asc' ? 'desc' : 'asc')
-                } else {
-                  setSort(value)
-                  setSortDir('asc')
-                }
-              }}>
-                <SelectTrigger className="w-[150px]">
-                  <ArrowUpDown className="h-4 w-4 mr-2" />
-                  <SelectValue placeholder="Sort by" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="name">Name</SelectItem>
-                  <SelectItem value="price">Price</SelectItem>
-                  <SelectItem value="stock">Stock</SelectItem>
-                </SelectContent>
-              </Select>
-              <Button 
-                variant="outline" 
-                onClick={handleExport}
-                className="ml-auto"
-              >
-                <FileDown className="h-4 w-4 mr-2" />
-                Export
-              </Button>
-            </div>
+            <Select value={stockFilter} onValueChange={(value: typeof stockFilter) => setStockFilter(value)}>
+              <SelectTrigger className="w-[150px]">
+                <SelectValue placeholder="Stock level" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All stock levels</SelectItem>
+                <SelectItem value="low">Low stock</SelectItem>
+                <SelectItem value="out">Out of stock</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={sort} onValueChange={(value: 'name' | 'price' | 'stock') => {
+              if (sort === value) {
+                setSortDir(current => current === 'asc' ? 'desc' : 'asc')
+              } else {
+                setSort(value)
+                setSortDir('asc')
+              }
+            }}>
+              <SelectTrigger className="w-[150px]">
+                <ArrowUpDown className="h-4 w-4 mr-2" />
+                <SelectValue placeholder="Sort by" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="name">Name</SelectItem>
+                <SelectItem value="price">Price</SelectItem>
+                <SelectItem value="stock">Stock</SelectItem>
+              </SelectContent>
+            </Select>
+            <Button 
+              variant="outline" 
+              onClick={handleExport}
+              className="ml-auto"
+            >
+              <FileDown className="h-4 w-4 mr-2" />
+              Export
+            </Button>
           </div>
         </CardContent>
       </Card>
