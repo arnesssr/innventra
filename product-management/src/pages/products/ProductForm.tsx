@@ -7,6 +7,9 @@ import { Button } from "../../components/ui/Button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/Select"
 import { useStore } from "../../store/useStore"
 import { Trash } from "lucide-react"
+import { VariationManager } from "../../features/products/variations/VariationManager"
+import { generateSKU } from "../../utils/productUtils" // Create this utility
+import type { Variation, VariantCombination } from '../../types/variationTypes'
 
 // Define interfaces for form field types and category configuration
 interface CategoryField {
@@ -123,7 +126,11 @@ interface ProductFormData {
   ageGroup?: string;
   createdAt?: string;
   updatedAt?: string;
-  [key: string]: string | number | File[] | undefined;
+  variations: Variation[];
+  variants: VariantCombination[];
+  hasVariations: boolean;
+  basePrice: number;
+  [key: string]: string | number | File[] | undefined | any[] | boolean;
 }
 
 /**
@@ -164,8 +171,12 @@ export function ProductForm() {
         status: existingProduct.status || 'draft',
         createdAt: existingProduct.createdAt || new Date().toISOString(),
         updatedAt: new Date().toISOString(),
+        variations: existingProduct.variations || [],
+        variants: existingProduct.variants || [],
+        hasVariations: existingProduct.hasVariations || false,
+        basePrice: parseFloat(existingProduct.price) || 0,
         ...Object.entries(existingProduct).reduce((acc, [key, value]) => {
-          if (!['name', 'category', 'price', 'description', 'images', 'stock', 'status', 'createdAt', 'updatedAt'].includes(key)) {
+          if (!['name', 'category', 'price', 'description', 'images', 'stock', 'status', 'createdAt', 'updatedAt', 'variations', 'variants', 'hasVariations', 'basePrice'].includes(key)) {
             acc[key] = value
           }
           return acc
@@ -182,7 +193,11 @@ export function ProductForm() {
       stock: 0,
       status: 'draft',
       createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      updatedAt: new Date().toISOString(),
+      variations: [],
+      variants: [],
+      hasVariations: false,
+      basePrice: 0
     }
   }
 
@@ -340,6 +355,22 @@ export function ProductForm() {
   }
 
   /**
+   * Handle variation updates from VariationManager
+   */
+  const handleVariationUpdate = (variations: Variation[], variants: VariantCombination[]) => {
+    setFormData(prev => ({
+      ...prev,
+      variations,
+      variants: variants.map(variant => ({
+        ...variant,
+        price: variant.price || parseFloat(prev.price) || 0,
+        stock: variant.stock || 0,
+        sku: variant.sku || generateSKU(prev.name, Object.values(variant.combination).join('-'))
+      }))
+    }))
+  }
+
+  /**
    * Renders category-specific form fields dynamically
    */
   const renderCategoryFields = () => {
@@ -393,7 +424,17 @@ export function ProductForm() {
     <div className="space-y-6 p-6">
       <Card>
         <CardHeader>
-          <CardTitle>{id ? 'Edit' : 'Add'} {getCategoryName(category || '')} Product</CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle>{id ? 'Edit' : 'Add'} {getCategoryName(category || '')} Product</CardTitle>
+            <div className="flex items-center gap-2">
+              <Button 
+                variant="outline" 
+                onClick={() => navigate('/app/products/categories')}
+              >
+                Back to Categories
+              </Button>
+            </div>
+          </div>
         </CardHeader>
         <CardContent>
           <form className="space-y-6" onSubmit={e => e.preventDefault()}>
@@ -494,11 +535,55 @@ export function ProductForm() {
               {errors.images && <span className="text-sm text-red-500">{errors.images}</span>}
             </div>
 
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={e => handleSubmit(e, 'draft')}>
+            {/* Variations Section */}
+            <div className="border-t mt-6 pt-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-medium">Product Variations</h3>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setFormData(prev => ({
+                    ...prev,
+                    hasVariations: !prev.hasVariations,
+                    variations: !prev.hasVariations ? [] : prev.variations,
+                    variants: !prev.hasVariations ? [] : prev.variants
+                  }))}
+                >
+                  {formData.hasVariations ? 'Remove Variations' : 'Add Variations'}
+                </Button>
+              </div>
+              
+              {formData.hasVariations && (
+                <VariationManager 
+                  variations={formData.variations}
+                  variants={formData.variants}
+                  baseProduct={formData.name}  // Pass full name
+                  category={category || ''}    // Pass category
+                  basePrice={parseFloat(formData.price) || 0}
+                  onUpdate={handleVariationUpdate}
+                />
+              )}
+            </div>
+
+            <div className="flex items-center justify-end gap-4 pt-6 border-t">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => navigate('/app/products/categories')}
+              >
+                Cancel
+              </Button>
+              <Button 
+                type="button"
+                variant="outline" 
+                onClick={e => handleSubmit(e, 'draft')}
+              >
                 Save as Draft
               </Button>
-              <Button onClick={e => handleSubmit(e, 'published')}>
+              <Button 
+                type="button"
+                onClick={e => handleSubmit(e, 'published')}
+              >
                 Publish
               </Button>
             </div>

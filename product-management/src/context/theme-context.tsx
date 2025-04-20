@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import { ThemeBoundary } from '../lib/theme-boundary'
 
-type Theme = 'system' | 'light' | 'dark' | 'red' | 'rose' | 'orange' | 'green' | 'blue' | 'yellow' | 'violet'
+export type Theme = 'system' | 'light' | 'dark' | 'red' | 'rose' | 'orange' | 'green' | 'blue' | 'yellow' | 'violet'
 
 interface ThemeProviderProps {
   children: React.ReactNode

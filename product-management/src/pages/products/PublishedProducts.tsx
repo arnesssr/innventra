@@ -7,9 +7,15 @@ import { Button } from "../../components/ui/Button"
 import { Filter, ArrowUpDown, Edit, Archive, MinusCircle, PlusCircle, Loader2, FileDown } from "lucide-react"
 import { useState, useEffect } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../../components/ui/Dialog"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useOutletContext } from "react-router-dom"
 import { Checkbox } from "../../components/ui/Checkbox"
-import { useToast } from "../../components/ui/use-toast"
+import { useNotifications } from "../../components/ui/Notifications"
+import { BulkActionsBar } from "../../features/products/bulk-operations/BulkActionsBar"
+import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "../../components/ui/Collapsible"
+
+interface OutletContextType {
+  searchTerm: string;
+}
 
 /**
  * PublishedProducts Component
@@ -32,6 +38,7 @@ export function PublishedProducts() {
   const getCategoryName = useStore(state => state.getCategoryName)
   const archiveProduct = useStore(state => state.archiveProduct)
   const adjustProductStock = useStore(state => state.adjustProductStock)
+  const updateProduct = useStore(state => state.updateProduct)
 
   // Filter and sort state
   const [categoryFilter, setCategoryFilter] = useState("all")
@@ -51,8 +58,13 @@ export function PublishedProducts() {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
+  // SKU display state
+  const [selectedProduct, setSelectedProduct] = useState<any | null>(null)
+
   const navigate = useNavigate()
-  const { toast } = useToast() // temporary fix
+  const { show } = useNotifications()
+
+  const { searchTerm } = useOutletContext<OutletContextType>()
 
   // Simulate loading state
   useEffect(() => {
@@ -94,16 +106,9 @@ export function PublishedProducts() {
   const handleQuickStockAdjust = async (productId: string, adjustment: number) => {
     try {
       await adjustProductStock(productId, adjustment)
-      toast({
-        title: "Stock updated",
-        description: "Product stock has been adjusted successfully."
-      })
+      show("Stock updated successfully", "success", "Stock Update")
     } catch (err) {
-      toast({
-        title: "Error",
-        description: "Failed to update stock. Please try again.",
-        variant: "destructive"
-      })
+      show("Failed to update stock", "error", "Error")
     }
   }
 
@@ -161,25 +166,73 @@ export function PublishedProducts() {
   }
 
   /**
+   * Handles bulk operations on selected products
+   * @param action - The type of bulk action (price, category, stock)
+   * @param value - The value to apply (price amount, category id, stock quantity)
+   */
+  const handleBulkUpdate = async (action: string, value: any) => {
+    try {
+      switch (action) {
+        case 'price':
+          // Handle price updates (fixed or percentage)
+          selectedProducts.forEach(id => {
+            const product = products.find(p => p.id === id)
+            if (!product) return
+
+            const newPrice = value.type === 'fixed' 
+              ? parseFloat(value.value)
+              : product.price * (1 + (parseFloat(value.value) / 100))
+
+            updateProduct(id, { price: newPrice })
+          })
+          break;
+
+        case 'category':
+          // Handle category changes
+          selectedProducts.forEach(id => {
+            updateProduct(id, { category: value })
+          })
+          break;
+
+        case 'stock':
+          // Handle stock adjustments
+          selectedProducts.forEach(id => {
+            adjustProductStock(id, parseInt(value))
+          })
+          break;
+      }
+
+      show(`Updated ${selectedProducts.length} products`, "success", "Bulk Update")
+      
+      // Clear selection after successful update
+      setSelectedProducts([])
+    } catch (error) {
+      show("Failed to update products", "error", "Error")
+    }
+  }
+
+  /**
    * Applies all active filters and sorting to products
    * Filtering order: category > price > stock
    * Then applies selected sorting
    */
   const filteredProducts = products
     .filter(product => {
-      // Apply category filter
+      // First apply search filter
+      const matchesSearch = !searchTerm || 
+        product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        product.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        product.sku?.toLowerCase().includes(searchTerm.toLowerCase())
+
+      // Then apply other filters
       const matchesCategory = categoryFilter === "all" || product.category === categoryFilter
-      
-      // Apply price range filter
       const matchesPriceRange = (!priceRange.min || product.price >= Number(priceRange.min)) &&
                                (!priceRange.max || product.price <= Number(priceRange.max))
-      
-      // Apply stock level filter
       const matchesStock = stockFilter === 'all' ||
                           (stockFilter === 'low' && product.stock <= 10 && product.stock > 0) ||
                           (stockFilter === 'out' && product.stock <= 0)
       
-      return matchesCategory && matchesPriceRange && matchesStock
+      return matchesSearch && matchesCategory && matchesPriceRange && matchesStock
     })
     .sort((a, b) => {
       const modifier = sortDir === 'asc' ? 1 : -1
@@ -203,6 +256,12 @@ export function PublishedProducts() {
 
   return (
     <div className="space-y-4">
+      <BulkActionsBar 
+        selectedIds={selectedProducts}
+        onBulkUpdate={handleBulkUpdate}
+        categories={categories}
+      />
+
       <Card>
         <CardContent className="p-4">
           <div className="flex gap-2 flex-wrap md:flex-nowrap">
@@ -310,7 +369,7 @@ export function PublishedProducts() {
                 <TableCell>Category</TableCell>
                 <TableCell>Price</TableCell>
                 <TableCell>Stock</TableCell>
-                <TableCell>Last Updated</TableCell>
+                <TableCell>SKU</TableCell> {/* Add SKU column */}
                 <TableCell>Actions</TableCell>
               </TableRow>
             </TableHeader>
@@ -369,10 +428,17 @@ export function PublishedProducts() {
                     </div>
                   </TableCell>
                   <TableCell>
-                    {product.updatedAt 
-                      ? new Date(product.updatedAt).toLocaleDateString()
-                      : 'Not updated'
-                    }
+                    {product.hasVariations ? (
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={() => setSelectedProduct(product)}
+                      >
+                        View {product.variants?.length || 0} SKUs
+                      </Button>
+                    ) : (
+                      <span className="font-mono text-sm">{product.sku}</span>
+                    )}
                   </TableCell>
                   <TableCell>
                     <div className="flex gap-2">
@@ -411,6 +477,45 @@ export function PublishedProducts() {
             <Button variant="default" onClick={confirmArchive}>
               Archive
             </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={!!selectedProduct} onOpenChange={() => setSelectedProduct(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Product SKUs</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            {/* Base SKU */}
+            <div>
+              <div className="text-sm text-muted-foreground mb-1">Base SKU:</div>
+              <div className="font-mono bg-muted/50 p-2 rounded-md">
+                {selectedProduct?.sku || 'No SKU'}
+              </div>
+            </div>
+
+            {/* Variant SKUs */}
+            {selectedProduct?.variants?.length > 0 && (
+              <div>
+                <div className="text-sm text-muted-foreground mb-2">Variants:</div>
+                <div className="grid gap-2">
+                  {selectedProduct.variants.map((variant: any) => (
+                    <div key={variant.id} className="flex justify-between items-center p-2 bg-muted/50 rounded-md">
+                      <div className="space-y-1">
+                        <div className="text-sm">{Object.values(variant.combination).join(' / ')}</div>
+                        <div className="font-mono text-xs text-muted-foreground">
+                          {variant.sku}
+                        </div>
+                      </div>
+                      <div className="text-sm text-right">
+                        <div>KES {variant.price?.toLocaleString()}</div>
+                        <div>Stock: {variant.stock}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </DialogContent>
       </Dialog>
