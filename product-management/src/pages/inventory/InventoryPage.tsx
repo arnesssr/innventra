@@ -1,16 +1,28 @@
 import { Tabs, TabsList, TabsTrigger } from "../../components/ui/Tabs"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { StockLevels } from "./StockLevels"
 import { StockMovements } from "./StockMovements"
 import { 
   Package2,        // Changed from Boxes to Package2
   ArrowUpDown,     
   AlertTriangle,
+  ClipboardList
 } from "lucide-react"
 import { StockAlerts } from "../../features/inventory/alerts/StockAlerts"
+import { StockOrderManagement } from "../../features/inventory/stock-orders/StockOrderManagement"
+import { useSearchParams } from 'react-router-dom'
 
 export function InventoryPage() {
-  const [currentView, setCurrentView] = useState<'levels' | 'movements' | 'alerts'>('levels')  // Removed analytics
+  const [searchParams] = useSearchParams()
+  const defaultTab = searchParams.get('tab') || 'levels'
+  const [currentView, setCurrentView] = useState<'levels' | 'movements' | 'alerts' | 'orders'>(defaultTab as any)
+
+  useEffect(() => {
+    const tab = searchParams.get('tab')
+    if (tab) {
+      setCurrentView(tab as any)
+    }
+  }, [searchParams])
 
   return (
     <div className="space-y-6">
@@ -32,6 +44,10 @@ export function InventoryPage() {
             <AlertTriangle className="h-4 w-4" />
             Alerts
           </TabsTrigger>
+          <TabsTrigger value="orders" className="flex items-center gap-2">
+            <ClipboardList className="h-4 w-4" />
+            Purchase Orders  {/* Changed from "Stock Orders" to "Purchase Orders" */}
+          </TabsTrigger>
         </TabsList>
       </Tabs>
 
@@ -39,6 +55,7 @@ export function InventoryPage() {
         {currentView === 'levels' && <StockLevels />}
         {currentView === 'movements' && <StockMovements />}
         {currentView === 'alerts' && <StockAlerts />}
+        {currentView === 'orders' && <StockOrderManagement />}
       </div>
     </div>
   )

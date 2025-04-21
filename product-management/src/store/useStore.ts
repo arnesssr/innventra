@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import { StockMovement, InventoryItem } from '../types/inventoryTypes'
 import type { Category as ProductCategory } from '../types/productTypes'
 import { checkStockLevel, shouldNotify, generateNotificationMessage } from '../utils/notificationUtils'
+import type { Supplier } from '../types/supplierTypes'
 
 export interface CategoryField {
   name: string;
@@ -88,6 +89,18 @@ interface NotificationPreferences {
   emailNotifications: boolean;
 }
 
+interface StockOrder {
+  id: string;
+  productId: string;
+  productName: string;
+  categoryId: string;
+  quantity: number;
+  status: 'pending' | 'completed' | 'cancelled';
+  createdAt: string;
+  completedAt?: string;
+  notes?: string;
+}
+
 interface Store {
   products: Product[];
   categories: Category[];
@@ -139,6 +152,15 @@ interface Store {
   generateStockAlerts: () => void;
   markAlertAsRead: (id: string) => void;
   clearNotifications: () => void;
+  createStockOrder: (order: Omit<StockOrder, 'id' | 'createdAt' | 'status'>) => void;
+  completeStockOrder: (orderId: string) => void;
+  cancelStockOrder: (orderId: string) => void;
+  stockOrders: StockOrder[];
+  suppliers: Supplier[];
+  addSupplier: (supplier: Supplier) => void;
+  updateSupplier: (id: string, updates: Partial<Supplier>) => void;
+  deleteSupplier: (id: string) => void;
+  createPurchaseOrder: (order: PurchaseOrder) => void;
 }
 
 const generateSKU = (categoryId: string, name: string, variant?: Record<string, string>) => {
@@ -162,6 +184,16 @@ export const useStore = create<Store>((set, get) => ({
   inventory: {},
   notifications: [],
   alerts: [],
+  stockOrders: [],
+  suppliers: [
+    {
+      id: 'sup-1',
+      name: 'Default Supplier',
+      email: 'contact@supplier.com',
+      status: 'active',
+      createdAt: new Date().toISOString()
+    }
+  ],
   
   notificationPreferences: {
     lowStock: true,
@@ -482,4 +514,76 @@ export const useStore = create<Store>((set, get) => ({
   })),
 
   clearNotifications: () => set({ notifications: [] }),
+
+  createStockOrder: (orderData) => set(state => ({
+    stockOrders: [
+      {
+        ...orderData,
+        id: Date.now().toString(),
+        status: 'pending',
+        createdAt: new Date().toISOString()
+      },
+      ...state.stockOrders
+    ]
+  })),
+
+  completeStockOrder: (orderId) => set(state => {
+    const order = state.stockOrders.find(o => o.id === orderId)
+    if (!order) return state
+
+    // Update inventory when order is completed
+    get().addStockMovement({
+      productId: order.productId,
+      type: 'in',
+      quantity: order.quantity,
+      notes: `Stock order ${orderId} received`,
+      date: new Date().toISOString()
+    })
+
+    return {
+      stockOrders: state.stockOrders.map(o => 
+        o.id === orderId ? {
+          ...o,
+          status: 'completed',
+          completedAt: new Date().toISOString()
+        } : o
+      )
+    }
+  }),
+
+  cancelStockOrder: (orderId) => set(state => ({
+    stockOrders: state.stockOrders.map(o =>
+      o.id === orderId ? { ...o, status: 'cancelled' } : o
+    )
+  })),
+
+  addSupplier: (supplier) => set(state => ({
+    suppliers: [...state.suppliers, supplier]
+  })),
+
+  updateSupplier: (id, updates) => set(state => ({
+    suppliers: state.suppliers.map(sup => 
+      sup.id === id ? { ...sup, ...updates } : sup
+    )
+  })),
+
+  deleteSupplier: (id) => set(state => ({
+    suppliers: state.suppliers.filter(sup => sup.id !== id)
+  })),
+
+  createPurchaseOrder: (order) => set((state) => ({
+    stockOrders: [...state.stockOrders, order],
+    // Optionally update other state like inventory
+    notifications: [
+      {
+        id: Date.now().toString(),
+        title: 'Purchase Order Created',
+        message: `Purchase order #${order.id} has been created`,
+        type: 'info',
+        read: false,
+        createdAt: new Date().toISOString()
+      },
+      ...state.notifications
+    ]
+  })),
 }))

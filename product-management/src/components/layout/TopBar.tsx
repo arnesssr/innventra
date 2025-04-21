@@ -72,6 +72,10 @@ function NotificationsList() {
     )
   }
 
+  function cn(...classes: (string | boolean | undefined)[]) {
+    return classes.filter(Boolean).join(' ')
+  }
+
   return (
     <div className="divide-y">
       {notifications.map(notification => (
