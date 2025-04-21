@@ -3,15 +3,14 @@ import { useState } from "react"
 import { StockLevels } from "./StockLevels"
 import { StockMovements } from "./StockMovements"
 import { 
-  ClipboardList, 
-  BarChart3, 
-  Activity, 
+  Package2,        // Changed from Boxes to Package2
+  ArrowUpDown,     
   AlertTriangle,
-  PackageCheck
 } from "lucide-react"
+import { StockAlerts } from "../../features/inventory/alerts/StockAlerts"
 
 export function InventoryPage() {
-  const [currentView, setCurrentView] = useState<'levels' | 'movements' | 'alerts' | 'analytics'>('levels')
+  const [currentView, setCurrentView] = useState<'levels' | 'movements' | 'alerts'>('levels')  // Removed analytics
 
   return (
     <div className="space-y-6">
@@ -22,20 +21,16 @@ export function InventoryPage() {
       <Tabs value={currentView} onValueChange={(v) => setCurrentView(v as any)}>
         <TabsList>
           <TabsTrigger value="levels" className="flex items-center gap-2">
-            <PackageCheck className="h-4 w-4" />
+            <Package2 className="h-4 w-4" />  {/* Changed icon here */}
             Stock Levels
           </TabsTrigger>
           <TabsTrigger value="movements" className="flex items-center gap-2">
-            <Activity className="h-4 w-4" />
+            <ArrowUpDown className="h-4 w-4" />
             Stock Movements
           </TabsTrigger>
           <TabsTrigger value="alerts" className="flex items-center gap-2">
             <AlertTriangle className="h-4 w-4" />
             Alerts
-          </TabsTrigger>
-          <TabsTrigger value="analytics" className="flex items-center gap-2">
-            <BarChart3 className="h-4 w-4" />
-            Analytics
           </TabsTrigger>
         </TabsList>
       </Tabs>
@@ -43,8 +38,7 @@ export function InventoryPage() {
       <div className="mt-4">
         {currentView === 'levels' && <StockLevels />}
         {currentView === 'movements' && <StockMovements />}
-        {currentView === 'alerts' && <div>Alerts Component Coming Soon</div>}
-        {currentView === 'analytics' && <div>Analytics Component Coming Soon</div>}
+        {currentView === 'alerts' && <StockAlerts />}
       </div>
     </div>
   )

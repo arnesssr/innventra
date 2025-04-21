@@ -1,6 +1,7 @@
 import { create } from 'zustand'
-import { StockMovement, InventoryItem } from '../features/inventory/types'
+import { StockMovement, InventoryItem } from '../types/inventoryTypes'
 import type { Category as ProductCategory } from '../types/productTypes'
+import { checkStockLevel, shouldNotify, generateNotificationMessage } from '../utils/notificationUtils'
 
 export interface CategoryField {
   name: string;
@@ -78,10 +79,41 @@ const DEFAULT_CATEGORIES: Category[] = [
   }
 ]
 
+interface NotificationPreferences {
+  lowStock: boolean;
+  outOfStock: boolean;
+  stockMovements: boolean;
+  lowStockThreshold: number;
+  browserNotifications: boolean;
+  emailNotifications: boolean;
+}
+
 interface Store {
   products: Product[];
   categories: Category[];
   inventory: Record<string, InventoryItem>;
+  notifications: Array<{
+    id: string;
+    type: 'low_stock' | 'out_of_stock';
+    productId: string;
+    productName: string;
+    currentStock: number;
+    threshold: number;
+    message: string;
+    timestamp: string;
+    read: boolean;
+  }>;
+  notificationPreferences: NotificationPreferences;
+  alerts: {
+    id: string;
+    type: 'low_stock' | 'out_of_stock';
+    productId: string;
+    productName: string;
+    currentStock: number;
+    threshold: number;
+    timestamp: string;
+    read: boolean;
+  }[];
   addCategory: (category: Omit<Category, 'id'>) => void;
   deleteCategory: (categoryId: string) => void;
   addProduct: (product: Product) => void;
@@ -99,6 +131,14 @@ interface Store {
   updateProduct: (productId: string, updates: Partial<Product>) => void;
   deleteProduct: (productId: string) => void;
   adjustProductStock: (productId: string, adjustment: number) => void;
+  getUnreadNotifications: () => number;
+  markNotificationAsRead: (id: string) => void;
+  generateStockNotifications: () => void;
+  updateNotificationPreferences: (preferences: Partial<NotificationPreferences>) => void;
+  addNotification: (notification: Omit<Store['notifications'][0], 'id' | 'timestamp' | 'read'>) => void;
+  generateStockAlerts: () => void;
+  markAlertAsRead: (id: string) => void;
+  clearNotifications: () => void;
 }
 
 const generateSKU = (categoryId: string, name: string, variant?: Record<string, string>) => {
@@ -120,7 +160,18 @@ export const useStore = create<Store>((set, get) => ({
   products: [],
   categories: DEFAULT_CATEGORIES,
   inventory: {},
+  notifications: [],
+  alerts: [],
   
+  notificationPreferences: {
+    lowStock: true,
+    outOfStock: true,
+    stockMovements: true,
+    lowStockThreshold: 20,
+    browserNotifications: true,
+    emailNotifications: false
+  },
+
   addCategory: (categoryData) => set((state) => ({
     categories: [
       ...state.categories,
@@ -146,10 +197,20 @@ export const useStore = create<Store>((set, get) => ({
 
   addProduct: (product) => set(state => {
     const baseSKU = generateSKU(product.category, product.name);
-    const variants = product.variants?.map(variant => ({
-      ...variant,
-      sku: generateSKU(product.category, product.name, variant.combination)
-    }));
+    interface ProductVariantCombination {
+      [key: string]: string;
+    }
+
+    interface ProductVariant {
+      combination: ProductVariantCombination;
+      sku?: string;
+      [key: string]: any;
+    }
+
+        const variants: ProductVariant[] = product.variants?.map((variant: ProductVariant) => ({
+          ...variant,
+          sku: generateSKU(product.category, product.name, variant.combination)
+        }));
 
     // Create preview URLs only for new File objects
     const imageUrls = product.images.map(img => {
@@ -223,6 +284,29 @@ export const useStore = create<Store>((set, get) => ({
       movement.quantity
     )
 
+    // Generate alert if stock is low
+    if (currentStock <= item.minimumStock) {
+      get().generateStockAlerts();
+    }
+
+    // Check if this movement should trigger a notification
+    const stockStatus = checkStockLevel({ ...item, currentStock })
+    if (stockStatus) {
+      get().addNotification({
+        type: stockStatus,
+        productId: item.productId,
+        productName: item.productName,
+        currentStock,
+        threshold: item.minimumStock,
+        message: generateNotificationMessage(
+          stockStatus,
+          item.productName,
+          currentStock,
+          item.minimumStock
+        )
+      })
+    }
+
     return {
       inventory: {
         ...state.inventory,
@@ -236,15 +320,25 @@ export const useStore = create<Store>((set, get) => ({
     }
   }),
 
-  updateMinimumStock: (productId, minimum) => set(state => ({
-    inventory: {
+  updateMinimumStock: (productId, minimum) => set(state => {
+    const inventory = state.inventory[productId];
+    if (!inventory) return state;
+
+    const updatedInventory = {
       ...state.inventory,
       [productId]: {
-        ...state.inventory[productId],
+        ...inventory,
         minimumStock: minimum
       }
+    };
+
+    // Check if we need to generate alerts after threshold change
+    if (inventory.currentStock <= minimum) {
+      get().generateStockAlerts();
     }
-  })),
+
+    return { inventory: updatedInventory };
+  }),
 
   archiveProduct: (productId: string) => set(state => ({
     products: state.products.map(product => 
@@ -302,5 +396,90 @@ export const useStore = create<Store>((set, get) => ({
           }
         : product
     )
-  }))
+  })),
+
+  getUnreadNotifications: () => {
+    return get().notifications.filter(n => !n.read).length
+  },
+
+  generateStockNotifications: () => {
+    const inventory = get().inventory
+    const newNotifications = Object.values(inventory)
+      .filter(item => item.currentStock <= item.minimumStock)
+      .map(item => {
+        const type = item.currentStock === 0 ? 'out_of_stock' as const : 'low_stock' as const;
+        return {
+          id: `${item.productId}-${Date.now()}`,
+          type,
+          productId: item.productId,
+          productName: item.productName,
+          currentStock: item.currentStock,
+          threshold: item.minimumStock,
+          message: generateNotificationMessage(type, item.productName, item.currentStock, item.minimumStock),
+          timestamp: new Date().toISOString(),
+          read: false
+        }
+      })
+
+    set({ notifications: newNotifications })
+  },
+
+  markNotificationAsRead: (id: string) => set(state => ({
+    notifications: state.notifications.map(n =>
+      n.id === id ? { ...n, read: true } : n
+    )
+  })),
+
+  updateNotificationPreferences: (preferences) => set(state => ({
+    notificationPreferences: {
+      ...state.notificationPreferences,
+      ...preferences
+    }
+  })),
+
+  addNotification: (notificationData: Omit<Store['notifications'][0], 'id' | 'timestamp' | 'read'>) => set(state => {
+    // Check if similar notification exists in last hour
+    const recentNotification = state.notifications.find(n => 
+      n.productId === notificationData.productId &&
+      n.type === notificationData.type &&
+      !shouldNotify(notificationData.currentStock, notificationData.threshold, n.timestamp)
+    )
+
+    if (recentNotification) return state
+
+    return {
+      notifications: [{
+        ...notificationData,
+        id: `${notificationData.productId}-${Date.now()}`,
+        timestamp: new Date().toISOString(),
+        read: false
+      }, ...state.notifications]
+    }
+  }),
+
+  generateStockAlerts: () => {
+    const inventory = get().inventory;
+    const alerts = Object.values(inventory)
+      .filter(item => item.currentStock <= item.minimumStock)
+      .map(item => ({
+        id: `${item.productId}-${Date.now()}`,
+        type: (item.currentStock === 0 ? 'out_of_stock' : 'low_stock') as 'out_of_stock' | 'low_stock',
+        productId: item.productId,
+        productName: item.productName,
+        currentStock: item.currentStock,
+        threshold: item.minimumStock,
+        timestamp: new Date().toISOString(),
+        read: false
+      }));
+    
+    set({ alerts });
+  },
+
+  markAlertAsRead: (id: string) => set(state => ({
+    alerts: state.alerts.map(alert =>
+      alert.id === id ? { ...alert, read: true } : alert
+    )
+  })),
+
+  clearNotifications: () => set({ notifications: [] }),
 }))
