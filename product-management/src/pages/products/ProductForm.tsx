@@ -9,7 +9,9 @@ import { useStore } from "../../store/useStore"
 import { Trash } from "lucide-react"
 import { VariationManager } from "../../features/products/variations/VariationManager"
 import { generateSKU } from "../../utils/productUtils" // Create this utility
+import { validateImage, createSafeObjectURL } from '../../utils/imageUtils'
 import type { Variation, VariantCombination } from '../../types/variationTypes'
+import { JSX } from "react/jsx-runtime"
 
 // Define interfaces for form field types and category configuration
 interface CategoryField {
@@ -301,31 +303,25 @@ export function ProductForm() {
   /**
    * Safely creates object URLs for images and handles file uploads
    */
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || [])
     
     // Validate files
-    const validFiles = files.filter(file => {
-      // Only allow images
-      if (!file.type.startsWith('image/')) {
-        return false
-      }
-      // Size limit (e.g., 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        return false
-      }
-      return true
-    })
+    const validatedFiles = await Promise.all(
+      files.map(async file => ({
+        file,
+        valid: await validateImage(file)
+      }))
+    )
+    
+    const validFiles = validatedFiles
+      .filter(({ valid }) => valid)
+      .map(({ file }) => file)
 
-    // Create safe URLs
-    const newUrls = validFiles.map(file => {
-      try {
-        return URL.createObjectURL(file)
-      } catch (error) {
-        console.error('Error creating object URL:', error)
-        return ''
-      }
-    }).filter(Boolean) // Remove any failed URLs
+    // Create safe URLs with validation
+    const newUrls = validFiles
+      .map(file => createSafeObjectURL(file))
+      .filter((url): url is string => url !== null)
 
     setFormData(prev => ({ 
       ...prev, 
@@ -415,6 +411,33 @@ export function ProductForm() {
             )}
           </div>
         ))}
+      </div>
+    )
+  }
+
+  const renderImagePreview = (file: File, index: number) => {
+    const imageUrl = URL.createObjectURL(file)
+
+    return (
+      <div 
+        key={index} 
+        className="relative aspect-square rounded-md overflow-hidden border bg-background"
+      >
+        <img
+          src={imageUrl}
+          alt={`Product preview ${index + 1}`}
+          className="w-full h-full object-cover"
+          onLoad={() => URL.revokeObjectURL(imageUrl)}
+        />
+        <Button
+          type="button"
+          variant="secondary"
+          size="icon"
+          className="absolute top-2 right-2"
+          onClick={() => removeImage(index)}
+        >
+          <Trash className="h-4 w-4" />
+        </Button>
       </div>
     )
   }
@@ -511,26 +534,7 @@ export function ProductForm() {
               </div>
               
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
-                {formData.images.map((file, index) => (
-                  <div key={index} className="relative group">
-                    <img
-                      src={imageUrls[index]}
-                      alt={`Product preview ${index + 1}`}
-                      className="w-full h-32 object-cover rounded-lg"
-                      onError={(e) => {
-                        e.currentTarget.src = '/fallback-image.png' // Add a fallback image
-                        console.error('Error loading image preview')
-                      }}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => removeImage(index)}
-                      className="absolute top-2 right-2 p-1 bg-red-500 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity"
-                    >
-                      <Trash className="h-4 w-4" />
-                    </button>
-                  </div>
-                ))}
+                {formData.images.map((file, index) => renderImagePreview(file, index))}
               </div>
               {errors.images && <span className="text-sm text-red-500">{errors.images}</span>}
             </div>

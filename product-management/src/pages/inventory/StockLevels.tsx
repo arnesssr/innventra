@@ -6,8 +6,11 @@ import { Input } from "../../components/ui/Input"
 import { useState } from "react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/Select"
 import { Card } from "../../components/ui/Card"
+import { useNavigate, useSearchParams } from "react-router-dom"
+import { cn } from "../../lib/utils"
 
 export function StockLevels() {
+  const navigate = useNavigate()
   // State for filtering and sorting
   const [sortBy, setSortBy] = useState<'stock' | 'name' | 'category'>('stock')
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
@@ -19,9 +22,29 @@ export function StockLevels() {
   const categories = useStore(state => state.categories)
 
   const getStockStatus = (current: number, minimum: number) => {
-    if (current <= 0) return { label: 'Out of Stock', color: 'text-red-500', icon: AlertTriangle }
-    if (current <= minimum) return { label: 'Low Stock', color: 'text-amber-500', icon: AlertTriangle }
-    return { label: 'In Stock', color: 'text-green-500', icon: CheckCircle }
+    if (current <= 0) return { 
+      label: 'Out of Stock', 
+      color: 'text-red-500', 
+      icon: AlertTriangle,
+      severity: 'critical'
+    }
+    if (current <= minimum) return { 
+      label: 'Low Stock', 
+      color: 'text-amber-500', 
+      icon: AlertTriangle,
+      severity: 'warning'
+    }
+    return { 
+      label: 'In Stock', 
+      color: 'text-green-500', 
+      icon: CheckCircle,
+      severity: 'good'
+    }
+  }
+
+  const handleCreateOrder = (productId: string) => {
+    // Navigate to orders tab with query params
+    navigate(`/app/inventory?tab=orders&action=new&productId=${productId}`)
   }
 
   // Filter and sort inventory items
@@ -96,7 +119,6 @@ export function StockLevels() {
             <TableCell>Current Stock</TableCell>
             <TableCell>Min. Stock</TableCell>
             <TableCell>Status</TableCell>
-            <TableCell>Actions</TableCell>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -104,7 +126,13 @@ export function StockLevels() {
             const status = getStockStatus(item.currentStock, item.minimumStock)
             
             return (
-              <TableRow key={item.productId}>
+              <TableRow 
+                key={item.productId}
+                className={cn({
+                  'bg-red-50/50 dark:bg-red-950/20': status.severity === 'critical',
+                  'bg-amber-50/50 dark:bg-amber-950/20': status.severity === 'warning'
+                })}
+              >
                 <TableCell>{item.productName}</TableCell>
                 <TableCell>{item.categoryId}</TableCell>
                 <TableCell>{item.currentStock}</TableCell>
@@ -126,14 +154,6 @@ export function StockLevels() {
                     <status.icon className="h-4 w-4 mr-2" />
                     {status.label}
                   </div>
-                </TableCell>
-                <TableCell>
-                  {item.currentStock <= item.minimumStock && (
-                    <Button size="sm" variant="outline" className="flex items-center gap-2">
-                      <ShoppingCart className="h-4 w-4" />
-                      Reorder
-                    </Button>
-                  )}
                 </TableCell>
               </TableRow>
             )
