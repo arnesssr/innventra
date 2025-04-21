@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom"
-import { LayoutDashboard, Store, Boxes, Settings, ChevronRight, BarChart, Truck, ShoppingBag } from "lucide-react"
+import { LayoutDashboard, Store, Boxes, Settings, ChevronRight, BarChart, Truck, ShoppingBag, MessageSquare } from "lucide-react"
 import { cn } from "../../lib/utils"
 import { Button } from "../ui/Button"
 
@@ -15,6 +15,7 @@ export function Sidebar({ expanded, onToggle }: SidebarProps) {
     { href: "/app/inventory", icon: Boxes, label: "Inventory" },
     { href: "/app/suppliers", icon: Truck, label: "Suppliers" },
     { href: "/app/orders", icon: ShoppingBag, label: "Orders" },
+    { href: "/app/messages", icon: MessageSquare, label: "Messages" },
     { href: "/app/reports", icon: BarChart, label: "Analytics" },
     { href: "/app/settings", icon: Settings, label: "Settings" }
   ]

@@ -12,6 +12,7 @@ import { SignIn, SignUp, SignedIn, SignedOut, RedirectToSignIn } from "@clerk/cl
 import { PublishedProducts } from "./pages/products/PublishedProducts"
 import { DraftsPage } from "./pages/products/DraftsPage"
 import { ArchivedProducts } from "./pages/products/ArchivedProducts"
+import { MessagesPage } from "./pages/messages/MessagesPage"
 
 function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -67,7 +68,8 @@ export const router = createBrowserRouter([
         ]
       },
       { path: "inventory", element: <InventoryPage /> },
-      { path: "settings", element: <SettingsPage /> }
+      { path: "settings", element: <SettingsPage /> },
+      { path: "messages", element: <MessagesPage /> }
     ]
   },
   {

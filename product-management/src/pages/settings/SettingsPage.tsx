@@ -6,6 +6,9 @@ import { useTheme } from "../../context/theme-context"
 import { RadioGroup, RadioGroupItem } from "../../components/ui/RadioGroup"
 import { Label } from "../../components/ui/Label"
 import { VisualStyleSettings } from "../../components/settings/VisualStyleSettings"
+import { Switch } from "../../components/ui/Switch"
+import { NotificationSettings } from "../../components/settings/NotificationSettings"
+import { NotificationCenter } from "../../components/settings/NotificationCenter"
 
 // Import Theme type from context
 import { Theme } from '../../context/theme-context'
@@ -87,6 +90,10 @@ if (newTheme === 'default') {
               <Button>Save Changes</Button>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="notifications">
+          <NotificationCenter />
         </TabsContent>
 
         <TabsContent value="appearance" className="space-y-6">
