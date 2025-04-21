@@ -49,6 +49,7 @@
     "framer-motion": "^12.7.3",
     "framer-motion-3d": "^12.4.13",
     "install": "^0.13.0",
+    "lodash": "^4.17.21",  
     "lottie-react": "^2.4.1",
     "lucide-react": "^0.344.0",
     "paper-css": "^0.4.1",
