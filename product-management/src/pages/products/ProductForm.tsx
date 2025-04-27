@@ -280,9 +280,11 @@ export function ProductForm() {
         id: id || Date.now().toString(),
         images: formData.images.map((file: File): ImageWithPreview => ({
           file,
-          previewUrl: URL.createObjectURL(file)
+          previewUrl: createSafeObjectURL(file)
         })),
-        imageUrls: formData.images.map((file: File) => URL.createObjectURL(file)),
+        imageUrls: formData.images
+          .map((file: File) => createSafeObjectURL(file))
+          .filter((url): url is string => url !== null),
         updatedAt: new Date().toISOString(),
         createdAt: formData.createdAt || new Date().toISOString()
       };

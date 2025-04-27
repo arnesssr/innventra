@@ -11,21 +11,16 @@ export async function validateImage(file: File): Promise<boolean> {
 
   // Validate image contents
   return new Promise((resolve) => {
-    const img = new Image()
-    const objectUrl = URL.createObjectURL(file)
-
-    img.onload = () => {
-      URL.revokeObjectURL(objectUrl)
-      resolve(true)
-    }
-
-    img.onerror = () => {
-      URL.revokeObjectURL(objectUrl)
-      resolve(false)
-    }
-
-    img.src = objectUrl
-  })
+    const reader = new FileReader();
+    reader.onload = () => {
+      const img = new Image();
+      img.onload = () => resolve(true);
+      img.onerror = () => resolve(false);
+      img.src = reader.result as string;
+    };
+    reader.onerror = () => resolve(false);
+    reader.readAsDataURL(file);
+  });
 }
 
 export function createSafeObjectURL(file: File): string | null {
