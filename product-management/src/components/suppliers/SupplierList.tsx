@@ -1,33 +1,10 @@
-import { useState } from "react"
+import { Table, TableHeader, TableRow, TableCell, TableBody } from "../ui/Table"
 import { useStore } from "../../store/useStore"
-import { DataTable } from "../ui/DataTable"
 import { SupplierStatusBadge } from "./SupplierStatusBadge"
 import { SupplierDetailsDrawer } from "./SupplierDetailsDrawer"
+import { useState } from "react"
 import type { Supplier } from "../../types/supplierTypes"
-import type { ColumnDef } from "@tanstack/react-table"
-
-const columns: ColumnDef<Supplier>[] = [
-  {
-    accessorKey: "name",
-    header: "Name",
-  },
-  {
-    accessorKey: "email",
-    header: "Email",
-  },
-  {
-    accessorKey: "status",
-    header: "Status",
-    cell: ({ row }) => (
-      <SupplierStatusBadge status={row.original.status} />
-    )
-  },
-  {
-    accessorKey: "createdAt",
-    header: "Since",
-    cell: ({ row }) => new Date(row.original.createdAt).toLocaleDateString()
-  }
-]
+import { SupplierFormActions } from "../../features/suppliers/SupplierFormActions"
 
 export function SupplierList() {
   const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>(null)
@@ -35,12 +12,44 @@ export function SupplierList() {
 
   return (
     <div className="space-y-4">
-      <DataTable 
-        columns={columns}
-        data={suppliers}
-        onRowClick={(row) => setSelectedSupplier(row)}
-      />
-      
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableCell>ID</TableCell>
+            <TableCell>Name & Contact</TableCell>
+            <TableCell>Phone</TableCell>
+            <TableCell>Status</TableCell>
+            <TableCell></TableCell>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {suppliers.map((supplier) => (
+            <TableRow 
+              key={supplier.id}
+              className="cursor-pointer"
+            >
+              <TableCell>SUP-{supplier.id.slice(0, 6)}</TableCell>
+              <TableCell>
+                <div>
+                  <p className="font-medium">{supplier.name}</p>
+                  <p className="text-sm text-muted-foreground">{supplier.email}</p>
+                </div>
+              </TableCell>
+              <TableCell>{supplier.phone || "—"}</TableCell>
+              <TableCell>
+                <SupplierStatusBadge status={supplier.status} />
+              </TableCell>
+              <TableCell>
+                <SupplierFormActions 
+                  supplier={supplier}
+                  onView={() => setSelectedSupplier(supplier)}
+                />
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+
       <SupplierDetailsDrawer
         supplier={selectedSupplier}
         open={!!selectedSupplier}

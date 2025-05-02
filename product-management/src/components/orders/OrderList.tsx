@@ -1,43 +1,10 @@
-import { useState, useMemo } from "react"
+import { useState } from "react"
 import { useStore } from "../../store/useStore"
-import { DataTable } from "../../components/ui/DataTable"
+import { Table, TableBody, TableCell, TableHeader, TableRow } from "../ui/Table"
 import { OrderStatusBadge } from "./OrderStatusBadge"
-import { formatDate } from "../../lib/utils/dateUtils"
 import { OrderDetailsDrawer } from "./OrderDetailsDrawer"
-import type { OrderStatus, Order } from "../../types/orderTypes"
-import type { ColumnDef } from "@tanstack/react-table"
-
-const columns: ColumnDef<Order>[] = [
-  {
-    accessorKey: "orderNumber",
-    header: "Order #"
-  },
-  {
-    accessorKey: "customerName",
-    header: "Customer"
-  },
-  {
-    accessorKey: "status",
-    header: "Status",
-    cell: ({ row }) => (
-      <OrderStatusBadge status={row.original.status} />
-    )
-  },
-  {
-    accessorKey: "total",
-    header: "Total",
-    cell: ({ row }) => (
-      <span>
-        ${row.original.total.toFixed(2)}
-      </span>
-    )
-  },
-  {
-    accessorKey: "createdAt",
-    header: "Date",
-    cell: ({ row }) => formatDate(row.original.createdAt)
-  }
-]
+import { formatDate } from "../../lib/utils/dateUtils"
+import type { Order } from "../../types/orderTypes"
 
 export function OrderList() {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
@@ -45,12 +12,35 @@ export function OrderList() {
 
   return (
     <div className="space-y-4">
-      <DataTable 
-        columns={columns}
-        data={orders}
-        onRowClick={(row: Order) => setSelectedOrder(row)}
-      />
-      
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableCell>Order #</TableCell>
+            <TableCell>Customer</TableCell>
+            <TableCell>Status</TableCell>
+            <TableCell>Total</TableCell>
+            <TableCell>Date</TableCell>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {orders.map((order) => (
+            <TableRow 
+              key={order.id}
+              className="cursor-pointer"
+              onClick={() => setSelectedOrder(order)}
+            >
+              <TableCell>{order.orderNumber}</TableCell>
+              <TableCell>{order.customerName}</TableCell>
+              <TableCell>
+                <OrderStatusBadge status={order.status} />
+              </TableCell>
+              <TableCell>${order.total.toFixed(2)}</TableCell>
+              <TableCell>{formatDate(order.createdAt)}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+
       <OrderDetailsDrawer
         order={selectedOrder}
         open={!!selectedOrder}
