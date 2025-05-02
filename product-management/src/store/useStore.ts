@@ -117,6 +117,7 @@ interface PurchaseOrder {
 }
 
 interface Store {
+  purchaseOrders: any
   products: Product[];
   orders: Order[];
   deleteOrder: (orderId: string) => void;
@@ -236,15 +237,7 @@ export const useStore = create<Store>((set, get) => ({
   notifications: [],
   alerts: [],
   stockOrders: [],
-  suppliers: [
-    {
-      id: 'sup-1',
-      name: 'Default Supplier',
-      email: 'contact@supplier.com',
-      status: 'active',
-      createdAt: new Date().toISOString()
-    }
-  ],
+  suppliers: [],
   
   notificationPreferences: {
     lowStock: true,

@@ -31,9 +31,11 @@ export function CreateSupplierForm({ onSuccess }: CreateSupplierFormProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     const supplier: Supplier = {
-      id: `sup-${Date.now()}`,
-      createdAt: new Date().toISOString(),
-      ...formData
+        id: `sup-${Date.now()}`,
+        createdAt: new Date().toISOString(),
+        ...formData,
+        lastOrderAmount: undefined,
+        lastOrderDate: ""
     }
     addSupplier(supplier)
     onSuccess?.()
