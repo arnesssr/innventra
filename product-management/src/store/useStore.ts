@@ -3,6 +3,7 @@ import { StockMovement, InventoryItem } from '../types/inventoryTypes'
 import type { Category as ProductCategory } from '../types/productTypes'
 import { checkStockLevel, shouldNotify, generateNotificationMessage } from '../utils/notificationUtils'
 import type { Supplier } from '../types/supplierTypes'
+import { Order, OrderStatus, PaymentStatus } from '@/types/orderTypes'
 
 export interface CategoryField {
   name: string;
@@ -101,8 +102,27 @@ interface StockOrder {
   notes?: string;
 }
 
+interface PurchaseOrder {
+  id: string;
+  supplierId: string;
+  items: Array<{
+    productId: string;
+    quantity: number;
+    price: number;
+  }>;
+  status: 'pending' | 'completed' | 'cancelled';
+  createdAt: string;
+  completedAt?: string;
+  notes?: string;
+}
+
 interface Store {
   products: Product[];
+  orders: Order[];
+  deleteOrder: (orderId: string) => void;
+  createOrder: (order: Omit<Order, 'id' | 'createdAt'>) => void;
+  updatePaymentStatus: (orderId: string, status: PaymentStatus) => void;
+  updateOrderStatus: (orderId: string, status: OrderStatus) => void;
   categories: Category[];
   inventory: Record<string, InventoryItem>;
   notifications: Array<{
@@ -161,6 +181,12 @@ interface Store {
   updateSupplier: (id: string, updates: Partial<Supplier>) => void;
   deleteSupplier: (id: string) => void;
   createPurchaseOrder: (order: PurchaseOrder) => void;
+  getOrderStats: () => {
+    totalOrders: number;
+    totalRevenue: number;
+    pendingOrders: number;
+    completedOrders: number;
+  };
 }
 
 const generateSKU = (categoryId: string, name: string, variant?: Record<string, string>) => {
@@ -180,7 +206,32 @@ const generateSKU = (categoryId: string, name: string, variant?: Record<string, 
 
 export const useStore = create<Store>((set, get) => ({
   products: [],
+  orders: [],
   categories: DEFAULT_CATEGORIES,
+  
+  deleteOrder: (orderId: string) => set(state => ({
+    orders: state.orders.filter(order => order.id !== orderId)
+  })),
+
+  createOrder: (orderData) => set(state => ({
+    orders: [...state.orders, {
+      ...orderData,
+      id: Date.now().toString(),
+      createdAt: new Date().toISOString()
+    }]
+  })),
+
+  updatePaymentStatus: (orderId: string, status: PaymentStatus) => set(state => ({
+    orders: state.orders.map(order =>
+      order.id === orderId ? { ...order, paymentStatus: status } : order
+    )
+  })),
+
+  updateOrderStatus: (orderId: string, status: OrderStatus) => set(state => ({
+    orders: state.orders.map(order =>
+      order.id === orderId ? { ...order, status } : order
+    )
+  })),
   inventory: {},
   notifications: [],
   alerts: [],
@@ -586,4 +637,14 @@ export const useStore = create<Store>((set, get) => ({
       ...state.notifications
     ]
   })),
+
+  getOrderStats: () => {
+    const orders = get().orders;
+    return {
+      totalOrders: orders.length,
+      totalRevenue: orders.reduce((sum, order) => sum + order.total, 0),
+      pendingOrders: orders.filter(order => order.status === 'pending').length,
+      completedOrders: orders.filter(order => order.status === 'completed').length
+    }
+  },
 }))
