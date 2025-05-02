@@ -15,6 +15,7 @@ import { ArchivedProducts } from "./pages/products/ArchivedProducts"
 import { MessagesPage } from "./pages/messages/MessagesPage"
 import { OrdersPage } from "./pages/orders/OrdersPage"
 
+
 function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-6">
@@ -71,7 +72,8 @@ export const router = createBrowserRouter([
       { path: "inventory", element: <InventoryPage /> },
       { path: "orders", element: <OrdersPage /> },
       { path: "settings", element: <SettingsPage /> },
-      { path: "messages", element: <MessagesPage /> }
+      { path: "messages", element: <MessagesPage /> },
+      { path: "suppliers", element: <SuppliersPage /> }
     ]
   },
   {
