@@ -16,7 +16,7 @@ export function Sidebar({ expanded, onToggle }: SidebarProps) {
     { href: "/app/suppliers", icon: Truck, label: "Suppliers" }, // Here's the suppliers link
     { href: "/app/orders", icon: ShoppingBag, label: "Sales Orders" },
     { href: "/app/messages", icon: MessageSquare, label: "Messages" },
-    { href: "/app/reports", icon: BarChart, label: "Analytics" },
+    { href: "/app/reports", icon: BarChart, label: "Reports & Analytics" },
     { href: "/app/settings", icon: Settings, label: "Settings" }
   ]
 
