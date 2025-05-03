@@ -15,7 +15,7 @@ import { ArchivedProducts } from "./pages/products/ArchivedProducts"
 import { MessagesPage } from "./pages/messages/MessagesPage"
 import { OrdersPage } from "./pages/orders/OrdersPage"
 import { SuppliersPage } from "./pages/suppliers/SuppliersPage"
-
+import { ReportsPage } from "./pages/reports/ReportsPage"
 
 function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -74,7 +74,8 @@ export const router = createBrowserRouter([
       { path: "orders", element: <OrdersPage /> },
       { path: "settings", element: <SettingsPage /> },
       { path: "messages", element: <MessagesPage /> },
-      { path: "suppliers", element: <SuppliersPage /> }
+      { path: "suppliers", element: <SuppliersPage /> },
+      { path: "reports", element: <ReportsPage /> }
     ]
   },
   {
