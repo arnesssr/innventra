@@ -4,6 +4,10 @@ import type { Category as ProductCategory } from '../types/productTypes'
 import { checkStockLevel, shouldNotify, generateNotificationMessage } from '../utils/notificationUtils'
 import type { Supplier } from '../types/supplierTypes'
 import { Order, OrderStatus, PaymentStatus } from '@/types/orderTypes'
+import { AuditService } from '../features/audit/services/auditService'
+import type { AuditEventType, AuditSeverity, AuditLog } from '../types/auditTypes'
+import { eventBus } from '@/lib/eventBus'
+import { getISOString, generateId, getCurrentTimestamp } from '../utils/timestampUtils'
 
 export interface CategoryField {
   name: string;
@@ -117,6 +121,7 @@ interface PurchaseOrder {
 }
 
 interface Store {
+  currentUser: any
   purchaseOrders: any
   products: Product[];
   orders: Order[];
@@ -188,6 +193,21 @@ interface Store {
     pendingOrders: number;
     completedOrders: number;
   };
+  auditLogs: AuditLog[];
+  addAuditLog: (event: {
+    eventType: AuditEventType; // Explicitly require eventType
+    userId: string;
+    details: string;
+    severity: AuditSeverity;
+    metadata?: Record<string, any>;
+  }) => AuditLog;
+  getAuditLogs: (filters?: {
+    eventType?: AuditEventType
+    severity?: AuditSeverity
+    startDate?: Date
+    endDate?: Date
+  }) => AuditLog[];
+  setAuditLogs: (logs: AuditLog[]) => void;
 }
 
 const generateSKU = (categoryId: string, name: string, variant?: Record<string, string>) => {
@@ -214,13 +234,19 @@ export const useStore = create<Store>((set, get) => ({
     orders: state.orders.filter(order => order.id !== orderId)
   })),
 
-  createOrder: (orderData) => set(state => ({
-    orders: [...state.orders, {
+  createOrder: async (orderData) => {
+    const newOrder = {
       ...orderData,
-      id: Date.now().toString(),
-      createdAt: new Date().toISOString()
-    }]
-  })),
+      ...getCurrentTimestamp(),
+    };
+    set(state => ({
+      orders: [...state.orders, newOrder]
+    }));
+    await AuditService.logAction('order.create', get().currentUser?.id,
+      `Created new order #${orderData.orderNumber}`,
+      { severity: 'info', metadata: { orderId: newOrder.id } }
+    );
+  },
 
   updatePaymentStatus: (orderId: string, status: PaymentStatus) => set(state => ({
     orders: state.orders.map(order =>
@@ -228,11 +254,19 @@ export const useStore = create<Store>((set, get) => ({
     )
   })),
 
-  updateOrderStatus: (orderId: string, status: OrderStatus) => set(state => ({
-    orders: state.orders.map(order =>
-      order.id === orderId ? { ...order, status } : order
+  updateOrderStatus: async (orderId: string, status: OrderStatus) => {
+    const order = get().orders.find(o => o.id === orderId)
+    set(state => ({
+      orders: state.orders.map(o => o.id === orderId ? { ...o, status } : o)
+    }))
+    
+    await AuditService.logAction(
+      'order.status_change',
+      get().currentUser?.id,
+      `Updated order #${order?.orderNumber} status to ${status}`,
+      { severity: 'info', metadata: { orderId, oldStatus: order?.status, newStatus: status } }
     )
-  })),
+  },
   inventory: {},
   notifications: [],
   alerts: [],
@@ -271,7 +305,7 @@ export const useStore = create<Store>((set, get) => ({
     }
   }),
 
-  addProduct: (product) => set(state => {
+  addProduct: async (product) => {
     const baseSKU = generateSKU(product.category, product.name);
     interface ProductVariantCombination {
       [key: string]: string;
@@ -305,7 +339,7 @@ export const useStore = create<Store>((set, get) => ({
       updatedAt: new Date().toISOString()
     };
 
-    return {
+    set(state => ({
       products: [...state.products, newProduct],
       inventory: {
         ...state.inventory,
@@ -326,8 +360,12 @@ export const useStore = create<Store>((set, get) => ({
           }]
         }
       }
-    };
-  }),
+    }));
+    await AuditService.logAction('product.create', get().currentUser?.id, 
+      `Created new product: ${product.name}`,
+      { severity: 'info', metadata: { productId: product.id } }
+    );
+  },
 
   getCategoryName: (categoryId: string) => {
     const category = get().categories.find(c => c.id === categoryId)
@@ -350,8 +388,7 @@ export const useStore = create<Store>((set, get) => ({
 
     const newMovement = {
       ...movement,
-      id: Date.now().toString(),
-      date: new Date().toISOString()
+      ...getCurrentTimestamp(),
     }
 
     const currentStock = item.currentStock + (
@@ -396,25 +433,31 @@ export const useStore = create<Store>((set, get) => ({
     }
   }),
 
-  updateMinimumStock: (productId, minimum) => set(state => {
-    const inventory = state.inventory[productId];
-    if (!inventory) return state;
-
-    const updatedInventory = {
-      ...state.inventory,
-      [productId]: {
-        ...inventory,
-        minimumStock: minimum
+  updateMinimumStock: async (productId, minimum) => {
+    const product = get().products.find(p => p.id === productId)
+    const inventory = get().inventory[productId]
+    
+    set(state => ({
+      inventory: {
+        ...state.inventory,
+        [productId]: { ...inventory, minimumStock: minimum }
       }
-    };
+    }))
 
-    // Check if we need to generate alerts after threshold change
-    if (inventory.currentStock <= minimum) {
-      get().generateStockAlerts();
-    }
-
-    return { inventory: updatedInventory };
-  }),
+    await AuditService.logAction(
+      'inventory.threshold_change',
+      get().currentUser?.id,
+      `Updated minimum stock for ${product?.name} to ${minimum}`,
+      { 
+        severity: 'info', 
+        metadata: { 
+          productId, 
+          oldThreshold: inventory?.minimumStock, 
+          newThreshold: minimum 
+        } 
+      }
+    )
+  },
 
   archiveProduct: (productId: string) => set(state => ({
     products: state.products.map(product => 
@@ -458,21 +501,35 @@ export const useStore = create<Store>((set, get) => ({
     }
   }),
 
-  deleteProduct: (productId) => set(state => ({
-    products: state.products.filter(product => product.id !== productId)
-  })),
+  deleteProduct: async (productId) => {
+    const product = get().products.find(p => p.id === productId);
+    set(state => ({
+      products: state.products.filter(product => product.id !== productId)
+    }));
+    await AuditService.logAction('product.delete', get().currentUser?.id,
+      `Deleted product: ${product?.name}`,
+      { severity: 'critical', metadata: { productId } }
+    );
+  },
 
-  adjustProductStock: (productId: string, adjustment: number) => set(state => ({
-    products: state.products.map(product => 
-      product.id === productId 
-        ? { 
-            ...product, 
-            stock: Math.max(0, product.stock + adjustment),
-            updatedAt: new Date().toISOString()
-          }
-        : product
-    )
-  })),
+  adjustProductStock: async (productId: string, adjustment: number) => {
+    const product = get().products.find(p => p.id === productId);
+    set(state => ({
+      products: state.products.map(product => 
+        product.id === productId 
+          ? { 
+              ...product, 
+              stock: Math.max(0, product.stock + adjustment),
+              updatedAt: new Date().toISOString()
+            }
+          : product
+      )
+    }));
+    await AuditService.logAction('inventory.adjust', get().currentUser?.id,
+      `Adjusted stock for ${product?.name} by ${adjustment}`,
+      { severity: 'warning', metadata: { productId, adjustment } }
+    );
+  },
 
   getUnreadNotifications: () => {
     return get().notifications.filter(n => !n.read).length
@@ -563,9 +620,8 @@ export const useStore = create<Store>((set, get) => ({
     stockOrders: [
       {
         ...orderData,
-        id: Date.now().toString(),
+        ...getCurrentTimestamp(),
         status: 'pending',
-        createdAt: new Date().toISOString()
       },
       ...state.stockOrders
     ]
@@ -640,4 +696,55 @@ export const useStore = create<Store>((set, get) => ({
       completedOrders: orders.filter(order => order.status === 'completed').length
     }
   },
+
+  auditLogs: [],
+  
+  addAuditLog: (event) => {
+    const log: AuditLog = {
+      id: crypto.randomUUID(),
+      timestamp: getISOString(),
+      eventType: event.eventType,
+      userId: event.userId,
+      userName: event.metadata?.userName || 'System',
+      details: event.details,
+      severity: event.severity,
+      metadata: event.metadata
+    }
+
+    // Update state immediately
+    set(state => ({
+      auditLogs: [log, ...state.auditLogs].slice(0, 1000) // Keep last 1000 logs
+    }))
+
+    // Persist to localStorage
+    try {
+      const existingLogs = JSON.parse(localStorage.getItem('auditLogs') || '[]')
+      const updatedLogs = [log, ...existingLogs].slice(0, 1000)
+      localStorage.setItem('auditLogs', JSON.stringify(updatedLogs))
+    } catch (error) {
+      console.error('Failed to persist audit logs:', error)
+    }
+
+    // Notify subscribers
+    eventBus.publish('auditLog.created', log)
+
+    return log
+  },
+
+  getAuditLogs: (filters) => {
+    const logs = get().auditLogs
+
+    if (!filters) return logs
+
+    return logs.filter(log => {
+      const matchesEventType = !filters.eventType || log.eventType === filters.eventType
+      const matchesSeverity = !filters.severity || log.severity === filters.severity
+      const matchesDateRange = (!filters.startDate || new Date(log.timestamp) >= filters.startDate) &&
+                             (!filters.endDate || new Date(log.timestamp) <= filters.endDate)
+      
+      return matchesEventType && matchesSeverity && matchesDateRange
+    })
+  },
+
+  setAuditLogs: (logs) => set({ auditLogs: logs }),
 }))

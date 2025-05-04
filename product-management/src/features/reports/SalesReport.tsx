@@ -15,6 +15,13 @@ export function SalesReport() {
     return acc
   }, {} as Record<string, number>)
 
+  // Sort months chronologically
+  const sortedMonths = Object.entries(monthlyRevenue).sort((a, b) => {
+    const months = ['January', 'February', 'March', 'April', 'May', 'June', 
+                   'July', 'August', 'September', 'October', 'November', 'December']
+    return months.indexOf(a[0]) - months.indexOf(b[0])
+  })
+
   return (
     <div className="space-y-6">
       {/* Key Metrics */}
@@ -73,6 +80,31 @@ export function SalesReport() {
           </div>
         </Card>
       </div>
+
+      {/* Monthly Revenue Overview */}
+      <Card className="p-6">
+        <h3 className="font-semibold mb-4">Monthly Revenue</h3>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableCell>Month</TableCell>
+              <TableCell>Revenue</TableCell>
+              <TableCell>% of Total</TableCell>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {sortedMonths.map(([month, revenue]) => (
+              <TableRow key={month}>
+                <TableCell>{month}</TableCell>
+                <TableCell>${revenue.toFixed(2)}</TableCell>
+                <TableCell>
+                  {((revenue / stats.totalRevenue) * 100).toFixed(1)}%
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </Card>
 
       {/* Recent Orders Table */}
       <Card className="p-6">

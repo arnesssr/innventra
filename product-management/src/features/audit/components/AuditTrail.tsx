@@ -1,15 +1,23 @@
+import { Card } from "../../../components/ui/Card"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/Select"
+import { Input } from "../../../components/ui/Input"
+import { Button } from "../../../components/ui/Button"
+import { formatDate } from "../../../lib/utils/dateUtils"
+import { useStore } from "../../../store/useStore"
+import { AlertTriangle, AlertCircle, Info, MoreHorizontal, ExternalLink, Check } from "lucide-react"
+import type { AuditEventType, AuditSeverity, AuditLog } from "../../../types/auditTypes"
+import { EVENT_TYPES } from "../../../types/auditTypes"  // Fixed import path
+import { AuditService } from "../services/auditService"
+import { Table, TableHeader, TableRow, TableCell, TableBody } from "../../../components/ui/Table"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from "../../../components/ui/dropdown-menu"
+
 import { useState, useEffect } from "react"
-import { Table, TableHeader, TableRow, TableCell, TableBody } from "../../components/ui/Table"
-import { Card } from "../../components/ui/Card"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/Select"
-import { Input } from "../../components/ui/Input"
-import { Button } from "../../components/ui/Button"
-import { formatDate } from "../../lib/utils/dateUtils"
-import { useStore } from "../../store/useStore"
-import { AlertTriangle, AlertCircle, Info } from "lucide-react"
-import { EVENT_TYPES, type AuditEventType, type AuditSeverity } from "../../types/auditTypes"
-import { AuditService } from "../audit/services/auditService"
-import React from "react"
 
 interface AuditTrailProps {
   defaultSeverity?: AuditSeverity
@@ -63,6 +71,31 @@ export function AuditTrail({ defaultSeverity, defaultType }: AuditTrailProps) {
       case 'warning': return <AlertTriangle className="h-4 w-4 text-yellow-500" />
       case 'info': return <Info className="h-4 w-4 text-blue-500" />
     }
+  }
+
+  const handleExport = (log: AuditLog) => {
+    const data = JSON.stringify(log, null, 2)
+    const blob = new Blob([data], { type: 'application/json' })
+    const url = window.URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `audit-log-${log.id}.json`
+    a.click()
+    window.URL.revokeObjectURL(url)
+  }
+
+  const handleMarkReviewed = async (log: AuditLog) => {
+    await AuditService.updateLog(log.id, {
+      ...log,
+      reviewed: true,
+      reviewedAt: new Date().toISOString(),
+      reviewedBy: useStore.getState().currentUser?.id
+    })
+  }
+
+  const handleAddNotes = (log: AuditLog) => {
+    // We'll implement this in a follow-up with a modal
+    console.log('Add notes for:', log.id)
   }
 
   // Create event type options array
@@ -142,17 +175,17 @@ export function AuditTrail({ defaultSeverity, defaultType }: AuditTrailProps) {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableCell sortable>Time</TableCell>
-              <TableCell sortable>Event</TableCell>
-              <TableCell sortable>User</TableCell>
+              <TableCell>Time</TableCell>
+              <TableCell>Event</TableCell>
+              <TableCell>User</TableCell>
               <TableCell>Details</TableCell>
-              <TableCell sortable>Severity</TableCell>
+              <TableCell>Severity</TableCell>
               <TableCell>Actions</TableCell>
             </TableRow>
           </TableHeader>
           <TableBody>
             {logs.map(log => (
-              <TableRow key={log.id} expandable>
+              <TableRow key={log.id}>
                 <TableCell>{formatDate(log.timestamp)}</TableCell>
                 <TableCell>{log.eventType}</TableCell>
                 <TableCell>{log.userId}</TableCell>
@@ -164,9 +197,27 @@ export function AuditTrail({ defaultSeverity, defaultType }: AuditTrailProps) {
                   </div>
                 </TableCell>
                 <TableCell>
-                  <Button variant="outline" size="sm">Export</Button>
-                  <Button variant="outline" size="sm">Mark as Reviewed</Button>
-                  <Button variant="outline" size="sm">Add Notes</Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon">
+                        <MoreHorizontal className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={() => handleExport(log)}>
+                        <ExternalLink className="mr-2 h-4 w-4" />
+                        Export
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleMarkReviewed(log)}>
+                        Mark as Reviewed
+                        {log.reviewed && <Check className="ml-auto h-4 w-4" />}
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={() => handleAddNotes(log)}>
+                        Add Notes
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </TableCell>
               </TableRow>
             ))}

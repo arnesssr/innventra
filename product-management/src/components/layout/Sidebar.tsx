@@ -13,10 +13,14 @@ export function Sidebar({ expanded, onToggle }: SidebarProps) {
     { href: "/app", icon: LayoutDashboard, label: "Dashboard" },
     { href: "/app/products", icon: Store, label: "Products" },
     { href: "/app/inventory", icon: Boxes, label: "Inventory" },
-    { href: "/app/suppliers", icon: Truck, label: "Suppliers" }, // Here's the suppliers link
+    { href: "/app/suppliers", icon: Truck, label: "Suppliers" },
     { href: "/app/orders", icon: ShoppingBag, label: "Sales Orders" },
     { href: "/app/messages", icon: MessageSquare, label: "Messages" },
-    { href: "/app/reports", icon: BarChart, label: "Reports & Analytics" },
+    { 
+      href: "/app/reports", 
+      icon: BarChart, 
+      label: "Reports"
+    },
     { href: "/app/settings", icon: Settings, label: "Settings" }
   ]
 
