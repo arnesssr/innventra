@@ -79,8 +79,8 @@ Automated bridge between inventory management and e-commerce platforms:
 
 1. **Bulk Operations**
    - [✓] Bulk product selection and management
-   - [ ] Bulk price updates
-   - [ ] Price history
+   - [✓] Bulk price updates
+   - [✓] Price history
    - [ ] Special pricing rules
    - [ ] Discount management
 
@@ -96,7 +96,7 @@ Automated bridge between inventory management and e-commerce platforms:
 ### Medium Priority
 - [ ] Enhanced Product Features
   - [✓] Bulk product actions
-  - [✓] Product variations
+  - [ ] Product variations
   - [ ] Product bundles
   - [ ] Related products
 

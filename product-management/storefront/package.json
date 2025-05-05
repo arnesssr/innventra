@@ -1,0 +1,19 @@
+{
+  "name": "@prodyfy/storefront",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "workspace:*",
+    "react-dom": "workspace:*",
+    "react-router-dom": "workspace:*",
+    "zustand": "workspace:*",
+    "lucide-react": "workspace:*"
+  }
+}

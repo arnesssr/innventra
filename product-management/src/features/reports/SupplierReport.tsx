@@ -41,7 +41,9 @@ export function SupplierReport() {
             {suppliers.map(supplier => (
               <TableRow key={supplier.id}>
                 <TableCell>{supplier.name}</TableCell>
-                <TableCell>0</TableCell>
+                <TableCell>
+                  {purchaseOrders.filter(order => order.supplierId === supplier.id).length}
+                </TableCell>
                 <TableCell>{supplier.lastOrderDate || '—'}</TableCell>
                 <TableCell>{supplier.status}</TableCell>
               </TableRow>

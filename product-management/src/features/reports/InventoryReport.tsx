@@ -21,20 +21,19 @@ export function InventoryReport() {
 
   return (
     <div className="space-y-6">
+      {/* Stats Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {/* Inventory Stats */}
         <Card className="p-6">
           <div className="flex items-center gap-3">
             <div className="p-3 bg-primary/10 rounded-lg">
               <TrendingUp className="h-6 w-6 text-primary" />
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Total Stock Value</p>
+              <p className="text-sm text-muted-foreground">Total Value</p>
               <p className="text-2xl font-bold">${stats.totalValue.toFixed(2)}</p>
             </div>
           </div>
         </Card>
-
         <Card className="p-6">
           <div className="flex items-center gap-3">
             <div className="p-3 bg-primary/10 rounded-lg">
@@ -46,7 +45,6 @@ export function InventoryReport() {
             </div>
           </div>
         </Card>
-
         <Card className="p-6">
           <div className="flex items-center gap-3">
             <div className="p-3 bg-primary/10 rounded-lg">
@@ -58,7 +56,6 @@ export function InventoryReport() {
             </div>
           </div>
         </Card>
-
         <Card className="p-6">
           <div className="flex items-center gap-3">
             <div className="p-3 bg-primary/10 rounded-lg">
@@ -86,16 +83,16 @@ export function InventoryReport() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {Object.values(inventory).map((item) => {
+            {Object.values(inventory).map(item => {
               const product = products.find(p => p.id === item.productId)
-              const value = (product?.price || 0) * item.currentStock
-
               return (
                 <TableRow key={item.productId}>
                   <TableCell>{product?.name}</TableCell>
                   <TableCell>{item.currentStock}</TableCell>
                   <TableCell>{item.minimumStock}</TableCell>
-                  <TableCell>${value.toFixed(2)}</TableCell>
+                  <TableCell>
+                    ${((product?.price || 0) * item.currentStock).toFixed(2)}
+                  </TableCell>
                   <TableCell>
                     {item.currentStock === 0 ? (
                       <span className="text-red-500">Out of Stock</span>
@@ -106,8 +103,8 @@ export function InventoryReport() {
                     )}
                   </TableCell>
                 </TableRow>
-              )
-            })}
+              )}
+            )}
           </TableBody>
         </Table>
       </Card>

@@ -1,42 +1,63 @@
+import { useSearchParams } from "react-router-dom"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../components/ui/Tabs"
-import { SalesReport } from "../../features/reports/SalesReport"
-import { InventoryReport } from "../../features/reports/InventoryReport"  // This should now work
-import { AuditTrail } from "../../features/reports/AuditTrail"
-import { SupplierReport } from "../../features/reports/SupplierReport"
+import { ErrorBoundary } from "../../components/ErrorBoundary"
+import { AuditsPage } from "./AuditsPage"
 import { Card } from "../../components/ui/Card"
+import { SalesReport } from "../../features/reports/SalesReport"
+import { InventoryReport } from "../../features/reports/InventoryReport"
+import { SupplierReport } from "../../features/reports/SupplierReport"
 
 export function ReportsPage() {
+  const [searchParams, setSearchParams] = useSearchParams()
+  const currentTab = searchParams.get("tab") || "reports"
+  const reportType = searchParams.get("type") || "sales"
+
+  const renderReportContent = () => {
+    switch (reportType) {
+      case "sales":
+        return <SalesReport />
+      case "inventory":
+        return <InventoryReport />
+      case "suppliers":
+        return <SupplierReport />
+      default:
+        return <SalesReport /> // Default to sales report
+    }
+  }
+
   return (
-    <div className="space-y-6 p-6">
+    <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Reports & Analytics</h1>
-        <p className="text-muted-foreground">
-          Comprehensive business insights and analysis
-        </p>
+        <h1 className="text-3xl font-bold">Reports & Analytics</h1>
+        <p className="text-muted-foreground">View reports and audit logs</p>
       </div>
 
-      <Tabs defaultValue="sales" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="sales">Sales Reports</TabsTrigger>
-          <TabsTrigger value="inventory">Inventory Reports</TabsTrigger>
-          <TabsTrigger value="suppliers">Supplier Reports</TabsTrigger>
-          <TabsTrigger value="audit">Audit Trail</TabsTrigger>
+      <Tabs value={currentTab} onValueChange={(value) => setSearchParams({ tab: value })}>
+        <TabsList className="w-full justify-start">
+          <TabsTrigger value="reports">Reports</TabsTrigger>
+          <TabsTrigger value="audit">Audit Logs</TabsTrigger>
         </TabsList>
 
-        <Card className="p-6">
-          <TabsContent value="sales" className="mt-0">
-            <SalesReport />
-          </TabsContent>
-          <TabsContent value="inventory" className="mt-0">
-            <InventoryReport />
-          </TabsContent>
-          <TabsContent value="suppliers" className="mt-0">
-            <SupplierReport />
-          </TabsContent>
-          <TabsContent value="audit" className="mt-0">
-            <AuditTrail />
-          </TabsContent>
-        </Card>
+        <TabsContent value="reports">
+          <ErrorBoundary>
+            <Tabs value={reportType} onValueChange={(value) => setSearchParams({ tab: 'reports', type: value })}>
+              <TabsList>
+                <TabsTrigger value="sales">Sales Report</TabsTrigger>
+                <TabsTrigger value="inventory">Inventory Report</TabsTrigger>
+                <TabsTrigger value="suppliers">Suppliers Report</TabsTrigger>
+              </TabsList>
+              <div className="mt-4">
+                {renderReportContent()}
+              </div>
+            </Tabs>
+          </ErrorBoundary>
+        </TabsContent>
+
+        <TabsContent value="audit">
+          <ErrorBoundary>
+            <AuditsPage />
+          </ErrorBoundary>
+        </TabsContent>
       </Tabs>
     </div>
   )

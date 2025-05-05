@@ -17,6 +17,7 @@ import { OrdersPage } from "./pages/orders/OrdersPage"
 import { SuppliersPage } from "./pages/suppliers/SuppliersPage"
 import { ReportsPage } from "./pages/reports/ReportsPage"
 
+
 function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-6">
@@ -75,7 +76,10 @@ export const router = createBrowserRouter([
       { path: "settings", element: <SettingsPage /> },
       { path: "messages", element: <MessagesPage /> },
       { path: "suppliers", element: <SuppliersPage /> },
-      { path: "reports", element: <ReportsPage /> }
+      {
+        path: "reports",
+        element: <ReportsPage />
+      }
     ]
   },
   {
