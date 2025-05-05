@@ -3,20 +3,16 @@ import { Button } from "../ui/Button"
 
 export function HeroSection() {
   return (
-    <section className="relative bg-accent py-28">
+    <section className="relative bg-gradient-to-r from-primary/10 to-primary/5 py-16">
       <div className="container">
-        <div className="max-w-2xl">
-          <h1 className="text-4xl font-bold tracking-tight mb-6">
+        <div className="max-w-2xl space-y-4">
+          <h1 className="text-4xl font-bold tracking-tight">
             Welcome to our Store
           </h1>
-          <p className="text-xl text-muted-foreground mb-8">
-            Discover our amazing products and best deals
+          <p className="text-lg text-muted-foreground">
+            Browse our collection of quality products
           </p>
-          <a href="#products" className="inline-flex">
-            <Button size="lg">
-              Shop Now
-            </Button>
-          </a>
+          <Button size="lg">Shop Now</Button>
         </div>
       </div>
     </section>

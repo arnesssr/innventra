@@ -1,29 +1,41 @@
 import React from "react"
-import { ProductGrid } from "../../components/product/ProductGrid"
 import { HeroSection } from "../../components/layout/HeroSection"
 import { Categories } from "../../components/categories/Categories"
+import { FeaturedSection } from "../../components/featured/FeaturedSection"
+import { ProductGrid } from "../../components/product/ProductGrid"
 
 export function HomePage() {
   return (
-    <div className="space-y-8">
+    <div className="space-y-16">
       {/* Hero Banner */}
       <HeroSection />
 
       {/* Categories */}
-      <section className="container py-12">
-        <h2 className="text-2xl font-bold mb-6">Shop by Category</h2>
+      <section className="container">
+        <div className="flex items-baseline justify-between mb-8">
+          <div>
+            <h2 className="text-2xl font-bold">Shop by Category</h2>
+            <p className="text-muted-foreground mt-1">
+              Browse our collections
+            </p>
+          </div>
+        </div>
         <Categories />
       </section>
 
       {/* Featured Products */}
-      <section className="container py-12">
-        <h2 className="text-2xl font-bold mb-6">Featured Products</h2>
-        <ProductGrid featured />
-      </section>
+      <FeaturedSection />
 
-      {/* All Products */}
-      <section className="container py-12">
-        <h2 className="text-2xl font-bold mb-6">All Products</h2>
+      {/* New Arrivals */}
+      <section className="container">
+        <div className="flex items-baseline justify-between mb-8">
+          <div>
+            <h2 className="text-2xl font-bold">New Arrivals</h2>
+            <p className="text-muted-foreground mt-1">
+              Check out our latest products
+            </p>
+          </div>
+        </div>
         <ProductGrid />
       </section>
     </div>

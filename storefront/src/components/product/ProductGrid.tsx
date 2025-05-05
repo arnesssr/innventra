@@ -1,36 +1,24 @@
-import React from 'react'
-import { useStorefrontProducts } from "../../hooks/useStorefrontProducts"
-import { ProductCard } from "./ProductCard"
+import React from "react"
 
-interface ProductGridProps {
-  featured?: boolean;
-  categoryId?: string;
-}
-
-export function ProductGrid({ featured, categoryId }: ProductGridProps) {
-  const { products } = useStorefrontProducts()
-
-  const filteredProducts = products.filter(product => {
-    if (categoryId && product.category !== categoryId) return false
-    if (featured && !product.featured) return false
-    return true
-  })
-
-  if (filteredProducts.length === 0) {
-    return (
-      <div className="text-center py-12">
-        <p className="text-muted-foreground">No products found</p>
-      </div>
-    )
-  }
+export function ProductGrid({ featured }: { featured?: boolean }) {
+  // Get products from localStorage
+  const products = JSON.parse(localStorage.getItem('storefront_products') || '[]')
+  const filteredProducts = featured ? products.filter((p: any) => p.featured) : products
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-      {filteredProducts.map(product => (
-        <ProductCard 
-          key={product.id} 
-          product={product}
-        />
+      {filteredProducts.map((product: any) => (
+        <div key={product.id} className="rounded-lg border bg-card p-4">
+          <img 
+            src={product.imageUrls[0]} 
+            alt={product.name}
+            className="w-full h-48 object-cover rounded-md"
+          />
+          <div className="mt-4">
+            <h3 className="font-medium">{product.name}</h3>
+            <p className="text-muted-foreground mt-1">${product.price}</p>
+          </div>
+        </div>
       ))}
     </div>
   )
