@@ -1,8 +1,8 @@
 import React from "react"
 import { useCartStore } from "../../store/cartStore"
-import { Card } from "../../components/ui/Card"
-import { Button } from "../../components/ui/Button"
-import { Separator } from "../../components/ui/Separator"
+import { Card } from "../ui/Card"
+import { Button } from "../ui/Button"
+import { Separator } from "../ui/Separator"
 import { Minus, Plus, Trash2 } from "lucide-react"
 
 export function CartDetails() {

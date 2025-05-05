@@ -1,9 +1,9 @@
 import React from 'react'
 import { useStore } from "../../store/useStore"
-import { Card } from "../../components/ui/Card"
+import { Card } from "../ui/Card"
 import { Label } from "../ui/Label"
-import { Checkbox } from "../../components/ui/Checkbox"
-import { Separator } from "../../components/ui/Separator"
+import { Checkbox } from "../ui/Checkbox"
+import { Separator } from "../ui/Separator"
 
 interface CategoryFiltersProps {
   categoryId: string;

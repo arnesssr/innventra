@@ -1,7 +1,7 @@
 import React from "react"
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "../ui/Sheet"
-import { Button } from "../../components/ui/Button"
-import { Separator } from "../../components/ui/Separator"
+import { Button } from "../ui/Button"
+import { Separator } from "../ui/Separator"
 import { useCartStore } from "../../store/cartStore"
 import { Minus, Plus, X } from "lucide-react"
 

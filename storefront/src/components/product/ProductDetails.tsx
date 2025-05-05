@@ -1,9 +1,9 @@
 import React, { useState } from "react"
 import { useStore } from "../../store/useStore"
-import { Button } from "../../components/ui/Button"
-import { Card } from "../../components/ui/Card"
-import { Separator } from "../../components/ui/Separator"
-import { Badge } from "../../components/ui/Badge"
+import { Button } from "../ui/Button"
+import { Card } from "../ui/Card"
+import { Separator } from "../ui/Separator"
+import { Badge } from "../ui/Badge"
 import { ShoppingCart, Heart } from "lucide-react"
 import { useCart } from "../../hooks/useCart"
 
