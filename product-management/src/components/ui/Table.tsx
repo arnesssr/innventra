@@ -1,5 +1,6 @@
 import * as React from "react"
 import { cn } from "../../lib/utils"
+import { ArrowUpDown } from "lucide-react"
 
 const Table = React.forwardRef<HTMLTableElement, React.HTMLAttributes<HTMLTableElement>>(
   ({ className, ...props }, ref) => (
@@ -35,9 +36,30 @@ const TableRow = React.forwardRef<HTMLTableRowElement, React.HTMLAttributes<HTML
 )
 TableRow.displayName = "TableRow"
 
-const TableCell = React.forwardRef<HTMLTableCellElement, React.TdHTMLAttributes<HTMLTableCellElement>>(
-  ({ className, ...props }, ref) => (
-    <td ref={ref} className={cn("p-4 align-middle [&:has([role=checkbox])]:pr-0", className)} {...props} />
+interface TableCellProps extends React.TdHTMLAttributes<HTMLTableCellElement> {
+  sortable?: boolean;
+  onSort?: () => void;
+}
+
+const TableCell = React.forwardRef<HTMLTableCellElement, TableCellProps>(
+  ({ className, sortable, onSort, children, ...props }, ref) => (
+    <td 
+      ref={ref} 
+      className={cn(
+        "p-4 align-middle [&:has([role=checkbox])]:pr-0",
+        sortable && "cursor-pointer",
+        className
+      )} 
+      onClick={sortable ? onSort : undefined}
+      {...props}
+    >
+      {sortable ? (
+        <div className="flex items-center gap-2">
+          {children}
+          <ArrowUpDown className="h-4 w-4" />
+        </div>
+      ) : children}
+    </td>
   )
 )
 TableCell.displayName = "TableCell"

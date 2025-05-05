@@ -18,6 +18,7 @@ import {
 } from "../../../components/ui/dropdown-menu"
 
 import { useState, useEffect } from "react"
+import React from "react"
 
 interface AuditTrailProps {
   defaultSeverity?: AuditSeverity
@@ -43,6 +44,11 @@ export function AuditTrail({ defaultSeverity, defaultType }: AuditTrailProps) {
     resourceType: ''
   })
 
+  const [sortConfig, setSortConfig] = useState<{
+    key: 'timestamp' | 'eventType' | 'userId' | 'severity';
+    direction: 'asc' | 'desc';
+  } | null>(null);
+
   const logs = useStore(state => state.getAuditLogs({
     eventType: filters.eventType === 'all' ? undefined : filters.eventType,
     severity: filters.severity === 'all' ? undefined : filters.severity,
@@ -51,6 +57,20 @@ export function AuditTrail({ defaultSeverity, defaultType }: AuditTrailProps) {
     user: filters.user || undefined,
     resourceType: filters.resourceType || undefined
   }))
+
+  const sortedLogs = React.useMemo(() => {
+    if (!sortConfig) return logs;
+
+    return [...logs].sort((a, b) => {
+      if (a[sortConfig.key] < b[sortConfig.key]) {
+        return sortConfig.direction === 'asc' ? -1 : 1;
+      }
+      if (a[sortConfig.key] > b[sortConfig.key]) {
+        return sortConfig.direction === 'asc' ? 1 : -1;
+      }
+      return 0;
+    });
+  }, [logs, sortConfig]);
 
   useEffect(() => {
     // Subscribe to real-time updates
@@ -97,6 +117,13 @@ export function AuditTrail({ defaultSeverity, defaultType }: AuditTrailProps) {
     // We'll implement this in a follow-up with a modal
     console.log('Add notes for:', log.id)
   }
+
+  const handleSort = (key: typeof sortConfig.key) => {
+    setSortConfig(current => ({
+      key,
+      direction: current?.key === key && current.direction === 'asc' ? 'desc' : 'asc'
+    }));
+  };
 
   // Create event type options array
   const eventTypeOptions = Object.values(EVENT_TYPES)
@@ -175,16 +202,36 @@ export function AuditTrail({ defaultSeverity, defaultType }: AuditTrailProps) {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableCell>Time</TableCell>
-              <TableCell>Event</TableCell>
-              <TableCell>User</TableCell>
+              <TableCell 
+                sortable 
+                onSort={() => handleSort('timestamp')}
+              >
+                Time
+              </TableCell>
+              <TableCell 
+                sortable 
+                onSort={() => handleSort('eventType')}
+              >
+                Event
+              </TableCell>
+              <TableCell 
+                sortable 
+                onSort={() => handleSort('userId')}
+              >
+                User
+              </TableCell>
               <TableCell>Details</TableCell>
-              <TableCell>Severity</TableCell>
+              <TableCell 
+                sortable 
+                onSort={() => handleSort('severity')}
+              >
+                Severity
+              </TableCell>
               <TableCell>Actions</TableCell>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {logs.map(log => (
+            {sortedLogs.map(log => (
               <TableRow key={log.id}>
                 <TableCell>{formatDate(log.timestamp)}</TableCell>
                 <TableCell>{log.eventType}</TableCell>

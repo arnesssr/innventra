@@ -1,5 +1,5 @@
 import { UserButton } from "@clerk/clerk-react"
-import { Bell, Search } from "lucide-react"
+import { Bell, Search, Store } from "lucide-react"
 import { Button } from "../ui/Button"
 import { ThemeToggle } from "../ui/ThemeToggle"
 import { useStore } from "../../store/useStore"
@@ -9,6 +9,12 @@ export function TopBar() {
   const navigate = useNavigate()
   const notifications = useStore(state => state.notifications)
   const unreadCount = notifications?.filter(n => !n.read).length || 0
+
+  const handleStoreClick = () => {
+    // Development environment
+    window.open('http://localhost:5174', '_blank')
+    // For production, would be: window.open('https://store.yourdomain.com', '_blank')
+  }
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-6">
@@ -27,6 +33,16 @@ export function TopBar() {
 
         {/* Right side - Actions */}
         <div className="flex items-center gap-4">
+          {/* Storefront Link Button */}
+          <Button 
+            variant="outline"
+            onClick={handleStoreClick}
+            className="flex items-center gap-2"
+          >
+            <Store className="h-4 w-4" />
+            <span>View Storefront</span>
+          </Button>
+
           <ThemeToggle />
           
           <Button 

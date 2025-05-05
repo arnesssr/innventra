@@ -43,6 +43,8 @@ interface Product {
   archivedAt?: string;
   updatedAt: string;
   createdAt: string;
+  publishedToStorefront: boolean;
+  storefrontUrl?: string;
   [key: string]: any;
 }
 
@@ -208,6 +210,8 @@ interface Store {
     endDate?: Date
   }) => AuditLog[];
   setAuditLogs: (logs: AuditLog[]) => void;
+  publishToStorefront: (productId: string) => Promise<void>;
+  unpublishFromStorefront: (productId: string) => Promise<void>;
 }
 
 const generateSKU = (categoryId: string, name: string, variant?: Record<string, string>) => {
@@ -747,4 +751,46 @@ export const useStore = create<Store>((set, get) => ({
   },
 
   setAuditLogs: (logs) => set({ auditLogs: logs }),
+
+  publishToStorefront: async (productId: string) => {
+    const product = get().products.find(p => p.id === productId);
+    if (!product || product.status !== 'published') return;
+
+    await storefrontService.publishProduct({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      description: product.description,
+      imageUrls: product.imageUrls,
+      category: product.category,
+      stock: product.stock
+    });
+
+    set(state => ({
+      products: state.products.map(p => 
+        p.id === productId 
+          ? { ...p, publishedToStorefront: true }
+          : p
+      )
+    }));
+
+    // Log the action
+    await AuditService.logAction(
+      'product.publish_to_storefront',
+      get().currentUser?.id,
+      `Published product ${product.name} to storefront`,
+      { severity: 'info', metadata: { productId } }
+    );
+  },
+
+  unpublishFromStorefront: async (productId: string) => {
+    await storefrontService.unpublishProduct(productId);
+    set(state => ({
+      products: state.products.map(p => 
+        p.id === productId 
+          ? { ...p, publishedToStorefront: false }
+          : p
+      )
+    }));
+  },
 }))
