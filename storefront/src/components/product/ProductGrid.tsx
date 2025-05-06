@@ -1,9 +1,16 @@
 import React from "react"
 
-export function ProductGrid({ featured }: { featured?: boolean }) {
+interface ProductGridProps {
+  featured?: boolean;
+  category?: string;  // Add category prop
+}
+
+export function ProductGrid({ featured, category }: ProductGridProps) {
   // Get products from localStorage
   const products = JSON.parse(localStorage.getItem('storefront_products') || '[]')
-  const filteredProducts = featured ? products.filter((p: any) => p.featured) : products
+  const filteredProducts = featured 
+    ? products.filter((p: any) => p.featured) 
+    : products.filter((p: any) => category ? p.category === category : true)
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">

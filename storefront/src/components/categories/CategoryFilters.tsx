@@ -13,7 +13,6 @@ export function CategoryFilters({ categoryId }: CategoryFiltersProps) {
     state.categories.find(c => c.id === categoryId)
   )
   if (!category) return null
-  if (!category) return null
   return (
     <Card className="p-4 space-y-4">
       <div>

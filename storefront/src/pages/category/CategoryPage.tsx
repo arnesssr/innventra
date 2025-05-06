@@ -13,7 +13,7 @@ export function CategoryPage() {
           <CategoryFilters categoryId={id!} />
         </aside>
         <main className="lg:col-span-3">
-          <ProductGrid categoryId={id!} />
+          <ProductGrid featured={false} category={id} />
         </main>
       </div>
     </div>
