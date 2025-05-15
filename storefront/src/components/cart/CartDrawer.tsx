@@ -3,6 +3,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "../ui/Sheet"
 import { Button } from "../ui/Button"
 import { Separator } from "../ui/Separator"
 import { useCartStore } from "../../store/cartStore"
+import { useNavigate } from "react-router-dom"
 import { Minus, Plus, X } from "lucide-react"
 
 interface CartDrawerProps {
@@ -12,6 +13,12 @@ interface CartDrawerProps {
 
 export function CartDrawer({ open, onClose }: CartDrawerProps) {
   const { items, removeFromCart, updateQuantity, getTotal } = useCartStore()
+  const navigate = useNavigate()
+
+  const handleCheckout = () => {
+    onClose()
+    navigate('/checkout')
+  }
 
   return (
     <Sheet open={open} onOpenChange={onClose}>
@@ -68,7 +75,10 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
                 <span>Total</span>
                 <span>${getTotal().toFixed(2)}</span>
               </div>
-              <Button className="w-full">
+              <Button 
+                className="w-full bg-gradient-to-r from-orange-500 to-red-500"
+                onClick={handleCheckout}
+              >
                 Proceed to Checkout
               </Button>
             </>

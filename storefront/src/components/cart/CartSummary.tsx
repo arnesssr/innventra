@@ -13,6 +13,10 @@ export function CartSummary() {
   const tax = subtotal * 0.1 // 10% tax
   const total = subtotal + tax
 
+  const handleCheckout = () => {
+    navigate('/checkout')
+  }
+
   return (
     <Card className="p-6">
       <h3 className="font-semibold mb-4">Order Summary</h3>
@@ -31,8 +35,8 @@ export function CartSummary() {
           <span>${total.toFixed(2)}</span>
         </div>
         <Button 
-          className="w-full"
-          onClick={() => navigate("/checkout")}
+          className="w-full bg-gradient-to-r from-orange-500 to-red-500"
+          onClick={handleCheckout}
           disabled={items.length === 0}
         >
           Proceed to Checkout

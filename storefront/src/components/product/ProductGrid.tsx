@@ -1,31 +1,68 @@
 import React from "react"
+import { ProductCard } from "./ProductCard"
+import { cn } from "../../lib/utils"
 
-interface ProductGridProps {
-  featured?: boolean;
-  category?: string;  // Add category prop
+// Update Product interface to match what's used throughout the app
+interface Product {
+  id: string
+  name: string
+  price: number
+  description: string
+  imageUrls: string[]
+  category: string
+  originalPrice?: number
+  isNew?: boolean
 }
 
-export function ProductGrid({ featured, category }: ProductGridProps) {
-  // Get products from localStorage
-  const products = JSON.parse(localStorage.getItem('storefront_products') || '[]')
-  const filteredProducts = featured 
-    ? products.filter((p: any) => p.featured) 
-    : products.filter((p: any) => category ? p.category === category : true)
+interface ProductGridProps {
+  products?: Product[]
+  columns?: 2 | 3 | 4
+  isLoading?: boolean
+  latest?: boolean  // Add this prop
+  onProductClick?: (id: string) => void | Promise<void>  // Add this prop
+}
+
+export function ProductGrid({ 
+  products = [], 
+  columns = 4, 
+  isLoading = false,
+  latest = false,  // Add default value
+  onProductClick 
+}: ProductGridProps) {
+  if (isLoading) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-muted-foreground">Loading products...</p>
+      </div>
+    )
+  }
+
+  // If latest is true, only show the most recent products
+  const displayProducts = latest ? products.slice(0, 4) : products
+
+  if (!displayProducts.length) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-muted-foreground">No products found</p>
+      </div>
+    )
+  }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-      {filteredProducts.map((product: any) => (
-        <div key={product.id} className="rounded-lg border bg-card p-4">
-          <img 
-            src={product.imageUrls[0]} 
-            alt={product.name}
-            className="w-full h-48 object-cover rounded-md"
-          />
-          <div className="mt-4">
-            <h3 className="font-medium">{product.name}</h3>
-            <p className="text-muted-foreground mt-1">${product.price}</p>
-          </div>
-        </div>
+    <div className={cn(
+      "grid gap-4",
+      {
+        'grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4': columns === 4,
+        'grid-cols-1 sm:grid-cols-2 md:grid-cols-3': columns === 3,
+        'grid-cols-1 sm:grid-cols-2': columns === 2
+      }
+    )}>
+      {displayProducts.map((product) => (
+        <ProductCard 
+          key={product.id} 
+          product={product}
+          onClick={() => onProductClick?.(product.id)}
+        />
       ))}
     </div>
   )
