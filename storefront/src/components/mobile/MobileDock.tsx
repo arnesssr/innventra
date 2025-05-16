@@ -1,13 +1,20 @@
 import { motion, useMotionValue, useSpring } from "framer-motion"
 import { Home, ShoppingBag, Heart, User, LayoutGrid, MessageSquare } from "lucide-react"
 import { Link, useLocation } from "react-router-dom"
-import { useCartStore } from "../../store/cartStore"
+import { useCartStore, CartItem } from "../../store/cartStore"
 
-const items = [
+interface DockItem {
+  icon: React.ElementType;
+  label: string;
+  href: string;
+  badge?: (cartItems: CartItem[]) => number;
+}
+
+const items: DockItem[] = [
   { icon: Home, label: "Home", href: "/" },
   { icon: LayoutGrid, label: "Categories", href: "/categories" },
-  { icon: MessageSquare, label: "Messages", href: "/messages", badge: "73" },
-  { icon: ShoppingBag, label: "Cart", href: "/cart", badge: "60" },
+  { icon: Heart, label: "Favorites", href: "/favorites" },
+  { icon: ShoppingBag, label: "Cart", href: "/cart", badge: (cartItems: CartItem[]) => cartItems.length },
   { icon: User, label: "Account", href: "/account" }
 ]
 
@@ -26,7 +33,7 @@ export function MobileDock() {
             label={item.label}
             href={item.href}
             active={location.pathname === item.href}
-            badge={item.badge || (item.label === "Cart" ? cartItems.length : undefined)}
+            badge={typeof item.badge === 'function' ? item.badge(cartItems) : (item.label === "Cart" ? cartItems.length : undefined)}
           />
         ))}
       </motion.div>
