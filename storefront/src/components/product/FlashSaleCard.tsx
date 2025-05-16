@@ -12,32 +12,24 @@ interface FlashSaleCardProps {
 
 export function FlashSaleCard({ product }: FlashSaleCardProps) {
   const navigate = useNavigate()
-  const discount = product.originalPrice 
-    ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
-    : 0
-
+  
   return (
     <div 
       onClick={() => navigate(`/product/${product.id}`)}
-      className="w-[100px] bg-white rounded-md overflow-hidden cursor-pointer"
+      className="w-[60px] h-[60px] relative rounded-sm overflow-hidden bg-white"
     >
-      <div className="relative aspect-square">
-        <img 
-          src={product.imageUrls[0]} 
-          alt={product.name}
-          className="w-full h-full object-cover"
-        />
-        {discount > 0 && (
-          <div className="absolute top-0 left-0 bg-red-500 text-white text-[10px] px-1">
-            -{discount}%
-          </div>
-        )}
-      </div>
-      <div className="p-1">
-        <p className="text-red-500 text-[11px] font-semibold">
-          ${product.price.toFixed(2)}
-        </p>
-      </div>
+      <img 
+        src={product.imageUrls[0]} 
+        alt={product.name}
+        className="w-full h-full object-cover"
+      />
+      {product.originalPrice && (
+        <div className="absolute bottom-0 left-0 right-0 bg-red-500/90 py-[1px]">
+          <span className="text-[8px] text-white font-medium block text-center">
+            -{Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}%
+          </span>
+        </div>
+      )}
     </div>
   )
 }

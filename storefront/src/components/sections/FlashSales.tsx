@@ -25,12 +25,12 @@ export function FlashSales({ endTime, products }: FlashSalesProps) {
           
           <div 
             ref={scrollContainerRef}
-            className="overflow-x-auto flex gap-3 pb-3 px-3 no-scrollbar snap-x snap-mandatory"
+            className="overflow-x-auto flex gap-1.5 pb-2 px-2 no-scrollbar"
           >
-            {products.slice(0, 15).map((product) => (
+            {products.slice(0, 20).map((product) => (
               <div 
                 key={product.id} 
-                className="flex-shrink-0 w-[calc(25vw-16px)] min-w-[90px] max-w-[120px] snap-start"
+                className="flex-shrink-0 w-[60px] md:w-[120px] h-[60px] md:h-[120px]" 
               >
                 <FlashSaleCard product={product} />
               </div>
