@@ -14,7 +14,7 @@ export function FlashSales({ endTime, products }: FlashSalesProps) {
   return (
     <section className="w-screen -ml-[calc(50vw-50%)] relative py-2">
       <div className="w-full bg-gradient-to-r from-orange-500 to-red-500 md:mx-4 md:rounded-xl">
-        <div className="container">
+        <div className="container px-0"> {/* Remove default container padding */}
           <div className="flex items-center justify-between p-2">
             <div className="flex items-center gap-1">
               <Zap className="w-4 h-4 text-white" fill="white" />
@@ -25,12 +25,12 @@ export function FlashSales({ endTime, products }: FlashSalesProps) {
           
           <div 
             ref={scrollContainerRef}
-            className="overflow-x-auto flex gap-1.5 pb-2 px-2 no-scrollbar"
+            className="overflow-x-auto flex gap-2 pb-2 px-2 no-scrollbar touch-pan-x snap-x snap-mandatory"
           >
             {products.slice(0, 20).map((product) => (
               <div 
                 key={product.id} 
-                className="flex-shrink-0 w-[60px] md:w-[120px] h-[60px] md:h-[120px]" 
+                className="flex-shrink-0 w-[60px] snap-start first:ml-2 last:mr-2" 
               >
                 <FlashSaleCard product={product} />
               </div>
