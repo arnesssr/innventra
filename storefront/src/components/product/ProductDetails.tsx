@@ -6,6 +6,7 @@ import { Separator } from "../ui/Separator"
 import { Badge } from "../ui/Badge"
 import { ShoppingCart, Heart } from "lucide-react"
 import { useCart } from "../../hooks/useCart"
+import { Product } from "../../types/product"
 
 interface ProductDetailsProps {
   productId: string
@@ -16,16 +17,26 @@ export function ProductDetails({ productId }: ProductDetailsProps) {
   const { addToCart } = useCart()
   
   const product = useStore(state => 
-    state.products.find(p => p.id === productId && p.status === 'published')
+    state.products.find(p => p.id === productId)
   )
+
+  const handleAddToCart = () => {
+    if (!product) return
+    
+    addToCart({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      quantity: 1,
+      imageUrl: product.imageUrls[0]
+    })
+  }
 
   if (!product) {
     return (
-      <Card className="p-6">
-        <div className="text-center text-muted-foreground">
-          Product not found or unavailable
-        </div>
-      </Card>
+      <div className="text-center py-8">
+        <p className="text-muted-foreground">Product not found</p>
+      </div>
     )
   }
 
@@ -76,7 +87,7 @@ export function ProductDetails({ productId }: ProductDetailsProps) {
           <Button 
             className="w-full"
             size="lg"
-            onClick={() => addToCart(product.id)}
+            onClick={handleAddToCart}
           >
             <ShoppingCart className="mr-2 h-5 w-5" />
             Add to Cart

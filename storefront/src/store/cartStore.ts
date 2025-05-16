@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 
-interface CartItem {
+export interface CartItem {
   id: string
   name: string
   price: number
@@ -10,61 +10,59 @@ interface CartItem {
 
 interface CartStore {
   items: CartItem[]
-  addToCart: (product: CartItem) => void
-  removeFromCart: (productId: string) => void
-  updateQuantity: (productId: string, quantity: number) => void
+  addToCart: (item: CartItem) => void
+  removeFromCart: (id: string) => void
+  updateQuantity: (id: string, quantity: number) => void
+  clearCart: () => void
   getTotal: () => number
   applyPromoCode: (code: string) => Promise<boolean>
 }
 
 export const useCartStore = create<CartStore>((set, get) => ({
   items: [],
-  
-  addToCart: (product) => {
+  addToCart: (item) => {
     set((state) => {
-      const existingItem = state.items.find(item => item.id === product.id)
+      const existingItem = state.items.find(cartItem => cartItem.id === item.id)
       
       if (existingItem) {
         return {
-          items: state.items.map(item =>
-            item.id === product.id
-              ? { ...item, quantity: item.quantity + 1 }
-              : item
+          items: state.items.map(cartItem =>
+            cartItem.id === item.id
+              ? { ...cartItem, quantity: cartItem.quantity + 1 }
+              : cartItem
           )
         }
       }
       
       return {
-        items: [...state.items, { ...product, quantity: 1 }]
+        items: [...state.items, { ...item, quantity: 1 }]
       }
     })
   },
-
-  removeFromCart: (productId) => {
+  removeFromCart: (id) => {
     set((state) => ({
-      items: state.items.filter(item => item.id !== productId)
+      items: state.items.filter(item => item.id !== id)
     }))
   },
-
-  updateQuantity: (productId, quantity) => {
+  updateQuantity: (id, quantity) => {
     set((state) => ({
       items: state.items.map(item =>
-        item.id === productId
+        item.id === id
           ? { ...item, quantity }
           : item
       ).filter(item => item.quantity > 0)
     }))
   },
-
+  clearCart: () => set({ items: [] }),
   getTotal: () => {
     const state = get()
     return state.items.reduce((total, item) => total + (item.price * item.quantity), 0)
   },
-
   applyPromoCode: async (code: string) => {
-    // Mock promo code validation
-    if (code === 'DISCOUNT10') {
-      // Apply 10% discount logic here
+    // Mock implementation - replace with actual promo code logic
+    const isValid = code.length > 0
+    if (isValid) {
+      // Apply discount logic here
       return true
     }
     return false
