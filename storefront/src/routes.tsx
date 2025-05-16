@@ -8,6 +8,8 @@ import { CartPage } from './pages/cart/CartPage'
 import { CheckoutPage } from './pages/checkout/CheckoutPage'
 import { OrdersPage } from './pages/orders/OrdersPage'
 import { AccountPage } from './pages/account/AccountPage'
+import { FavoritesPage } from './pages/favorites/FavoritesPage'
+import { MobileCategories } from './components/mobile/MobileCategories'
 
 export function StoreRoutes() {
   return (
@@ -19,7 +21,9 @@ export function StoreRoutes() {
         <Route path="/cart" element={<CartPage />} />
         <Route path="/checkout" element={<CheckoutPage />} />
         <Route path="/orders" element={<OrdersPage />} />
+        <Route path="/favorites" element={<FavoritesPage />} />
         <Route path="/account/*" element={<AccountPage />} />
+        <Route path="/categories" element={<MobileCategories />} />
       </Route>
     </Routes>
   )

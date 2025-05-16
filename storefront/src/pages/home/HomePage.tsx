@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom"
 import { useCartStore } from "../../store/cartStore"
 import { ProductCard } from "../../components/product/ProductCard"
 import { Card } from "../../components/ui/Card"
+import { FlashSales } from "../../components/sections/FlashSales"
 
 // Transform category config into grid format
 const categories = Object.entries(CATEGORY_CONFIG).map(([id, config]) => ({
@@ -43,15 +44,68 @@ const featuredProducts = [
   // Add more mock products...
 ]
 
+// Add mock flash sale products
+const flashSaleProducts = [
+  {
+    id: "1",
+    name: "NIV Study Bible",
+    price: 29.99,
+    originalPrice: 49.99,
+    imageUrls: ["https://via.placeholder.com/200?text=Bible1"],
+    category: "bibles",
+  },
+  {
+    id: "2",
+    name: "Daily Devotional",
+    price: 14.99,
+    originalPrice: 24.99,
+    imageUrls: ["https://via.placeholder.com/200?text=Book1"],
+    category: "books",
+  },
+  {
+    id: "3",
+    name: "Cross Necklace",
+    price: 19.99,
+    originalPrice: 39.99,
+    imageUrls: ["https://via.placeholder.com/200?text=Gift1"],
+    category: "gifts",
+  },
+  {
+    id: "4",
+    name: "Prayer Journal",
+    price: 9.99,
+    originalPrice: 19.99,
+    imageUrls: ["https://via.placeholder.com/200?text=Book2"],
+    category: "books",
+  },
+  {
+    id: "5",
+    name: "Christian Art Print",
+    price: 24.99,
+    originalPrice: 44.99,
+    imageUrls: ["https://via.placeholder.com/200?text=Art1"],
+    category: "gifts",
+  },
+]
+
 export function HomePage() {
   const [isCartOpen, setIsCartOpen] = useState(false)
   const navigate = useNavigate()
   const { addToCart } = useCartStore()
 
+  // Set flash sale end time to 24 hours from now
+  const flashSaleEnd = new Date(Date.now() + 24 * 60 * 60 * 1000)
+
   return (
     <div className="space-y-16">
       {/* Hero Section */}
       <HeroSection />
+
+      {/* Flash Sales Section */}
+      <FlashSales
+        endTime={flashSaleEnd}
+        products={flashSaleProducts}
+      />
 
       {/* Categories */}
       <section className="container">
