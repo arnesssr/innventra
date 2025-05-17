@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { db } from '../config/database';
 import { auth } from '../middleware/auth';
+import rateLimit from 'express-rate-limit';
 
 const router = Router();
 
@@ -13,7 +14,13 @@ router.get('/', async (req, res) => {
   }
 });
 
-router.post('/', auth, async (req, res) => {
+const postRateLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per windowMs
+  message: { error: 'Too many requests, please try again later.' },
+});
+
+router.post('/', auth, postRateLimiter, async (req, res) => {
   try {
     const { name, price, description, category, imageUrls } = req.body;
     const { rows } = await db.query(
